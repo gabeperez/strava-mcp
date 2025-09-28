@@ -1,0 +1,20 @@
+{
+	"name": "strava-mcp-oauth",
+	"main": "src/index.ts",
+	"compatibility_date": "2024-11-06",
+	"compatibility_flags": [
+		"global_fetch_strictly_public"
+	],
+	"kv_namespaces": [
+		{
+			"binding": "STRAVA_SESSIONS",
+			"id": "25472761404c4f98a37a8ece07550458"
+		}
+	],
+	"vars": {
+		"STRAVA_REDIRECT_URI": "https://strava-mcp-oauth.perez-jg22.workers.dev/callback"
+	},
+	"observability": {
+		"enabled": true
+	}
+}

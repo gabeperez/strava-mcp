@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strava MCP Server - Connect Your AI to Strava</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #FC4C02 0%, #FF7B00 100%);
+        }
+        .feature-card {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .hero-pattern {
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 123, 0, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(252, 76, 2, 0.3) 0%, transparent 50%);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+    <!-- Navigation -->
+    <nav class="relative z-10 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 gradient-bg rounded-lg flex items-center justify-center">
+                    <i class="fas fa-running text-white text-xl"></i>
+                </div>
+                <span class="text-xl font-bold">Strava MCP Server</span>
+            </div>
+            <a href="/auth" class="bg-orange-500 hover:bg-orange-600 px-6 py-2 rounded-lg font-semibold transition-colors">
+                Get Started
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative min-h-screen hero-pattern overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-gray-900/90 via-gray-900/80 to-gray-900/90"></div>
+        
+        <div class="relative z-10 max-w-7xl mx-auto px-6 pt-20 pb-32">
+            <div class="text-center max-w-4xl mx-auto">
+                <h1 class="text-5xl md:text-7xl font-bold mb-8 bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">
+                    Connect Your AI to Strava
+                </h1>
+                <p class="text-xl md:text-2xl text-gray-300 mb-12 leading-relaxed">
+                    Get your personal MCP server URL to unlock powerful Strava integration with AI assistants like 
+                    <span class="text-orange-400 font-semibold">Poke.com</span>, 
+                    <span class="text-orange-400 font-semibold">Claude Desktop</span>, and more.
+                </p>
+                
+                <div class="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
+                    <a href="/auth" class="group relative overflow-hidden bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-4 px-8 rounded-xl text-lg transition-all duration-300 transform hover:scale-105 shadow-xl">
+                        <span class="relative z-10 flex items-center">
+                            <i class="fab fa-strava mr-3"></i>
+                            Connect with Strava
+                        </span>
+                        <div class="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                    </a>
+                    
+                    <div class="text-gray-400 flex items-center">
+                        <i class="fas fa-shield-alt mr-2"></i>
+                        Secure OAuth Authentication
+                    </div>
+                </div>
+
+                <!-- Demo Video/Image Placeholder -->
+                <div class="relative max-w-4xl mx-auto">
+                    <div class="bg-gray-800 rounded-2xl p-8 shadow-2xl border border-gray-700">
+                        <div class="bg-gray-900 rounded-lg p-6 font-mono text-sm text-left">
+                            <div class="flex items-center mb-4 text-gray-400">
+                                <div class="flex space-x-2">
+                                    <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                                    <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                                    <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                                </div>
+                                <span class="ml-4">AI Assistant - Poke.com</span>
+                            </div>
+                            <div class="space-y-2 text-gray-300">
+                                <div><span class="text-blue-400">You:</span> Show me my recent Strava activities</div>
+                                <div><span class="text-green-400">AI:</span> I found your recent activities! Here are your last 5 workouts:</div>
+                                <div class="ml-4 text-gray-400">
+                                    • Evening Run - 5.2 miles, 7:45 pace<br>
+                                    • Morning Bike Ride - 25 miles, 285W avg<br>
+                                    • Trail Run - 8.1 miles, varied terrain
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-24 bg-gray-800">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-6">Why Choose Our MCP Server?</h2>
+                <p class="text-xl text-gray-400">Everything you need for seamless AI-Strava integration</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="feature-card rounded-2xl p-8 text-center">
+                    <div class="w-16 h-16 gradient-bg rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-link text-2xl text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">Personal MCP URL</h3>
+                    <p class="text-gray-300">Get your unique, secure MCP server URL that works with any AI assistant supporting the Model Context Protocol.</p>
+                </div>
+
+                <div class="feature-card rounded-2xl p-8 text-center">
+                    <div class="w-16 h-16 gradient-bg rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-sync-alt text-2xl text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">Auto Token Refresh</h3>
+                    <p class="text-gray-300">Never worry about expired tokens. Our system automatically refreshes your Strava authentication in the background.</p>
+                </div>
+
+                <div class="feature-card rounded-2xl p-8 text-center">
+                    <div class="w-16 h-16 gradient-bg rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-shield-alt text-2xl text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">Secure & Private</h3>
+                    <p class="text-gray-300">Your data stays private. We only access what you authorize and never store sensitive information permanently.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Supported Clients -->
+    <section class="py-24 bg-gray-900">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <h2 class="text-4xl font-bold mb-12">Works With Your Favorite AI Assistants</h2>
+            
+            <div class="grid md:grid-cols-4 gap-8">
+                <div class="bg-gray-800 rounded-xl p-6 hover:bg-gray-700 transition-colors">
+                    <div class="text-3xl mb-4">🔍</div>
+                    <h3 class="font-bold mb-2">Poke.com</h3>
+                    <p class="text-gray-400 text-sm">Popular AI assistant with MCP support</p>
+                </div>
+                
+                <div class="bg-gray-800 rounded-xl p-6 hover:bg-gray-700 transition-colors">
+                    <div class="text-3xl mb-4">💬</div>
+                    <h3 class="font-bold mb-2">Claude Desktop</h3>
+                    <p class="text-gray-400 text-sm">Anthropic's desktop AI assistant</p>
+                </div>
+                
+                <div class="bg-gray-800 rounded-xl p-6 hover:bg-gray-700 transition-colors">
+                    <div class="text-3xl mb-4">🤖</div>
+                    <h3 class="font-bold mb-2">Custom Clients</h3>
+                    <p class="text-gray-400 text-sm">Any MCP-compatible application</p>
+                </div>
+                
+                <div class="bg-gray-800 rounded-xl p-6 hover:bg-gray-700 transition-colors">
+                    <div class="text-3xl mb-4">⚡</div>
+                    <h3 class="font-bold mb-2">Future Clients</h3>
+                    <p class="text-gray-400 text-sm">Ready for new MCP implementations</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-24 gradient-bg">
+        <div class="max-w-4xl mx-auto text-center px-6">
+            <h2 class="text-4xl font-bold mb-6">Ready to Get Started?</h2>
+            <p class="text-xl mb-8 text-orange-100">
+                Connect your Strava account and get your personal MCP URL in under 30 seconds.
+            </p>
+            
+            <a href="/auth" class="inline-block bg-white text-orange-600 hover:text-orange-700 font-bold py-4 px-8 rounded-xl text-lg transition-colors shadow-xl hover:shadow-2xl transform hover:scale-105">
+                <i class="fab fa-strava mr-3"></i>
+                Get Your MCP URL Now
+            </a>
+            
+            <div class="mt-8 text-orange-200 text-sm">
+                <i class="fas fa-lock mr-2"></i>
+                Secure authentication via Strava OAuth
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-950 py-12">
+        <div class="max-w-7xl mx-auto px-6 text-center text-gray-400">
+            <div class="flex items-center justify-center space-x-3 mb-6">
+                <div class="w-8 h-8 gradient-bg rounded-lg flex items-center justify-center">
+                    <i class="fas fa-running text-white"></i>
+                </div>
+                <span class="font-bold">Strava MCP Server</span>
+            </div>
+            
+            <p class="mb-4">
+                Powered by Cloudflare Workers • Built for the Model Context Protocol
+            </p>
+            
+            <div class="flex justify-center space-x-6 text-sm">
+                <a href="https://github.com/r-huijts/strava-mcp" class="hover:text-orange-400 transition-colors">
+                    <i class="fab fa-github mr-2"></i>Original Project
+                </a>
+                <a href="/status" class="hover:text-orange-400 transition-colors">
+                    <i class="fas fa-server mr-2"></i>Server Status
+                </a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Strava MCP Server</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #FC4C02 0%, #FF7B00 100%);
+        }
+        .card {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .copy-success {
+            animation: copySuccess 2s ease-out;
+        }
+        @keyframes copySuccess {
+            0% { opacity: 0; transform: translateY(-10px); }
+            20% { opacity: 1; transform: translateY(0); }
+            80% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-gray-800 border-b border-gray-700">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 gradient-bg rounded-lg flex items-center justify-center">
+                        <i class="fas fa-running text-white text-xl"></i>
+                    </div>
+                    <span class="text-xl font-bold">Strava MCP Server</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-gray-300">Welcome back!</span>
+                    <form action="/logout" method="post" class="inline">
+                        <button type="submit" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-6 py-8">
+        <!-- Welcome Section -->
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold mb-4 bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">
+                Your Strava MCP Dashboard
+            </h1>
+            <p class="text-xl text-gray-400">
+                Everything you need to connect AI assistants to your Strava data
+            </p>
+        </div>
+
+        <!-- Profile & MCP URL Section -->
+        <div class="grid lg:grid-cols-3 gap-8 mb-8">
+            <!-- Profile Card -->
+            <div class="card rounded-2xl p-6">
+                <div class="flex items-center space-x-4 mb-6">
+                    <div class="w-16 h-16 rounded-full overflow-hidden bg-gray-700">
+                        {{#if profile.profile_medium}}
+                            <img src="{{profile.profile_medium}}" alt="Profile" class="w-full h-full object-cover">
+                        {{else}}
+                            <div class="w-full h-full flex items-center justify-center">
+                                <i class="fas fa-user text-2xl text-gray-400"></i>
+                            </div>
+                        {{/if}}
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold">{{profile.firstname}} {{profile.lastname}}</h2>
+                        <p class="text-orange-400">@{{profile.username}}</p>
+                    </div>
+                </div>
+                
+                <div class="space-y-3 text-sm">
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Location:</span>
+                        <span>{{#if profile.city}}{{profile.city}}, {{profile.state}}{{else}}Not set{{/if}}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Athlete Type:</span>
+                        <span class="capitalize">{{profile.athlete_type}}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Member Since:</span>
+                        <span>{{created_at}}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MCP URL Card -->
+            <div class="lg:col-span-2 card rounded-2xl p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold flex items-center">
+                        <i class="fas fa-link text-orange-400 mr-3"></i>
+                        Your Personal MCP URL
+                    </h2>
+                    <div class="bg-green-500 text-green-100 px-3 py-1 rounded-full text-sm font-semibold">
+                        <i class="fas fa-check-circle mr-1"></i>Active
+                    </div>
+                </div>
+
+                <p class="text-gray-300 mb-6">
+                    Use this URL in your AI assistant to access your Strava data. This URL is unique to you and stays active as long as your account is connected.
+                </p>
+
+                <div class="bg-gray-800 rounded-lg p-4 mb-6">
+                    <div class="flex items-center justify-between">
+                        <code class="text-orange-400 font-mono text-sm break-all">
+                            {{mcp_url}}
+                        </code>
+                        <button 
+                            onclick="copyToClipboard('{{mcp_url}}')" 
+                            class="ml-4 bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex-shrink-0"
+                        >
+                            <i class="fas fa-copy mr-2"></i>Copy
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quick Setup Instructions -->
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-gray-800/50 rounded-lg p-4">
+                        <h3 class="font-bold mb-2 text-orange-400">
+                            <i class="fas fa-search mr-2"></i>For Poke.com
+                        </h3>
+                        <ol class="text-sm text-gray-300 space-y-1">
+                            <li>1. Add new MCP server</li>
+                            <li>2. Paste your URL above</li>
+                            <li>3. Save and start chatting!</li>
+                        </ol>
+                    </div>
+                    
+                    <div class="bg-gray-800/50 rounded-lg p-4">
+                        <h3 class="font-bold mb-2 text-orange-400">
+                            <i class="fas fa-desktop mr-2"></i>For Claude Desktop
+                        </h3>
+                        <ol class="text-sm text-gray-300 space-y-1">
+                            <li>1. Open config file</li>
+                            <li>2. Add server entry</li>
+                            <li>3. Use URL as endpoint</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats & Activity Overview -->
+        <div class="grid lg:grid-cols-4 gap-6 mb-8">
+            <!-- Quick Stats -->
+            <div class="card rounded-xl p-6 text-center">
+                <div class="text-3xl text-orange-400 mb-2">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3 class="text-2xl font-bold">{{stats.recent_run_totals.count}}</h3>
+                <p class="text-gray-400">Recent Runs</p>
+            </div>
+
+            <div class="card rounded-xl p-6 text-center">
+                <div class="text-3xl text-orange-400 mb-2">
+                    <i class="fas fa-biking"></i>
+                </div>
+                <h3 class="text-2xl font-bold">{{stats.recent_ride_totals.count}}</h3>
+                <p class="text-gray-400">Recent Rides</p>
+            </div>
+
+            <div class="card rounded-xl p-6 text-center">
+                <div class="text-3xl text-orange-400 mb-2">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h3 class="text-2xl font-bold">{{total_time}}</h3>
+                <p class="text-gray-400">Total Time</p>
+            </div>
+
+            <div class="card rounded-xl p-6 text-center">
+                <div class="text-3xl text-orange-400 mb-2">
+                    <i class="fas fa-route"></i>
+                </div>
+                <h3 class="text-2xl font-bold">{{total_distance}}</h3>
+                <p class="text-gray-400">Total Distance</p>
+            </div>
+        </div>
+
+        <!-- Recent Activities -->
+        <div class="card rounded-2xl p-6 mb-8">
+            <h2 class="text-2xl font-bold mb-6 flex items-center">
+                <i class="fas fa-list text-orange-400 mr-3"></i>
+                Recent Activities
+            </h2>
+            
+            {{#if recent_activities}}
+                <div class="space-y-4">
+                    {{#each recent_activities}}
+                    <div class="bg-gray-800/50 rounded-lg p-4 flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <div class="text-2xl">
+                                {{#if (eq sport_type "Run")}}🏃{{/if}}
+                                {{#if (eq sport_type "Ride")}}🚴{{/if}}
+                                {{#if (eq sport_type "Swim")}}🏊{{/if}}
+                                {{#if (not (or (eq sport_type "Run") (eq sport_type "Ride") (eq sport_type "Swim")))}}⚡{{/if}}
+                            </div>
+                            <div>
+                                <h3 class="font-semibold">{{name}}</h3>
+                                <div class="text-sm text-gray-400">
+                                    <span class="mr-4">
+                                        <i class="fas fa-calendar mr-1"></i>{{start_date_local}}
+                                    </span>
+                                    <span class="mr-4">
+                                        <i class="fas fa-route mr-1"></i>{{distance}}km
+                                    </span>
+                                    <span>
+                                        <i class="fas fa-clock mr-1"></i>{{moving_time}}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-right text-sm text-gray-400">
+                            {{sport_type}}
+                        </div>
+                    </div>
+                    {{/each}}
+                </div>
+            {{else}}
+                <div class="text-center py-8 text-gray-400">
+                    <i class="fas fa-running text-4xl mb-4"></i>
+                    <p>No recent activities found</p>
+                    <p class="text-sm">Go get moving! 🏃‍♂️</p>
+                </div>
+            {{/if}}
+        </div>
+
+        <!-- API Usage & Tools -->
+        <div class="grid lg:grid-cols-2 gap-8">
+            <!-- Available Tools -->
+            <div class="card rounded-2xl p-6">
+                <h2 class="text-2xl font-bold mb-6 flex items-center">
+                    <i class="fas fa-tools text-orange-400 mr-3"></i>
+                    Available MCP Tools
+                </h2>
+                
+                <div class="space-y-3">
+                    <div class="bg-gray-800/30 rounded-lg p-3">
+                        <h3 class="font-semibold text-sm">get-recent-activities</h3>
+                        <p class="text-xs text-gray-400">Fetch your recent Strava activities</p>
+                    </div>
+                    <div class="bg-gray-800/30 rounded-lg p-3">
+                        <h3 class="font-semibold text-sm">get-athlete-profile</h3>
+                        <p class="text-xs text-gray-400">Get your athlete profile information</p>
+                    </div>
+                    <div class="bg-gray-800/30 rounded-lg p-3">
+                        <h3 class="font-semibold text-sm">get-activity-details</h3>
+                        <p class="text-xs text-gray-400">Get detailed info about specific activities</p>
+                    </div>
+                    <div class="bg-gray-800/30 rounded-lg p-3">
+                        <h3 class="font-semibold text-sm">get-activity-streams</h3>
+                        <p class="text-xs text-gray-400">Access time-series data (GPS, heart rate, etc.)</p>
+                    </div>
+                    <div class="text-center mt-4">
+                        <span class="text-sm text-gray-400">And 6 more tools...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Usage Stats -->
+            <div class="card rounded-2xl p-6">
+                <h2 class="text-2xl font-bold mb-6 flex items-center">
+                    <i class="fas fa-chart-bar text-orange-400 mr-3"></i>
+                    API Usage
+                </h2>
+                
+                <div class="space-y-6">
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm text-gray-400">Requests This Month</span>
+                            <span class="font-semibold">0 / 1000</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-2">
+                            <div class="bg-gradient-to-r from-orange-400 to-orange-600 h-2 rounded-full" style="width: 0%"></div>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">Generous limits for personal use</p>
+                    </div>
+                    
+                    <div class="bg-gray-800/30 rounded-lg p-4">
+                        <h3 class="font-semibold mb-2 flex items-center">
+                            <i class="fas fa-shield-alt text-green-400 mr-2"></i>
+                            Status: All Systems Operational
+                        </h3>
+                        <div class="space-y-2 text-sm text-gray-400">
+                            <div class="flex justify-between">
+                                <span>OAuth Token:</span>
+                                <span class="text-green-400">Valid</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>MCP Endpoint:</span>
+                                <span class="text-green-400">Active</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Last Refresh:</span>
+                                <span>{{last_refresh}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Copy Success Message -->
+    <div id="copy-success" class="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg hidden">
+        <i class="fas fa-check mr-2"></i>MCP URL copied to clipboard!
+    </div>
+
+    <script>
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(function() {
+                const successMsg = document.getElementById('copy-success');
+                successMsg.classList.remove('hidden');
+                successMsg.classList.add('copy-success');
+                
+                setTimeout(() => {
+                    successMsg.classList.add('hidden');
+                    successMsg.classList.remove('copy-success');
+                }, 2000);
+            }, function(err) {
+                console.error('Could not copy text: ', err);
+                // Fallback for older browsers
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    const successMsg = document.getElementById('copy-success');
+                    successMsg.classList.remove('hidden');
+                    successMsg.classList.add('copy-success');
+                    
+                    setTimeout(() => {
+                        successMsg.classList.add('hidden');
+                        successMsg.classList.remove('copy-success');
+                    }, 2000);
+                } catch (err) {
+                    console.error('Fallback: Could not copy text: ', err);
+                }
+                document.body.removeChild(textArea);
+            });
+        }
+
+        // Auto-refresh every 5 minutes to keep data fresh
+        setTimeout(() => {
+            window.location.reload();
+        }, 5 * 60 * 1000);
+    </script>
+</body>
+</html>
