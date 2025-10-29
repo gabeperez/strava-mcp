@@ -170,7 +170,18 @@ export class StravaWebhookHandler {
       : 'N/A';
     const elevation = activity.total_elevation_gain || 0;
     const avgHR = activity.average_heartrate || 'N/A';
-    const date = new Date(activity.start_date_local).toLocaleString();
+    
+    // Use start_date_local which already includes the athlete's timezone
+    // Format it more naturally (e.g., "Oct 29, 2025, 12:13 PM")
+    const localDate = new Date(activity.start_date_local);
+    const date = localDate.toLocaleString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    });
 
     let message = `🏃 New Strava Workout!\n\n`;
     message += `**${activity.name}**\n`;
