@@ -22,14 +22,56 @@ A complete **Model Context Protocol (MCP) server** for Strava that enables AI as
 
 ## 🚀 Quick Start
 
-**Note:** Deploying to Cloudflare requires using the command line (Terminal). Don't worry - we've made it as simple as copy & paste!
+**Note:** Deploying to Cloudflare requires some terminal commands, but we've made it as simple as possible!
 
 <details open>
-<summary><b>⚡ Automated Setup (Easiest - One Script Does Everything!)</b></summary>
+<summary><b>🔘 Option A: Deploy Button + Setup Script (Easiest!)</b></summary>
+
+### Click a button, then run one command
+
+Best for users who prefer clicking buttons over typing commands.
+
+**Step 1: Click Deploy to Cloudflare**
+
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/gabeperez/strava-mcp-oauth)
+
+This will:
+1. Fork the repo to your GitHub account
+2. Deploy it to your Cloudflare account
+3. Give you a worker URL
+
+**Step 2: Finish Configuration**
+
+After deployment, you need to configure secrets and webhooks:
+
+1. **Open Terminal** (Mac: Cmd+Space, type "Terminal" | Windows: search "PowerShell")
+
+2. **Clone YOUR fork and run setup:**
+   ```bash
+   # Replace YOUR-USERNAME with your GitHub username
+   git clone https://github.com/YOUR-USERNAME/strava-mcp-oauth.git
+   cd strava-mcp-oauth
+   npm install
+   node scripts/setup.js
+   ```
+
+3. **Answer the prompts:**
+   - Strava Client ID (get from [strava.com/settings/api](https://www.strava.com/settings/api))
+   - Strava Client Secret
+   - Poke API key for webhooks (optional)
+
+4. **Done!** Visit your worker URL and authenticate with Strava.
+
+</details>
+
+<details>
+<summary><b>⚡ Option B: Fully Automated Setup (One Script Does Everything!)</b></summary>
 
 ### Copy & paste 5 commands, answer a few questions, done!
 
-This automated script handles everything: database creation, configuration, secrets, webhooks, and deployment.
+Best for users comfortable with terminal commands.
+
+This automated script handles everything: forking, database creation, configuration, secrets, webhooks, and deployment.
 
 **Step 1: Open Terminal**
 - **Mac**: Press Cmd+Space, type "Terminal", press Enter
