@@ -1,5 +1,7 @@
 # Strava Webhook Setup Guide
 
+> ⚠️ **IMPORTANT: Personal Use Only** - The webhook notification system currently sends all activity updates to a single Poke API key. This setup is designed for **personal/single-user deployments only**. Multi-user support with per-user notification routing is planned for future releases.
+
 This guide will help you set up real-time Strava activity notifications using webhooks.
 
 ## Prerequisites

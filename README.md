@@ -2,6 +2,8 @@
 
 > **Production-ready MCP server** for Strava with OAuth authentication and real-time webhook notifications
 
+⚠️ **IMPORTANT: Personal Use Only** - This project is currently designed for **single-user/personal deployments**. The webhook notification system sends all activity updates to a single Poke API key (yours). Multi-user support with per-user notifications is planned for future releases.
+
 [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/gabeperez/strava-mcp-oauth)
 
 [![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-F38020?logo=cloudflare)](https://workers.cloudflare.com/)
@@ -190,6 +192,8 @@ See [README_DEPLOY.md](README_DEPLOY.md) for detailed manual setup guide.
 </details>
 
 ## 🔔 Real-time Webhooks (Optional)
+
+> ⚠️ **Personal Use Only**: Webhooks currently send notifications to a single Poke API key. Only enable if you're the sole user of this deployment. Multi-user webhook support coming soon.
 
 Get instant push notifications via Poke when you finish workouts!
 
@@ -421,6 +425,19 @@ See [.env.example](.env.example) for all configuration options.
 - Ensure all secrets are set
 
 </details>
+
+## 🗺️ Roadmap
+
+### Coming Soon
+
+- [ ] **Multi-user Webhook Support** - Per-user Poke API keys and notification routing
+- [ ] **Public stravamcp.com Service** - Hosted version for non-technical users
+- [ ] **More Notification Channels** - Discord, Slack, email, etc.
+- [ ] **Activity Analytics** - Trends, insights, and training load tracking
+- [ ] **Custom Webhook Filters** - Choose which activities trigger notifications
+- [ ] **Web Dashboard Enhancements** - More stats, charts, and visualizations
+
+Interested in contributing to any of these? [Open a discussion](https://github.com/gabeperez/strava-mcp-oauth/discussions)!
 
 ## 🤝 Contributing
 
