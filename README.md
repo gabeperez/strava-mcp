@@ -29,7 +29,9 @@ A complete **Model Context Protocol (MCP) server** for Strava that enables AI as
 
 ### Click a button, then run one command
 
-Best for users who prefer clicking buttons over typing commands.
+Best for users who prefer clicking buttons over typing commands. 
+
+⚠️ **Make sure to copy/duplicate the Repo First** ⚠️
 
 **Step 1: Click Deploy to Cloudflare**
 
