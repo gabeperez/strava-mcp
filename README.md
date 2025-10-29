@@ -29,44 +29,46 @@ A complete **Model Context Protocol (MCP) server** for Strava that enables AI as
 
 **Step 1: Deploy to Cloudflare Workers**
 
-**Option A: Automated Setup** ⚡ **Easiest!**
+**Option A: Automated Setup** ⚡ **Recommended for First-Time Users**
 
-```bash
-git clone https://github.com/gabeperez/strava-mcp-oauth.git
-cd strava-mcp-oauth
-npm install
-wrangler login
-node scripts/setup.js
-```
+This option runs one script that does everything for you!
 
-The setup script will:
-- ✅ Create your KV namespace automatically
-- ✅ Update configuration files for you
-- ✅ Prompt for your Strava API credentials
-- ✅ Set up webhooks (optional)
-- ✅ Deploy everything
+1. **Open your Terminal** (Mac: Cmd+Space, type "Terminal". Windows: search "Command Prompt")
 
-**Option B: One-Click Deploy** 
+2. **Copy and paste these commands** one at a time:
 
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/gabeperez/strava-mcp-oauth)
+   ```bash
+   # Download the project
+   git clone https://github.com/gabeperez/strava-mcp-oauth.git
+   
+   # Go into the folder
+   cd strava-mcp-oauth
+   
+   # Install dependencies
+   npm install
+   
+   # Login to Cloudflare (opens browser)
+   wrangler login
+   
+   # Run the automated setup
+   node scripts/setup.js
+   ```
 
-After clicking deploy, run: `node scripts/setup.js` to complete configuration.
+3. **Follow the prompts** - the script will ask you for:
+   - Your Strava Client ID (from https://www.strava.com/settings/api)
+   - Your Strava Client Secret
+   - (Optional) Poke API key for notifications
 
-**Option C: Manual Deployment**
+4. **Done!** The script automatically:
+   - ✅ Creates your database (KV namespace)
+   - ✅ Updates all configuration files
+   - ✅ Sets your secrets securely
+   - ✅ Deploys your worker to Cloudflare
+   - ✅ Gives you your worker URL
 
-Follow the [step-by-step deployment guide](README_DEPLOY.md) (takes ~5 minutes):
+**Option B: Step-by-Step Manual Guide**
 
-```bash
-git clone https://github.com/gabeperez/strava-mcp-oauth.git
-cd strava-mcp-oauth
-npm install
-wrangler login
-wrangler kv:namespace create STRAVA_SESSIONS
-# Update wrangler.jsonc with KV namespace ID
-wrangler secret put STRAVA_CLIENT_ID
-wrangler secret put STRAVA_CLIENT_SECRET
-npm run deploy
-```
+Prefer to do it yourself? See [README_DEPLOY.md](README_DEPLOY.md) for detailed instructions.
 
 **Step 2: Visit Your Dashboard**
 
@@ -91,75 +93,54 @@ That's it! Ask your AI: *"Show me my recent Strava workouts"* 🎉
 </details>
 
 <details>
-<summary><b>💻 CLI Setup (For Developers)</b></summary>
+<summary><b>💻 Advanced: Manual CLI Setup</b></summary>
 
-### For developers who prefer command-line tools
+### For developers who want full control
+
+If you prefer to configure everything manually instead of using the automated script:
 
 **Prerequisites:**
-- Node.js 18+
-- Cloudflare account
-- Strava API app ([create one](https://www.strava.com/settings/api))
+- Node.js 18+ installed ([download here](https://nodejs.org/))
+- Cloudflare account (free) - [sign up](https://dash.cloudflare.com/sign-up)
+- Strava API app - [create one](https://www.strava.com/settings/api)
 
-**Step 1: Clone & Install**
+**Commands to run:**
 
 ```bash
+# 1. Download and install
 git clone https://github.com/gabeperez/strava-mcp-oauth.git
 cd strava-mcp-oauth
 npm install
-```
 
-**Step 2: Configure Cloudflare**
-
-```bash
-# Login to Cloudflare
+# 2. Login to Cloudflare (opens browser)
 wrangler login
 
-# Create KV namespace
+# 3. Create database (KV namespace)
 wrangler kv:namespace create STRAVA_SESSIONS
+# Copy the "id" from output and paste into wrangler.jsonc
 
-# Note the namespace ID and update wrangler.jsonc:
-# "id": "YOUR_KV_NAMESPACE_ID"
+# 4. Set your Strava API credentials
+wrangler secret put STRAVA_CLIENT_ID
+# Paste your Client ID when prompted
+
+wrangler secret put STRAVA_CLIENT_SECRET
+# Paste your Client Secret when prompted
+
+# 5. Deploy to Cloudflare
+npm run deploy
+
+# 6. Visit your worker URL to authenticate
+open https://your-worker-name.your-subdomain.workers.dev/auth
 ```
 
-**Step 3: Set Secrets**
+**Optional: Set up webhooks**
 
 ```bash
-# Required
-wrangler secret put STRAVA_CLIENT_ID
-wrangler secret put STRAVA_CLIENT_SECRET
-
-# Optional (for webhooks)
 wrangler secret put STRAVA_WEBHOOK_VERIFY_TOKEN
 wrangler secret put POKE_API_KEY
 ```
 
-**Step 4: Deploy**
-
-```bash
-npm run deploy
-```
-
-**Step 5: Authenticate**
-
-```bash
-# Visit to authenticate
-open https://your-worker-url.workers.dev/auth
-
-# Check status
-curl https://your-worker-url.workers.dev/status
-```
-
-**Step 6: Test MCP**
-
-```bash
-# Test server
-curl https://your-worker-url.workers.dev/mcp
-
-# List tools
-curl -X POST https://your-worker-url.workers.dev/mcp \
-  -H "Content-Type: application/json" \
-  -d '{"jsonrpc":"2.0","id":"1","method":"tools/list","params":{}}'
-```
+See [README_DEPLOY.md](README_DEPLOY.md) for detailed manual setup guide.
 
 </details>
 
