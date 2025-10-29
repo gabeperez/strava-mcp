@@ -1,241 +1,402 @@
-# Strava MCP OAuth Worker
+# 🌴 Strava MCP OAuth - Cloudflare Workers
 
-A Cloudflare Worker that implements a complete Model Context Protocol (MCP) server for Strava with seamless OAuth authentication. This enables AI assistants like Poke.com, Claude Desktop, and others to access your Strava data through natural language queries.
+> **Production-ready MCP server** for Strava with OAuth authentication and real-time webhook notifications
+
+[![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-F38020?logo=cloudflare)](https://workers.cloudflare.com/)
+[![MCP Protocol](https://img.shields.io/badge/MCP-2024--11--05-blue)](https://modelcontextprotocol.io/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+A complete **Model Context Protocol (MCP) server** for Strava that enables AI assistants (Poke, Claude Desktop, etc.) to access your Strava data through natural language. Plus optional real-time webhook notifications when you complete workouts!
 
 ## ✨ Features
 
-- 🔐 **Seamless Authentication**: Device-based OAuth with no URL management required
-- 🏃 **Complete MCP Server**: Full MCP protocol implementation with all Strava tools
-- 🔄 **Automatic Token Refresh**: Transparent token renewal for uninterrupted access
-- 🌐 **Universal Compatibility**: Works with any MCP client (Poke.com, Claude Desktop, etc.)
-- ⚡ **Edge Performance**: Cloudflare Workers for global low-latency access
-- 🛡️ **Advanced Security**: Device fingerprinting, session management, secure token storage
-- 🔔 **Real-time Webhooks**: Optional push notifications for new Strava activities via Poke
+- 🔐 **Zero-Config OAuth** - Device-based authentication, no URL management
+- 🏃 **9 MCP Tools** - Activities, segments, routes, athlete stats, and more
+- 🔔 **Real-time Webhooks** - Push notifications via Poke for new activities
+- 🔄 **Auto Token Refresh** - Never worry about expired tokens
+- 🎨 **Beautiful Dashboard** - Web UI to view your Strava data
+- ⚡ **Edge Performance** - Global Cloudflare network, <50ms response times
+- 💰 **Free Tier** - 100k requests/day at zero cost
 
 ## 🚀 Quick Start
 
-**New to deployment?** See [README_DEPLOY.md](README_DEPLOY.md) for step-by-step instructions!
+<details open>
+<summary><b>📱 Browser/Dashboard Setup (Easiest)</b></summary>
 
-### 1. Strava API Setup
+### Perfect for non-technical users who want a web interface
 
-1. Go to [https://www.strava.com/settings/api](https://www.strava.com/settings/api)
-2. Create a new application:
-   - Application Name: `Strava MCP OAuth`
-   - Website: `https://your-domain.com` (can be any URL)
-   - Authorization Callback Domain: `your-worker-name.your-subdomain.workers.dev`
-3. Note your **Client ID** and **Client Secret**
+**Step 1: Deploy the Worker**
 
-### 2. Deploy to Cloudflare Workers
+Use the one-click deploy button or follow [README_DEPLOY.md](README_DEPLOY.md):
 
 ```bash
-# Clone and install
-git clone <your-repo-url>
+git clone https://github.com/gabeperez/strava-mcp-oauth.git
 cd strava-mcp-oauth
 npm install
+wrangler login
+wrangler kv:namespace create STRAVA_SESSIONS
+# Update wrangler.jsonc with KV namespace ID
+wrangler secret put STRAVA_CLIENT_ID
+wrangler secret put STRAVA_CLIENT_SECRET
+npm run deploy
+```
 
+**Step 2: Visit Your Dashboard**
+
+1. Go to `https://your-worker-url.workers.dev`
+2. Click "Authenticate with Strava"
+3. Authorize the app
+4. You'll see your personal dashboard with:
+   - Recent activities
+   - Performance stats
+   - Personal MCP token
+   - Beautiful activity cards
+
+**Step 3: Use with AI Assistants**
+
+From your dashboard, copy your personal MCP URL and add it to:
+- **Poke**: Settings → Integrations → Add MCP Server
+- **Claude Desktop**: Add to `claude_desktop_config.json`
+- **Any MCP Client**: Use the URL shown on your dashboard
+
+That's it! Ask your AI: *"Show me my recent Strava workouts"* 🎉
+
+</details>
+
+<details>
+<summary><b>💻 CLI Setup (For Developers)</b></summary>
+
+### For developers who prefer command-line tools
+
+**Prerequisites:**
+- Node.js 18+
+- Cloudflare account
+- Strava API app ([create one](https://www.strava.com/settings/api))
+
+**Step 1: Clone & Install**
+
+```bash
+git clone https://github.com/gabeperez/strava-mcp-oauth.git
+cd strava-mcp-oauth
+npm install
+```
+
+**Step 2: Configure Cloudflare**
+
+```bash
 # Login to Cloudflare
 wrangler login
 
 # Create KV namespace
 wrangler kv:namespace create STRAVA_SESSIONS
-# Copy the namespace ID and update wrangler.jsonc
 
-# Set up environment secrets
+# Note the namespace ID and update wrangler.jsonc:
+# "id": "YOUR_KV_NAMESPACE_ID"
+```
+
+**Step 3: Set Secrets**
+
+```bash
+# Required
 wrangler secret put STRAVA_CLIENT_ID
 wrangler secret put STRAVA_CLIENT_SECRET
 
-# Deploy the worker
+# Optional (for webhooks)
+wrangler secret put STRAVA_WEBHOOK_VERIFY_TOKEN
+wrangler secret put POKE_API_KEY
+```
+
+**Step 4: Deploy**
+
+```bash
 npm run deploy
 ```
 
-### 3. Link Your Strava Account
+**Step 5: Authenticate**
 
-1. Visit `https://your-worker-url.workers.dev/auth`
-2. Authorize the application with Strava
-3. You'll see a success page - the worker is now ready!
-
-### 4. Configure Your MCP Client
-
-**For Poke.com, Claude Desktop, or any MCP client:**
-
-1. Use this MCP server URL:
-   ```
-   https://your-worker-url.workers.dev/mcp
-   ```
-
-2. The first time you use any Strava tool, you'll get an authentication link
-3. Click the link, authorize with Strava, and you're done!
-4. From then on, the same device/browser will stay authenticated automatically
-
-**No URL management, no API keys, just set it and forget it!**
-
-## MCP Server Details
-
-### Available MCP Tools
-
-| Tool Name | Description |
-|-----------|-------------|
-| `welcome-strava-mcp` | Welcome message and setup instructions |
-| `authenticate-strava` | Get authentication URL (if needed) |
-| `get-recent-activities` | Fetch recent Strava activities |
-| `get-athlete-profile` | Get athlete profile information |
-| `get-athlete-stats` | Get activity statistics (recent, YTD, all-time) |
-| `get-activity-details` | Get detailed information about a specific activity |
-| `get-activity-streams` | Get time-series data from activities |
-| `get-starred-segments` | List segments starred by athlete |
-| `explore-segments` | Find popular segments in a geographical area |
-| `get-athlete-routes` | List routes created by athlete |
-
-### MCP Endpoints
-
-| Endpoint | Method | Description |
-|----------|--------|--------------|
-| `/` | GET | Server info and capabilities |
-| `/mcp` | GET | MCP server initialization (SSE) |
-| `/mcp` | POST | MCP JSON-RPC requests |
-| `/auth` | GET | OAuth authentication flow |
-| `/callback` | GET | OAuth callback (automatic) |
-| `/status` | GET | Check authentication status |
-
-## Usage Examples
-
-### Test MCP Server
 ```bash
-# Check server info
-curl https://your-worker-name.your-subdomain.workers.dev/
+# Visit to authenticate
+open https://your-worker-url.workers.dev/auth
 
-# Test MCP initialization
-curl https://your-worker-name.your-subdomain.workers.dev/mcp
-
-# Test tool listing
-curl -X POST -H "Content-Type: application/json" \
-  -d '{"jsonrpc":"2.0","id":"1","method":"tools/list","params":{}}' \
-  https://your-worker-name.your-subdomain.workers.dev/mcp
+# Check status
+curl https://your-worker-url.workers.dev/status
 ```
 
-## MCP Client Setup
+**Step 6: Test MCP**
 
-### Poke.com
-1. Add a new MCP server
-2. Enter URL: `https://your-worker-name.your-subdomain.workers.dev/mcp`
-3. Save the configuration
-4. First query will prompt for authentication
+```bash
+# Test server
+curl https://your-worker-url.workers.dev/mcp
 
-### Claude Desktop
-Add to your `claude_desktop_config.json`:
+# List tools
+curl -X POST https://your-worker-url.workers.dev/mcp \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":"1","method":"tools/list","params":{}}'
+```
+
+</details>
+
+## 🔔 Real-time Webhooks (Optional)
+
+Get instant push notifications via Poke when you finish workouts!
+
+<details>
+<summary><b>📱 Click to see webhook notification example</b></summary>
+
+```
+🏃 New Strava Workout!
+
+**Morning Run**
+Type: Run
+Date: Oct 29, 2025 7:30 AM
+Distance: 10.5 km
+Duration: 52 minutes
+Pace: 4:57 min/km
+Elevation: 120m
+Avg HR: 145 bpm
+🏆 2 PRs!
+```
+
+Sent instantly to your phone via iMessage/SMS when you complete an activity!
+
+</details>
+
+### Quick Webhook Setup
+
+```bash
+# 1. Set Poke API key (get from https://poke.com/settings/advanced)
+wrangler secret put POKE_API_KEY
+
+# 2. Set webhook verification token
+wrangler secret put STRAVA_WEBHOOK_VERIFY_TOKEN
+# Enter: STRAVA_MCP_WEBHOOK
+
+# 3. Test endpoint
+node scripts/manage-webhook.js test
+
+# 4. Create subscription
+STRAVA_CLIENT_ID=xxx STRAVA_CLIENT_SECRET=xxx \
+node scripts/manage-webhook.js create
+
+# 5. Monitor events
+wrangler tail
+```
+
+**See [WEBHOOK_SETUP.md](WEBHOOK_SETUP.md) for complete instructions**
+
+## 📚 Available MCP Tools
+
+Ask your AI assistant natural language questions, and these tools will be called automatically:
+
+| Tool | Example Query |
+|------|---------------|
+| `get-recent-activities` | "Show me my last 5 workouts" |
+| `get-athlete-profile` | "What's my Strava profile info?" |
+| `get-athlete-stats` | "What are my cycling stats this year?" |
+| `get-activity-details` | "Get details for activity 123456" |
+| `get-activity-streams` | "Show me heart rate data from my last run" |
+| `get-starred-segments` | "What segments have I starred?" |
+| `explore-segments` | "Find climbing segments near San Francisco" |
+| `get-athlete-routes` | "List my saved routes" |
+| `authenticate-strava` | "How do I connect my Strava account?" |
+
+## 🌐 Endpoints
+
+| Endpoint | Purpose |
+|----------|---------|
+| `/` | Landing page & documentation |
+| `/auth` | Start OAuth flow |
+| `/dashboard?token=xxx` | Personal dashboard with stats |
+| `/mcp` | MCP server endpoint (for AI assistants) |
+| `/webhook` | Strava webhook receiver (optional) |
+| `/test-poke` | Test Poke integration |
+
+## 🎯 Usage Examples
+
+### With Poke
+
+1. Add MCP server in Poke settings
+2. Use URL: `https://your-worker-url.workers.dev/mcp`
+3. Ask: *"What was my pace on yesterday's run?"*
+
+### With Claude Desktop
+
+Add to `claude_desktop_config.json`:
+
 ```json
 {
   "mcpServers": {
     "strava": {
-      "command": "node",
-      "args": ["-e", "console.log('Use the web version at: https://your-worker-name.your-subdomain.workers.dev/mcp')"]
+      "url": "https://your-worker-url.workers.dev/mcp"
     }
   }
 }
 ```
 
-### Any MCP Client
-**Server URL:** `https://your-worker-name.your-subdomain.workers.dev/mcp`
+### Natural Language Queries
 
-**Natural language queries you can make:**
 - "Show me my recent Strava activities"
-- "What was my heart rate data from my last run?"
-- "Get the power profile for my weekend ride"
-- "Find challenging climbs near Boulder, Colorado"
+- "What was my heart rate during my last run?"
+- "Get power data from yesterday's bike ride"
+- "Find challenging segments near Boulder"
 - "What are my all-time cycling stats?"
 
-## Security Features
+## 🔒 Security Features
 
-- **Device Fingerprinting**: Automatic authentication based on browser/device characteristics
-- **CSRF Protection**: State parameter validation in OAuth flow
-- **Automatic Token Refresh**: Seamless token renewal for uninterrupted access
-- **Per-user Isolation**: Each athlete's data is completely separate
-- **Secure Token Storage**: Encrypted session storage in Cloudflare KV
-- **Rate Limit Awareness**: Respects Strava API limits and quotas
-- **Session Management**: 30-day session persistence with automatic cleanup
+- **Device Fingerprinting** - Automatic authentication by browser
+- **Token Refresh** - Seamless renewal before expiration
+- **Per-user Isolation** - Complete data separation
+- **Secure Storage** - KV encryption for tokens
+- **CSRF Protection** - State validation in OAuth flow
+- **Rate Limiting** - Respects Strava API quotas
 
-## How Device Authentication Works
+## 🏗️ Architecture
 
-1. **First Time**: When you authenticate via OAuth, the system creates a device fingerprint from your browser's User-Agent and Accept headers
-2. **Subsequent Requests**: The same device/browser automatically gets authenticated without requiring new tokens or URL changes
-3. **Multiple Devices**: Each device maintains its own authentication state
-4. **Privacy**: Only basic browser characteristics are used - no tracking or personal data
+```
+┌─────────────────┐    ┌──────────────────────┐    ┌─────────────────┐
+│  AI Assistant   │───▶│  Cloudflare Worker   │───▶│   Strava API    │
+│  (Poke/Claude)  │    │                      │    │                 │
+│                 │    │ • MCP Server         │    │ • Activities    │
+│ Natural Language│    │ • OAuth Handler      │    │ • Segments      │
+│ Queries         │    │ • Device Auth        │    │ • Routes        │
+│                 │    │ • Token Manager      │    │ • Stats         │
+│                 │    │ • Webhook Handler    │    │                 │
+└─────────────────┘    └──────────────────────┘    └─────────────────┘
+                                 │                           │
+                                 ▼                           ▼
+                       ┌──────────────────┐       ┌─────────────────┐
+                       │   Cloudflare KV  │       │   Poke API      │
+                       │  • Sessions      │       │  • Push Notify  │
+                       │  • OAuth Tokens  │       │  • iMessage/SMS │
+                       │  • Activity Data │       └─────────────────┘
+                       └──────────────────┘
+```
 
-## Troubleshooting
+## 📖 Documentation
 
-### MCP Client Issues
-- **"Authentication Required"**: Click the provided auth link in the tool response
-- **"Server Not Found"**: Verify the MCP URL includes `/mcp` at the end
-- **Connection Timeouts**: Check if your client supports HTTPS MCP servers
+- [README_DEPLOY.md](README_DEPLOY.md) - Step-by-step deployment (5 minutes)
+- [WEBHOOK_SETUP.md](WEBHOOK_SETUP.md) - Complete webhook guide
+- [WEBHOOK_QUICKSTART.md](WEBHOOK_QUICKSTART.md) - Quick webhook reference
+- [WARP.md](WARP.md) - Development & architecture details
+- [PUBLISHING_CHECKLIST.md](PUBLISHING_CHECKLIST.md) - Template publishing guide
 
-### Authentication Issues
-1. Visit the authentication URL provided by the `authenticate-strava` tool
-2. Ensure you're using the same browser/device for subsequent requests
-3. Check `/status` endpoint to verify authentication state
+## 🛠️ Tech Stack
 
-### API Errors
-- **401 Unauthorized**: Re-authenticate via the provided OAuth link
-- **403 Forbidden**: Check if your Strava app has required scopes
-- **429 Rate Limited**: Wait 15 minutes for rate limit reset
+- **Runtime**: Cloudflare Workers (V8 isolates)
+- **Framework**: [Hono](https://hono.dev/) (lightweight web framework)
+- **Storage**: Cloudflare KV (sessions & tokens)
+- **Protocol**: [Model Context Protocol](https://modelcontextprotocol.io/) (MCP)
+- **Auth**: Strava OAuth 2.0
+- **Notifications**: [Poke API](https://poke.com/) (optional)
 
-## Development
+## 💰 Pricing
 
-### Local Development
+**100% Free!** Runs on Cloudflare's generous free tier:
+
+- **Workers**: 100,000 requests/day
+- **KV Storage**: 100,000 reads/day, 1,000 writes/day  
+- **Bandwidth**: Unlimited on free tier
+
+Perfect for personal use. No credit card required.
+
+## 🔧 Development
+
+### Local Testing
+
 ```bash
 # Install dependencies
 npm install
 
-# Start development server
-wrangler dev --local
+# Start local server
+wrangler dev
 
-# Test OAuth flow at http://localhost:8787
+# Visit http://localhost:8787
+```
+
+### Run Tests
+
+```bash
+npm test
 ```
 
 ### Environment Variables
-- `STRAVA_CLIENT_ID`: Your Strava app's Client ID
-- `STRAVA_CLIENT_SECRET`: Your Strava app's Client Secret (stored as secret)
-- `STRAVA_REDIRECT_URI`: Set to worker URL + `/callback`
 
-### KV Namespace
-- `STRAVA_SESSIONS`: Stores user sessions and tokens
+See [.env.example](.env.example) for all configuration options.
 
-## Architecture
+## 🐛 Troubleshooting
 
-```
-┌─────────────────┐    ┌──────────────────────┐    ┌─────────────────┐
-│  MCP Client     │───▶│  Cloudflare Worker   │───▶│   Strava API    │
-│                 │    │                      │    │                 │
-│ • Poke.com      │    │ • MCP Server         │    │ • Activities    │
-│ • Claude        │    │ • OAuth Flow         │    │ • Segments      │
-│ • Any MCP Client│    │ • Device Auth        │    │ • Routes        │
-│                 │    │ • Token Refresh      │    │ • Athlete Data  │
-│ Natural Language│    │ • JSON-RPC Handler   │    │ • Streams       │
-│ Strava Queries  │    │ • Session Management │    │ • Statistics    │
-└─────────────────┘    └──────────────────────┘    └─────────────────┘
-                              │
-                              ▼
-                       ┌─────────────────┐
-                       │ Cloudflare KV   │
-                       │                 │
-                       │ • User Sessions │
-                       │ • Device Auth   │
-                       │ • OAuth Tokens  │
-                       └─────────────────┘
-```
+<details>
+<summary><b>Authentication Issues</b></summary>
 
-### Key Components
+**"Authentication Required" error**
+- Visit `/auth` to re-authenticate
+- Make sure you're using the same browser/device
+- Check `/status` endpoint to verify session
 
-1. **MCP Server**: Implements full Model Context Protocol specification
-2. **Device Authentication**: Browser fingerprinting for seamless auth
-3. **OAuth Integration**: Secure Strava API authentication flow
-4. **Session Management**: Persistent authentication with 30-day expiration
-5. **Token Refresh**: Automatic renewal of expired access tokens
-6. **KV Storage**: Encrypted storage of session data and authentication state
+**"Invalid Callback Domain"**
+- Verify Strava app callback domain matches worker URL exactly
+- Don't include protocol (http://) or path (/callback)
 
-## Contributing
+</details>
 
-Based on the original [Strava MCP server](https://github.com/r-huijts/strava-mcp) by r-huijts.
+<details>
+<summary><b>Webhook Issues</b></summary>
 
-## License
+**Not receiving webhook events**
+- Run `node scripts/manage-webhook.js view` to check subscription
+- Monitor logs with `wrangler tail`
+- Verify athlete is authenticated (visit `/dashboard`)
+- Check Strava app has correct OAuth scopes
 
-MIT License - see original project for details.
+**Poke notifications not working**
+- Verify `POKE_API_KEY` is set: `wrangler secret list`
+- Test manually: `curl -X POST https://your-worker-url.workers.dev/test-poke`
+- Check logs for Poke API errors
+
+</details>
+
+<details>
+<summary><b>Deployment Issues</b></summary>
+
+**"KV namespace not found"**
+- Create namespace: `wrangler kv:namespace create STRAVA_SESSIONS`
+- Update ID in `wrangler.jsonc`
+
+**"Deployment failed"**
+- Verify logged in: `wrangler whoami`
+- Check syntax in `wrangler.jsonc`
+- Ensure all secrets are set
+
+</details>
+
+## 🤝 Contributing
+
+Contributions welcome! Please:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📝 License
+
+MIT License - see [LICENSE](LICENSE) file for details.
+
+## 🙏 Credits
+
+- Built with [Hono](https://hono.dev/)
+- Powered by [Cloudflare Workers](https://workers.cloudflare.com/)
+- MCP by [Anthropic](https://www.anthropic.com/)
+- Notifications via [Poke](https://poke.com/)
+- Inspired by the Strava community 🏃‍♀️🚴‍♂️
+
+## ⭐ Star History
+
+If this project helped you, consider giving it a star!
+
+---
+
+**Made with ❤️ for athletes who love data**
+
+[Report Bug](https://github.com/gabeperez/strava-mcp-oauth/issues) · [Request Feature](https://github.com/gabeperez/strava-mcp-oauth/issues) · [Discussions](https://github.com/gabeperez/strava-mcp-oauth/discussions)
