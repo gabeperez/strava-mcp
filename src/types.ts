@@ -4,6 +4,8 @@ export interface Env {
   STRAVA_CLIENT_ID: string;
   STRAVA_CLIENT_SECRET: string; 
   STRAVA_REDIRECT_URI: string;
+  STRAVA_WEBHOOK_VERIFY_TOKEN?: string;
+  POKE_API_KEY?: string;
 }
 
 // Strava OAuth session stored in KV
@@ -67,4 +69,48 @@ export interface ApiResponse<T = any> {
 export interface AuthenticatedContext {
   session: StravaSession;
   token: string;
+}
+
+// Webhook event types
+export interface StravaWebhookEvent {
+  object_type: 'activity' | 'athlete';
+  object_id: number;
+  aspect_type: 'create' | 'update' | 'delete';
+  updates?: Record<string, any>;
+  owner_id: number;
+  subscription_id: number;
+  event_time: number;
+}
+
+export interface StravaWebhookSubscription {
+  id: number;
+  application_id: number;
+  callback_url: string;
+  created_at: string;
+  updated_at: string;
+}
+
+// Strava activity details
+export interface StravaActivity {
+  id: number;
+  name: string;
+  type: string;
+  sport_type: string;
+  distance: number;
+  moving_time: number;
+  elapsed_time: number;
+  total_elevation_gain: number;
+  start_date: string;
+  start_date_local: string;
+  average_speed: number;
+  max_speed: number;
+  average_heartrate?: number;
+  max_heartrate?: number;
+  average_watts?: number;
+  kilojoules?: number;
+  average_cadence?: number;
+  elev_high?: number;
+  elev_low?: number;
+  pr_count?: number;
+  achievement_count?: number;
 }

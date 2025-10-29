@@ -104,7 +104,7 @@ export const LANDING_TEMPLATE = `<!DOCTYPE html>
     <meta property="og:image" content="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961568/SportMCP_opengraph.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:url" content="https://strava-mcp-oauth.perez-jg22.workers.dev">
+    <meta property="og:url" content="{{base_url}}">
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Strava MCP Server - Connect Your AI to Strava">
@@ -138,9 +138,13 @@ export const LANDING_TEMPLATE = `<!DOCTYPE html>
                 <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="Strava MCP Logo" class="w-10 h-10 rounded-lg">
                 <span class="text-xl font-bold">Strava MCP Server</span>
             </div>
-            <a href="/auth" class="bg-orange-500 hover:bg-orange-600 px-6 py-2 rounded-lg font-semibold transition-colors">
-                Get Started
-            </a>
+            <div class="flex items-center space-x-6">
+                <a href="/about" class="text-gray-300 hover:text-white transition-colors">About</a>
+                <a href="/support" class="text-gray-300 hover:text-white transition-colors">Support</a>
+                <a href="/auth" class="bg-orange-500 hover:bg-orange-600 px-6 py-2 rounded-lg font-semibold transition-colors">
+                    Get Started
+                </a>
+            </div>
         </div>
     </nav>
 
@@ -261,12 +265,19 @@ export const LANDING_TEMPLATE = `<!DOCTYPE html>
     <!-- Footer -->
     <footer class="bg-gray-950 py-12">
         <div class="max-w-7xl mx-auto px-6 text-center text-gray-400">
-            <div class="flex items-center justify-center space-x-3 mb-6">
+            <div class="flex items-center justify-center space-x-6 mb-6">
+                <a href="/privacy" class="hover:text-white transition-colors text-sm">Privacy Policy</a>
+                <a href="/terms" class="hover:text-white transition-colors text-sm">Terms of Service</a>
+                <a href="/about" class="hover:text-white transition-colors text-sm">About</a>
+                <a href="/support" class="hover:text-white transition-colors text-sm">Support</a>
+            </div>
+            
+            <div class="flex items-center justify-center space-x-3 mb-4">
                 <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="Strava MCP Logo" class="w-8 h-8 rounded-lg">
                 <span class="font-bold">Strava MCP Server</span>
             </div>
             
-            <p class="mb-4">
+            <p class="text-sm">
                 Powered by Cloudflare Workers • Built for the Model Context Protocol
             </p>
         </div>
@@ -326,7 +337,9 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                     <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="Strava MCP Logo" class="w-10 h-10 rounded-lg">
                     <span class="text-xl font-bold">Strava MCP Server</span>
                 </div>
-                <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-6">
+                    <a href="/about" class="text-gray-300 hover:text-white transition-colors">About</a>
+                    <a href="/support" class="text-gray-300 hover:text-white transition-colors">Support</a>
                     <span class="text-gray-300">Welcome back!</span>
                     <form action="/logout" method="post" class="inline">
                         <button type="submit" class="text-gray-400 hover:text-white transition-colors">

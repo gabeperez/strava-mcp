@@ -3,7 +3,7 @@
 ## 🚀 **Quick Setup (2 Steps)**
 
 ### **Step 1: Get Your API Key**
-1. 👉 **[Click here to authenticate](https://strava-mcp-oauth.perez-jg22.workers.dev/auth)**
+1. 👉 **[Click here to authenticate](https://your-worker-name.your-subdomain.workers.dev/auth)**
 2. 🔐 Log in with your Strava account  
 3. 🔑 **Copy your API Key** from the success page (starts with `strava_`)
 
@@ -12,7 +12,7 @@ Add these to your AI assistant (Poke, Claude, etc.):
 
 **MCP Server URL:**
 ```
-https://strava-mcp-oauth.perez-jg22.workers.dev/mcp
+https://your-worker-name.your-subdomain.workers.dev/mcp
 ```
 
 **API Key:** *(paste the key you copied)*
@@ -25,7 +25,7 @@ strava_[your_key_here]
 ## 🎯 **For Poke.com Users**
 
 1. Go to **MCP URL** platform in Poke
-2. **Server URL**: `https://strava-mcp-oauth.perez-jg22.workers.dev/mcp`
+2. **Server URL**: `https://your-worker-name.your-subdomain.workers.dev/mcp`
 3. **API Key**: Paste your API key from Step 1
 4. Click **Add Integration**
 
@@ -54,7 +54,7 @@ Once set up, try asking:
 - Try getting a fresh API key by re-authenticating
 
 **"Invalid MCP server URL" error?**  
-- Use the `/mcp` endpoint: `https://strava-mcp-oauth.perez-jg22.workers.dev/mcp`
+- Use the `/mcp` endpoint: `https://your-worker-name.your-subdomain.workers.dev/mcp`
 - Not the root URL
 
 **Still having issues?**

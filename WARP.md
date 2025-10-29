@@ -28,6 +28,10 @@ wrangler login
 wrangler secret put STRAVA_CLIENT_ID
 wrangler secret put STRAVA_CLIENT_SECRET
 
+# Set webhook secrets (optional - for real-time notifications)
+wrangler secret put STRAVA_WEBHOOK_VERIFY_TOKEN
+wrangler secret put POKE_API_KEY
+
 # Deploy to production
 npm run deploy
 # or: wrangler deploy
@@ -47,6 +51,24 @@ curl -X POST -H "Content-Type: application/json" \
   https://your-worker.workers.dev/mcp
 ```
 
+### Webhook Management
+```bash
+# Test webhook endpoint
+node scripts/manage-webhook.js test
+
+# Create webhook subscription
+STRAVA_CLIENT_ID=xxx STRAVA_CLIENT_SECRET=xxx node scripts/manage-webhook.js create
+
+# View active subscription
+STRAVA_CLIENT_ID=xxx STRAVA_CLIENT_SECRET=xxx node scripts/manage-webhook.js view
+
+# Delete subscription
+STRAVA_CLIENT_ID=xxx STRAVA_CLIENT_SECRET=xxx node scripts/manage-webhook.js delete
+
+# Monitor webhook events in real-time
+wrangler tail
+```
+
 ## Architecture Overview
 
 This is a **Cloudflare Workers** application that implements a **Model Context Protocol (MCP) server** for Strava API integration with OAuth authentication.
@@ -58,6 +80,7 @@ This is a **Cloudflare Workers** application that implements a **Model Context P
 - **OAuth Flow**: `src/auth.ts` + `src/session.ts` - Device-based authentication with KV storage
 - **API Proxy**: `src/api.ts` + `src/middleware.ts` - Authenticated Strava API wrapper
 - **Templates**: `src/templates.ts` - Landing page and dashboard HTML generation
+- **Webhooks**: `src/webhook.ts` - Real-time Strava activity notifications with Poke integration
 
 ### Key Features
 
@@ -66,6 +89,7 @@ This is a **Cloudflare Workers** application that implements a **Model Context P
 3. **Complete MCP Implementation**: 9 Strava tools (activities, segments, routes, stats)
 4. **Protected API Routes**: `/api/*` endpoints with authentication middleware
 5. **Beautiful Web Interface**: Landing page + personal dashboard at `/dashboard`
+6. **Real-time Webhooks**: Strava webhook integration for instant activity notifications via Poke
 
 ### MCP Tools Available
 
@@ -102,11 +126,15 @@ wrangler dev
 - `STRAVA_CLIENT_ID` - From Strava API app settings
 - `STRAVA_CLIENT_SECRET` - From Strava API app settings  
 
+**Optional Secrets** (for webhook functionality):
+- `STRAVA_WEBHOOK_VERIFY_TOKEN` - Token to verify webhook callbacks (e.g., "STRAVA_MCP_WEBHOOK")
+- `POKE_API_KEY` - API key for Poke notification service
+
 **Environment Variables** (in `wrangler.jsonc`):
 - `STRAVA_REDIRECT_URI` - OAuth callback URL (worker domain + `/callback`)
 
 **KV Namespace**:
-- `STRAVA_SESSIONS` - Stores user sessions and OAuth tokens
+- `STRAVA_SESSIONS` - Stores user sessions, OAuth tokens, and webhook activity summaries
 
 ### Testing  
 - **Unit Tests**: `npm test` (Vitest with Cloudflare Workers integration)
@@ -129,6 +157,7 @@ src/
 ├── session.ts        # KV session management
 ├── middleware.ts     # Auth middleware + API proxy
 ├── api.ts           # Strava API handlers
+├── webhook.ts        # Webhook verification and event handling
 ├── templates.ts     # HTML template engine
 ├── types.ts         # TypeScript interfaces
 └── worker-fixed.ts  # Worker type fixes
@@ -139,7 +168,8 @@ test/
 └── tsconfig.json   # Test-specific TS config
 
 scripts/
-└── verify-deployment.js  # Post-deploy verification
+├── verify-deployment.js  # Post-deploy verification
+└── manage-webhook.js     # Webhook subscription management
 
 wrangler.jsonc       # Cloudflare Workers config
 vitest.config.mts    # Vitest configuration
@@ -153,4 +183,19 @@ vitest.config.mts    # Vitest configuration
 5. MCP clients authenticate via device fingerprint or personal token
 6. Tokens auto-refresh 5 minutes before expiry
 
-This architecture enables AI assistants to access personal Strava data through natural language queries while maintaining secure, per-user authentication.
+### Webhook Flow (Optional)
+1. Create webhook subscription via `manage-webhook.js` script
+2. Strava verifies callback URL with GET request to `/webhook`
+3. When activities are created/updated/deleted, Strava POSTs to `/webhook`
+4. Worker fetches full activity details using athlete's stored token
+5. Formats activity message and sends to Poke API (if configured)
+6. Stores activity summary in KV for 30 days
+7. Handles athlete deauthorization events automatically
+
+**Supported Webhook Events:**
+- Activity created (new workouts)
+- Activity updated (title, type, privacy changes)
+- Activity deleted
+- Athlete deauthorized (auto-cleanup)
+
+This architecture enables AI assistants to access personal Strava data through natural language queries while maintaining secure, per-user authentication, with optional real-time push notifications for new activities.

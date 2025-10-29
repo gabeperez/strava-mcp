@@ -4,7 +4,7 @@
  * Deployment verification script for Strava MCP OAuth Worker
  */
 
-const WORKER_URL = 'https://strava-mcp-oauth.perez-jg22.workers.dev';
+const WORKER_URL = 'https://your-worker-name.your-subdomain.workers.dev';
 
 async function testEndpoint(path, expectedStatus = 200, description) {
   try {
@@ -63,7 +63,7 @@ async function verifyDeployment() {
     console.log('\n🎉 Deployment verification successful!');
     console.log('\n📝 Next steps:');
     console.log('1. Update your Strava app settings at https://www.strava.com/settings/api');
-    console.log(`   - Authorization Callback Domain: strava-mcp-oauth.perez-jg22.workers.dev`);
+    console.log(`   - Authorization Callback Domain: your-worker-name.your-subdomain.workers.dev`);
     console.log(`2. Visit ${WORKER_URL}/auth to link your Strava account`);
     console.log(`3. Configure your AI assistant with: ${WORKER_URL}`);
   } else {

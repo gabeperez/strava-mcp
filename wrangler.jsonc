@@ -8,11 +8,11 @@
 	"kv_namespaces": [
 		{
 			"binding": "STRAVA_SESSIONS",
-			"id": "25472761404c4f98a37a8ece07550458"
+			"id": "YOUR_KV_NAMESPACE_ID"
 		}
 	],
 	"vars": {
-		"STRAVA_REDIRECT_URI": "https://strava-mcp-oauth.perez-jg22.workers.dev/callback"
+		"STRAVA_REDIRECT_URI": "https://YOUR-WORKER-NAME.YOUR-SUBDOMAIN.workers.dev/callback"
 	},
 	"observability": {
 		"enabled": true

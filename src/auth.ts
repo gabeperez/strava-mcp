@@ -18,11 +18,21 @@ export class AuthHandler {
     return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
   }
 
+  // Get current domain for dynamic URL generation
+  private getCurrentDomain(c: Context): string {
+    const host = c.req.header('host');
+    if (host?.includes('stravamcp.com')) {
+      return 'https://stravamcp.com';
+    }
+    return 'https://your-worker-name.your-subdomain.workers.dev';
+  }
+
   // GET /auth - Initiate OAuth flow
   async initiateAuth(c: Context) {
     try {
       const sessionId = c.req.query('session'); // Get session ID if provided
       const state = generateState();
+      const currentDomain = this.getCurrentDomain(c);
       
       // Store state in a temporary KV entry for CSRF protection
       const stateData = { 
@@ -183,8 +193,9 @@ export class AuthHandler {
         expires_at: Math.floor(Date.now() / 1000) + (365 * 24 * 60 * 60) // 1 year
       }), { expirationTtl: 365 * 24 * 60 * 60 }); // 1 year
 
-      // Redirect to dashboard instead of success page
-      return c.redirect(`/dashboard?token=${personalMcpToken}`);
+      // Always redirect to stravamcp.com for better UX, fallback to workers.dev
+      const dashboardDomain = 'https://stravamcp.com';
+      return c.redirect(`${dashboardDomain}/dashboard?token=${personalMcpToken}`);
     } catch (error: any) {
       console.error('OAuth callback error:', error);
       return c.html(`

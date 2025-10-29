@@ -5,7 +5,7 @@
 **YES - You can safely share this MCP URL with anyone:**
 
 ```
-https://strava-mcp-oauth.perez-jg22.workers.dev/mcp
+https://your-worker-name.your-subdomain.workers.dev/mcp
 ```
 
 ### **Your Data is 100% Private Because:**

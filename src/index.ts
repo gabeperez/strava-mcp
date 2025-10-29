@@ -5,6 +5,8 @@ import { AuthMiddleware } from './middleware';
 import { StravaApiHandlers } from './api';
 import { StravaMCPServer, handleMCPOverSSE } from './mcp-server';
 import { TemplateEngine, LANDING_TEMPLATE, DASHBOARD_TEMPLATE } from './templates';
+import { ABOUT_TEMPLATE, SUPPORT_TEMPLATE, PRIVACY_TEMPLATE, TERMS_TEMPLATE } from './legal-templates';
+import { StravaWebhookHandler } from './webhook';
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -12,6 +14,10 @@ const app = new Hono<{ Bindings: Env }>();
 const templates = new TemplateEngine();
 templates.loadTemplate('landing', LANDING_TEMPLATE);
 templates.loadTemplate('dashboard', DASHBOARD_TEMPLATE);
+templates.loadTemplate('about', ABOUT_TEMPLATE);
+templates.loadTemplate('support', SUPPORT_TEMPLATE);
+templates.loadTemplate('privacy', PRIVACY_TEMPLATE);
+templates.loadTemplate('terms', TERMS_TEMPLATE);
 
 // CORS middleware for all routes
 app.use('*', async (c, next) => {
@@ -35,9 +41,20 @@ app.use('*', async (c, next) => {
   c.res.headers.set('Access-Control-Allow-Credentials', 'true');
 });
 
+// Helper function to get current domain
+function getCurrentDomain(c: any): string {
+  const host = c.req.header('host');
+  if (host?.includes('stravamcp.com')) {
+    return 'https://stravamcp.com';
+  }
+  return 'https://your-worker-name.your-subdomain.workers.dev';
+}
+
+
 // Root endpoint - Serve landing page
 app.get('/', (c) => {
   const acceptHeader = c.req.header('Accept');
+  const currentDomain = getCurrentDomain(c);
   
   // If requesting JSON (for API or MCP clients), return server info
   if (acceptHeader?.includes('application/json')) {
@@ -65,16 +82,16 @@ app.get('/', (c) => {
       },
       authentication: {
         type: 'oauth2',
-        url: 'https://strava-mcp-oauth.perez-jg22.workers.dev/auth',
+        url: `${currentDomain}/auth`,
         required: true
       },
       transport: 'https',
-      mcpEndpoint: 'https://strava-mcp-oauth.perez-jg22.workers.dev/mcp'
+      mcpEndpoint: `${currentDomain}/mcp`
     });
   }
   
   // Otherwise, serve the beautiful landing page
-  const html = templates.render('landing');
+  const html = templates.render('landing', { base_url: currentDomain });
   return c.html(html);
 });
 
@@ -97,6 +114,91 @@ app.get('/status', async (c) => {
 app.post('/logout', async (c) => {
   const authHandler = new AuthHandler(c.env);
   return authHandler.logout(c);
+});
+
+// Webhook endpoints
+app.get('/webhook', async (c) => {
+  const webhookHandler = new StravaWebhookHandler(c.env);
+  return webhookHandler.handleVerification(c);
+});
+
+app.post('/webhook', async (c) => {
+  const webhookHandler = new StravaWebhookHandler(c.env);
+  return webhookHandler.handleEvent(c, c.executionCtx);
+});
+
+// Test endpoint for Poke notifications
+app.post('/test-poke', async (c) => {
+  try {
+    if (!c.env.POKE_API_KEY) {
+      return c.json({ error: 'POKE_API_KEY not configured' }, 400);
+    }
+
+    const testMessage = `🏃 Test Strava Webhook!
+
+**Morning Run - Webhook Integration Test**
+Type: Run
+Date: ${new Date().toLocaleString()}
+Distance: 10.5 km
+Duration: 52 minutes
+Pace: 4:57 min/km
+Elevation: 120m
+Avg HR: 145 bpm
+🏆 2 PRs!
+
+✨ This is a test notification from your Strava MCP webhook integration!`;
+
+    const response = await fetch('https://poke.com/api/v1/inbound-sms/webhook', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${c.env.POKE_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ message: testMessage }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      return c.json({
+        success: false,
+        error: `Poke API error: ${response.status}`,
+        details: errorText
+      }, response.status);
+    }
+
+    const data = await response.json();
+    return c.json({
+      success: true,
+      message: 'Test notification sent to Poke!',
+      poke_response: data
+    });
+  } catch (error: any) {
+    return c.json({
+      success: false,
+      error: error.message
+    }, 500);
+  }
+});
+
+// Legal and informational pages  
+app.get('/about', (c) => {
+  const html = templates.render('about');
+  return c.html(html);
+});
+
+app.get('/support', (c) => {
+  const html = templates.render('support');
+  return c.html(html);
+});
+
+app.get('/privacy', (c) => {
+  const html = templates.render('privacy');
+  return c.html(html);
+});
+
+app.get('/terms', (c) => {
+  const html = templates.render('terms');
+  return c.html(html);
 });
 
 // Dashboard endpoint
@@ -179,12 +281,14 @@ app.get('/dashboard', async (c) => {
     const statsDateRange = fourWeeksAgo.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + 
       ' - ' + new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     
+    const currentDomain = getCurrentDomain(c);
+    
     // Prepare dashboard data
     const dashboardData = {
       profile: formattedProfile,
       stats,
       recent_activities: formattedActivities,
-      mcp_url: `https://strava-mcp-oauth.perez-jg22.workers.dev/mcp?token=${token}`,
+      mcp_url: `${currentDomain}/mcp?token=${token}`,
       created_at: new Date(session.created_at * 1000).toLocaleDateString(),
       last_refresh: new Date().toLocaleString(),
       total_time: Math.round((stats.recent_run_totals.moving_time + stats.recent_ride_totals.moving_time) / 3600) + 'h',
@@ -244,7 +348,7 @@ app.get('/mcp', async (c) => {
       ...(isAuthenticated ? {} : {
         authenticationRequired: {
           message: 'Please authenticate with Strava to access your data',
-          authUrl: 'https://strava-mcp-oauth.perez-jg22.workers.dev/auth'
+          authUrl: `${getCurrentDomain(c)}/auth`
         }
       })
     }
@@ -260,7 +364,9 @@ app.post('/mcp', async (c) => {
     const request = await c.req.json();
     
     // Try to get authentication context
-    let context: any = {};
+    let context: any = {
+      baseUrl: getCurrentDomain(c)
+    };
     
     // Check for personal MCP token in URL parameter
     const personalToken = c.req.query('token');

@@ -241,6 +241,7 @@ export class StravaMCPServer {
 
   private async handleToolCall(request: MCPRequest, context: any): Promise<MCPResponse> {
     const { name, arguments: args } = request.params;
+    const baseUrl = context.baseUrl || 'https://your-worker-name.your-subdomain.workers.dev'; // fallback
     
     // Check if user is authenticated
     if (!context.session || !context.token) {
@@ -251,7 +252,7 @@ export class StravaMCPServer {
           content: [
             {
               type: 'text',
-              text: `🔐 **Authentication Required**\n\nTo use ${name}, please connect your Strava account first:\n\n👉 [Authenticate with Strava](https://strava-mcp-oauth.perez-jg22.workers.dev/auth)\n\nThis will allow the AI to access your Strava data securely. Each user authenticates with their own account - your data stays private!\n\nAfter authentication, try your request again.`
+              text: `🔐 **Authentication Required**\n\nTo use ${name}, please connect your Strava account first:\n\n👉 [Authenticate with Strava](${baseUrl}/auth)\n\nThis will allow the AI to access your Strava data securely. Each user authenticates with their own account - your data stays private!\n\nAfter authentication, try your request again.`
             }
           ]
         }
@@ -289,7 +290,7 @@ export class StravaMCPServer {
                 content: [
                   {
                     type: 'text',
-                    text: `🎉 **Welcome to Strava MCP!**\n\nI can help you access and analyze your Strava data through natural language.\n\n🔐 **Quick Setup (just 2 clicks!):**\n\n1. 👉 [Connect your Strava account](https://strava-mcp-oauth.perez-jg22.workers.dev/auth)\n2. 📎 Copy your personal MCP URL from the success page\n3. 🔄 Replace this connection with your personal URL\n\n🏃 **After setup, I can help you:**\n• View recent activities and detailed workout data\n• Analyze heart rate, power, and performance metrics\n• Explore segments and find new routes\n• Get comprehensive athlete statistics\n\n📊 **Privacy Note:** Each user gets their own personal URL. Your data stays completely private!`
+                    text: `🎉 **Welcome to Strava MCP!**\n\nI can help you access and analyze your Strava data through natural language.\n\n🔐 **Quick Setup (just 2 clicks!):**\n\n1. 👉 [Connect your Strava account](${baseUrl}/auth)\n2. 📎 Copy your personal MCP URL from the success page\n3. 🔄 Replace this connection with your personal URL\n\n🏃 **After setup, I can help you:**\n• View recent activities and detailed workout data\n• Analyze heart rate, power, and performance metrics\n• Explore segments and find new routes\n• Get comprehensive athlete statistics\n\n📊 **Privacy Note:** Each user gets their own personal URL. Your data stays completely private!`
                   }
                 ]
               }
@@ -306,7 +307,7 @@ export class StravaMCPServer {
             status: 'pending'
           }), { expirationTtl: 1800 }); // 30 minutes
           
-          const authUrl = `https://strava-mcp-oauth.perez-jg22.workers.dev/auth?session=${userSessionId}`;
+          const authUrl = `${baseUrl}/auth?session=${userSessionId}`;
           
           return {
             jsonrpc: '2.0',

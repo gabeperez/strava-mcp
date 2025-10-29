@@ -2,7 +2,7 @@
 
 A Cloudflare Worker that implements a complete Model Context Protocol (MCP) server for Strava with seamless OAuth authentication. This enables AI assistants like Poke.com, Claude Desktop, and others to access your Strava data through natural language queries.
 
-## Features
+## ✨ Features
 
 - 🔐 **Seamless Authentication**: Device-based OAuth with no URL management required
 - 🏃 **Complete MCP Server**: Full MCP protocol implementation with all Strava tools
@@ -10,8 +10,11 @@ A Cloudflare Worker that implements a complete Model Context Protocol (MCP) serv
 - 🌐 **Universal Compatibility**: Works with any MCP client (Poke.com, Claude Desktop, etc.)
 - ⚡ **Edge Performance**: Cloudflare Workers for global low-latency access
 - 🛡️ **Advanced Security**: Device fingerprinting, session management, secure token storage
+- 🔔 **Real-time Webhooks**: Optional push notifications for new Strava activities via Poke
 
-## Quick Start
+## 🚀 Quick Start
+
+**New to deployment?** See [README_DEPLOY.md](README_DEPLOY.md) for step-by-step instructions!
 
 ### 1. Strava API Setup
 
@@ -19,26 +22,35 @@ A Cloudflare Worker that implements a complete Model Context Protocol (MCP) serv
 2. Create a new application:
    - Application Name: `Strava MCP OAuth`
    - Website: `https://your-domain.com` (can be any URL)
-   - Authorization Callback Domain: `strava-mcp-oauth.perez-jg22.workers.dev`
+   - Authorization Callback Domain: `your-worker-name.your-subdomain.workers.dev`
 3. Note your **Client ID** and **Client Secret**
 
 ### 2. Deploy to Cloudflare Workers
 
 ```bash
+# Clone and install
+git clone <your-repo-url>
+cd strava-mcp-oauth
+npm install
+
+# Login to Cloudflare
+wrangler login
+
+# Create KV namespace
+wrangler kv:namespace create STRAVA_SESSIONS
+# Copy the namespace ID and update wrangler.jsonc
+
 # Set up environment secrets
 wrangler secret put STRAVA_CLIENT_ID
-# Enter your Strava Client ID when prompted
-
-wrangler secret put STRAVA_CLIENT_SECRET  
-# Enter your Strava Client Secret when prompted
+wrangler secret put STRAVA_CLIENT_SECRET
 
 # Deploy the worker
-wrangler deploy
+npm run deploy
 ```
 
 ### 3. Link Your Strava Account
 
-1. Visit `https://strava-mcp-oauth.perez-jg22.workers.dev/auth`
+1. Visit `https://your-worker-url.workers.dev/auth`
 2. Authorize the application with Strava
 3. You'll see a success page - the worker is now ready!
 
@@ -48,7 +60,7 @@ wrangler deploy
 
 1. Use this MCP server URL:
    ```
-   https://strava-mcp-oauth.perez-jg22.workers.dev/mcp
+   https://your-worker-url.workers.dev/mcp
    ```
 
 2. The first time you use any Strava tool, you'll get an authentication link
@@ -90,22 +102,22 @@ wrangler deploy
 ### Test MCP Server
 ```bash
 # Check server info
-curl https://strava-mcp-oauth.perez-jg22.workers.dev/
+curl https://your-worker-name.your-subdomain.workers.dev/
 
 # Test MCP initialization
-curl https://strava-mcp-oauth.perez-jg22.workers.dev/mcp
+curl https://your-worker-name.your-subdomain.workers.dev/mcp
 
 # Test tool listing
 curl -X POST -H "Content-Type: application/json" \
   -d '{"jsonrpc":"2.0","id":"1","method":"tools/list","params":{}}' \
-  https://strava-mcp-oauth.perez-jg22.workers.dev/mcp
+  https://your-worker-name.your-subdomain.workers.dev/mcp
 ```
 
 ## MCP Client Setup
 
 ### Poke.com
 1. Add a new MCP server
-2. Enter URL: `https://strava-mcp-oauth.perez-jg22.workers.dev/mcp`
+2. Enter URL: `https://your-worker-name.your-subdomain.workers.dev/mcp`
 3. Save the configuration
 4. First query will prompt for authentication
 
@@ -116,14 +128,14 @@ Add to your `claude_desktop_config.json`:
   "mcpServers": {
     "strava": {
       "command": "node",
-      "args": ["-e", "console.log('Use the web version at: https://strava-mcp-oauth.perez-jg22.workers.dev/mcp')"]
+      "args": ["-e", "console.log('Use the web version at: https://your-worker-name.your-subdomain.workers.dev/mcp')"]
     }
   }
 }
 ```
 
 ### Any MCP Client
-**Server URL:** `https://strava-mcp-oauth.perez-jg22.workers.dev/mcp`
+**Server URL:** `https://your-worker-name.your-subdomain.workers.dev/mcp`
 
 **Natural language queries you can make:**
 - "Show me my recent Strava activities"
