@@ -22,78 +22,80 @@ A complete **Model Context Protocol (MCP) server** for Strava that enables AI as
 
 ## 🚀 Quick Start
 
+**Note:** Deploying to Cloudflare requires using the command line (Terminal). Don't worry - we've made it as simple as copy & paste!
+
 <details open>
-<summary><b>📱 Browser/Dashboard Setup (Easiest)</b></summary>
+<summary><b>⚡ Automated Setup (Easiest - One Script Does Everything!)</b></summary>
 
-### Perfect for non-technical users who want a web interface
+### Copy & paste 5 commands, answer a few questions, done!
 
-**Step 1: Deploy to Cloudflare Workers**
+This automated script handles everything: database creation, configuration, secrets, webhooks, and deployment.
 
-**Option A: Automated Setup** ⚡ **Recommended for First-Time Users**
+**Step 1: Open Terminal**
+- **Mac**: Press Cmd+Space, type "Terminal", press Enter
+- **Windows**: Search "Command Prompt" or "PowerShell"
 
-This option runs one script that does everything for you!
+**Step 2: Copy & Paste These Commands**
 
-1. **Open your Terminal** (Mac: Cmd+Space, type "Terminal". Windows: search "Command Prompt")
+Paste these commands **one at a time** (press Enter after each):
 
-2. **Copy and paste these commands** one at a time:
+```bash
+# Download the project
+git clone https://github.com/gabeperez/strava-mcp-oauth.git
 
-   ```bash
-   # Download the project
-   git clone https://github.com/gabeperez/strava-mcp-oauth.git
-   
-   # Go into the folder
-   cd strava-mcp-oauth
-   
-   # Install dependencies
-   npm install
-   
-   # Login to Cloudflare (opens browser)
-   wrangler login
-   
-   # Run the automated setup
-   node scripts/setup.js
-   ```
+# Go into the folder
+cd strava-mcp-oauth
 
-3. **Follow the prompts** - the script will ask you for:
-   - Your Strava Client ID (from https://www.strava.com/settings/api)
-   - Your Strava Client Secret
-   - (Optional) Poke API key for notifications
+# Install dependencies (takes ~30 seconds)
+npm install
 
-4. **Done!** The script automatically:
-   - ✅ Creates your database (KV namespace)
-   - ✅ Updates all configuration files
-   - ✅ Sets your secrets securely
-   - ✅ Deploys your worker to Cloudflare
-   - ✅ Gives you your worker URL
+# Login to Cloudflare (opens browser - just click "Allow")
+wrangler login
 
-**Option B: Step-by-Step Manual Guide**
+# Run automated setup (asks you a few questions, then does everything!)
+node scripts/setup.js
+```
 
-Prefer to do it yourself? See [README_DEPLOY.md](README_DEPLOY.md) for detailed instructions.
+**Step 3: Answer the Prompts**
 
-**Step 2: Visit Your Dashboard**
+The script will ask you for:
+1. **Strava Client ID** - Get from [strava.com/settings/api](https://www.strava.com/settings/api)
+2. **Strava Client Secret** - Same page as above
+3. **Set up webhooks?** - Type "y" for push notifications (optional)
+4. **Poke API Key** - If you said yes to webhooks, get from [poke.com/settings/advanced](https://poke.com/settings/advanced)
 
-1. Go to `https://your-worker-url.workers.dev`
+**Step 4: Done! 🎉**
+
+The script automatically:
+- ✅ Creates your database (KV namespace)
+- ✅ Updates all configuration files
+- ✅ Sets your secrets securely
+- ✅ Sets up webhooks (if you chose yes)
+- ✅ Deploys to Cloudflare
+- ✅ Gives you your worker URL
+
+**Step 5: Visit Your Dashboard**
+
+1. Open the URL the script gave you (looks like `https://strava-mcp-oauth.yourname.workers.dev`)
 2. Click "Authenticate with Strava"
-3. Authorize the app
-4. You'll see your personal dashboard with:
-   - Recent activities
-   - Performance stats
-   - Personal MCP token
-   - Beautiful activity cards
+3. You'll see your beautiful dashboard with:
+   - 🏃 Recent activities
+   - 📊 Performance stats  
+   - 🔗 Personal MCP URL for AI assistants
+   - 🔔 Webhook status (if enabled)
 
-**Step 3: Use with AI Assistants**
+**Step 6: Connect to Poke or Claude**
 
-From your dashboard, copy your personal MCP URL and add it to:
+Copy your MCP URL from the dashboard and add it to:
 - **Poke**: Settings → Integrations → Add MCP Server
-- **Claude Desktop**: Add to `claude_desktop_config.json`
-- **Any MCP Client**: Use the URL shown on your dashboard
+- **Claude Desktop**: Add URL to `claude_desktop_config.json`
 
 That's it! Ask your AI: *"Show me my recent Strava workouts"* 🎉
 
 </details>
 
 <details>
-<summary><b>💻 Advanced: Manual CLI Setup</b></summary>
+<summary><b>🛠️ Advanced: Manual Step-by-Step Setup</b></summary>
 
 ### For developers who want full control
 
