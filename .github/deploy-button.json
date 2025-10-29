@@ -1,0 +1,43 @@
+{
+  "$schema": "https://raw.githubusercontent.com/cloudflare/workers-sdk/main/schemas/deploy-config.json",
+  "name": "strava-mcp-oauth",
+  "type": "javascript",
+  "build": {
+    "command": "npm install && npm run build"
+  },
+  "deploy": {
+    "environment_variables": [
+      {
+        "name": "STRAVA_REDIRECT_URI",
+        "type": "plain_text",
+        "default": "https://strava-mcp-oauth.workers.dev/callback"
+      }
+    ],
+    "secrets": [
+      {
+        "name": "STRAVA_CLIENT_ID",
+        "type": "secret_text"
+      },
+      {
+        "name": "STRAVA_CLIENT_SECRET",
+        "type": "secret_text"
+      },
+      {
+        "name": "STRAVA_WEBHOOK_VERIFY_TOKEN",
+        "type": "secret_text",
+        "required": false
+      },
+      {
+        "name": "POKE_API_KEY",
+        "type": "secret_text",
+        "required": false
+      }
+    ],
+    "kv_namespaces": [
+      {
+        "binding": "STRAVA_SESSIONS",
+        "id": ""
+      }
+    ]
+  }
+}

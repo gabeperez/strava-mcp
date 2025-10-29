@@ -2,8 +2,6 @@
 
 > **Production-ready MCP server** for Strava with OAuth authentication and real-time webhook notifications
 
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/gabeperez/strava-mcp-oauth)
-
 [![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-F38020?logo=cloudflare)](https://workers.cloudflare.com/)
 [![MCP Protocol](https://img.shields.io/badge/MCP-2024--11--05-blue)](https://modelcontextprotocol.io/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -27,21 +25,9 @@ A complete **Model Context Protocol (MCP) server** for Strava that enables AI as
 
 ### Perfect for non-technical users who want a web interface
 
-**Step 1: Deploy to Cloudflare Workers**
+**Step 1: Deploy the Worker**
 
-**Option A: One-Click Deploy** ⚡
-
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/gabeperez/strava-mcp-oauth)
-
-After deployment, you'll need to:
-1. Create a KV namespace: `wrangler kv:namespace create STRAVA_SESSIONS`
-2. Update `wrangler.jsonc` with the KV namespace ID
-3. Set your secrets (see below)
-4. Redeploy: `npm run deploy`
-
-**Option B: Manual Deployment**
-
-Follow the [step-by-step deployment guide](README_DEPLOY.md) (takes ~5 minutes):
+Use the one-click deploy button or follow [README_DEPLOY.md](README_DEPLOY.md):
 
 ```bash
 git clone https://github.com/gabeperez/strava-mcp-oauth.git
