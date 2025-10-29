@@ -25,9 +25,9 @@ A complete **Model Context Protocol (MCP) server** for Strava that enables AI as
 
 ### Perfect for non-technical users who want a web interface
 
-**Step 1: Deploy the Worker**
+**Step 1: Deploy to Cloudflare Workers**
 
-Use the one-click deploy button or follow [README_DEPLOY.md](README_DEPLOY.md):
+Follow the [step-by-step deployment guide](README_DEPLOY.md) (takes ~5 minutes):
 
 ```bash
 git clone https://github.com/gabeperez/strava-mcp-oauth.git
