@@ -38,9 +38,8 @@ Best for users who prefer clicking buttons over typing commands.
 [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/gabeperez/strava-mcp-oauth)
 
 This will:
-1. Fork the repo to your GitHub account
-2. Deploy it to your Cloudflare account
-3. Give you a worker URL
+1. Deploy it to your Cloudflare account
+2. Give you a worker URL
 
 **Step 2: Finish Configuration**
 
@@ -60,7 +59,7 @@ After deployment, you need to configure secrets and webhooks:
 3. **Answer the prompts:**
    - Strava Client ID (get from [strava.com/settings/api](https://www.strava.com/settings/api))
    - Strava Client Secret
-   - Poke API key for webhooks (optional)
+   - [Poke API](http://poke.com/) (or other AI/Chat App) key for webhooks (optional)
 
 4. **Done!** Visit your worker URL and authenticate with Strava.
 
