@@ -112,17 +112,30 @@ export class StravaWebhookHandler {
     try {
       console.log(`🏃 Processing new activity ${activityId} for athlete ${ownerId}`);
 
-      // Get the athlete's access token
+      // Get the athlete's session
       const sessionManager = new KVSessionManager(this.env);
-      const session = await sessionManager.getSession(ownerId);
+      let session = await sessionManager.getSession(ownerId);
 
       if (!session) {
         console.error(`❌ No session found for athlete ${ownerId}`);
         return;
       }
 
-      // Fetch full activity details from Strava
-      const activity = await this.fetchActivityDetails(activityId, session.access_token);
+      // Proactively refresh the access token if it is expired or expiring soon
+      const now = Math.floor(Date.now() / 1000);
+      if (session.expires_at <= now + 300) { // refresh if within 5 minutes of expiry
+        try {
+          console.log(`🔄 Access token expired or expiring soon for athlete ${ownerId}, refreshing...`);
+          session = await sessionManager.refreshToken(session);
+          console.log(`✅ Token refreshed successfully for athlete ${ownerId}`);
+        } catch (refreshError: any) {
+          console.error(`❌ Proactive token refresh failed for athlete ${ownerId}:`, refreshError.message);
+          // Continue with the existing token — fetchActivityDetails will handle a 401 below
+        }
+      }
+
+      // Fetch full activity details from Strava, refreshing on 401 if needed
+      const activity = await this.fetchActivityDetails(activityId, session.access_token, session, sessionManager);
 
       // Format and send notification
       const message = this.formatActivityMessage(activity);
@@ -145,12 +158,34 @@ export class StravaWebhookHandler {
   }
 
   /**
-   * Fetch full activity details from Strava API
+   * Fetch full activity details from Strava API.
+   * On a 401 Unauthorized response, refreshes the token once and retries.
+   * The refreshed session is persisted to KV via the sessionManager.
    */
-  private async fetchActivityDetails(activityId: number, accessToken: string): Promise<StravaActivity> {
-    const response = await fetch(`https://www.strava.com/api/v3/activities/${activityId}`, {
+  private async fetchActivityDetails(
+    activityId: number,
+    accessToken: string,
+    session: import('./types').StravaSession,
+    sessionManager: KVSessionManager
+  ): Promise<StravaActivity> {
+    const url = `https://www.strava.com/api/v3/activities/${activityId}`;
+    let response = await fetch(url, {
       headers: { 'Authorization': `Bearer ${accessToken}` },
     });
+
+    // On 401, attempt one token refresh and retry
+    if (response.status === 401) {
+      console.log(`🔄 Received 401 for activity ${activityId}, refreshing token and retrying...`);
+      try {
+        const refreshedSession = await sessionManager.refreshToken(session);
+        console.log(`✅ Token refreshed on 401 for athlete ${session.athlete_id}`);
+        response = await fetch(url, {
+          headers: { 'Authorization': `Bearer ${refreshedSession.access_token}` },
+        });
+      } catch (refreshError: any) {
+        throw new Error(`Token refresh on 401 failed: ${refreshError.message}`);
+      }
+    }
 
     if (!response.ok) {
       throw new Error(`Strava API error: ${response.status}`);
