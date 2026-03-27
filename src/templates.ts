@@ -863,7 +863,7 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
     </div>
 
     <script>
-        function copyToClipboard(text) {
+        window.copyToClipboard = function copyToClipboard(text) {
             navigator.clipboard.writeText(text).then(function() {
                 const successMsg = document.getElementById('copy-success');
                 successMsg.classList.remove('hidden');
@@ -899,7 +899,7 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
         }
 
         // Agent tab switching
-        function showAgent(agent) {
+        window.showAgent = function showAgent(agent) {
             document.querySelectorAll('.agent-panel').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.agent-tab').forEach(el => {
                 el.classList.remove('active-tab', 'border-orange-500', 'text-orange-400');
@@ -912,7 +912,7 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
         }
 
         // Copy config snippet
-        function copyConfig(elementId) {
+        window.copyConfig = function copyConfig(elementId) {
             const text = document.getElementById(elementId).textContent;
             navigator.clipboard.writeText(text).then(() => {
                 const successMsg = document.getElementById('copy-success');
@@ -933,7 +933,7 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
         }, 5 * 60 * 1000);
 
         // Save per-user Poke API key
-        async function savePokeKey(event) {
+        window.savePokeKey = async function savePokeKey(event) {
             event.preventDefault();
             const key = document.getElementById('poke-key-input').value.trim();
             const status = document.getElementById('poke-status');
