@@ -334,19 +334,18 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
 <body class="bg-gray-900 text-white min-h-screen">
     <!-- Navigation -->
     <nav class="bg-gray-800 border-b border-gray-700">
-        <div class="max-w-7xl mx-auto px-6 py-4">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-3">
-                    <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="SportsMCP Logo" class="w-10 h-10 rounded-lg">
-                    <span class="text-xl font-bold">SportsMCP</span>
+                    <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="SportsMCP Logo" class="w-9 h-9 rounded-lg">
+                    <span class="text-lg font-bold">SportsMCP</span>
                 </div>
-                <div class="flex items-center space-x-6">
-                    <a href="/about" class="text-gray-300 hover:text-white transition-colors">About</a>
-                    <a href="/support" class="text-gray-300 hover:text-white transition-colors">Support</a>
-                    <span class="text-gray-300">Welcome back!</span>
+                <div class="flex items-center space-x-3 sm:space-x-5">
+                    <a href="/about" class="hidden sm:block text-gray-300 hover:text-white transition-colors text-sm">About</a>
+                    <a href="/support" class="hidden sm:block text-gray-300 hover:text-white transition-colors text-sm">Support</a>
                     <form action="/logout" method="post" class="inline">
-                        <button type="submit" class="text-gray-400 hover:text-white transition-colors">
-                            <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                        <button type="submit" class="text-gray-400 hover:text-white transition-colors text-sm">
+                            <i class="fas fa-sign-out-alt mr-1"></i><span class="hidden sm:inline">Logout</span><span class="sm:hidden">Exit</span>
                         </button>
                     </form>
                 </div>
@@ -354,7 +353,7 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
         </div>
     </nav>
 
-    <div class="max-w-7xl mx-auto px-6 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6">
         <!-- Welcome Section -->
         <div class="mb-8">
             <h1 class="text-4xl font-bold mb-4 bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">
@@ -366,23 +365,21 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
             
             <!-- Quick Insights Banner -->
             <div class="bg-gradient-to-r from-orange-500/20 to-orange-600/20 rounded-xl p-4 border border-orange-500/30">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-6">
-                        <div class="text-center">
-                            <div class="text-2xl font-bold text-orange-400">{{total_activities}}</div>
-                            <div class="text-sm text-gray-300">Activities</div>
-                            <div class="text-xs text-gray-500">Last 4 weeks</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-2xl font-bold text-orange-400">{{insights.most_active_sport}}</div>
-                            <div class="text-sm text-gray-300">Most Active</div>
-                            <div class="text-xs text-gray-500">Primary sport</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-2xl font-bold text-orange-400">{{insights.weekly_average}}</div>
-                            <div class="text-sm text-gray-300">Per Week</div>
-                            <div class="text-xs text-gray-500">Average pace</div>
-                        </div>
+                <div class="grid grid-cols-3 gap-2 sm:flex sm:items-center sm:justify-between">
+                    <div class="text-center">
+                        <div class="text-xl sm:text-2xl font-bold text-orange-400">{{total_activities}}</div>
+                        <div class="text-xs sm:text-sm text-gray-300">Activities</div>
+                        <div class="text-xs text-gray-500 hidden sm:block">Last 4 weeks</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-xl sm:text-2xl font-bold text-orange-400">{{insights.most_active_sport}}</div>
+                        <div class="text-xs sm:text-sm text-gray-300">Most Active</div>
+                        <div class="text-xs text-gray-500 hidden sm:block">Primary sport</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-xl sm:text-2xl font-bold text-orange-400">{{insights.weekly_average}}</div>
+                        <div class="text-xs sm:text-sm text-gray-300">Per Week</div>
+                        <div class="text-xs text-gray-500 hidden sm:block">Average pace</div>
                     </div>
                     <div class="hidden md:flex items-center text-orange-400">
                         <i class="fas fa-chart-line text-3xl"></i>
@@ -391,8 +388,28 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
             </div>
         </div>
 
+        <!-- Poke Notifications (compact, near top) -->
+        <div class="card rounded-2xl p-4 mb-6">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                <div class="flex items-center gap-2 flex-shrink-0">
+                    <i class="fas fa-bell text-orange-400 text-lg"></i>
+                    <h2 class="text-base font-bold">Poke Notifications</h2>
+                </div>
+                <p class="text-xs text-gray-400 sm:mr-4 flex-shrink-0">Get notified on <a href="https://poke.com" target="_blank" rel="noopener noreferrer" class="text-orange-400 hover:underline">Poke.com</a> after each workout.</p>
+                <form id="poke-form" class="flex gap-2 flex-1 min-w-0" onsubmit="window.savePokeKey(event)">
+                    <input type="password" id="poke-key-input" placeholder="poke_xxxxxxxxxxxxxxxx"
+                           class="flex-1 min-w-0 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500">
+                    <button type="submit"
+                            class="flex-shrink-0 bg-orange-500 hover:bg-orange-600 text-white font-semibold px-4 py-2 rounded-lg text-sm transition-colors whitespace-nowrap">
+                        Save Key
+                    </button>
+                </form>
+            </div>
+            <p id="poke-status" class="text-xs mt-2 hidden"></p>
+        </div>
+
         <!-- Profile & MCP URL Section -->
-        <div class="grid lg:grid-cols-3 gap-8 mb-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
             <!-- Profile Card -->
             <div class="card rounded-2xl p-6">
                 <div class="flex items-center space-x-4 mb-6">
@@ -444,11 +461,11 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                 </p>
 
                 <div class="bg-gray-800 rounded-lg p-4 mb-6">
-                    <div class="flex items-center justify-between">
-                        <code class="text-orange-400 font-mono text-sm break-all" id="mcp-url-text">{{mcp_url}}</code>
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <code class="text-orange-400 font-mono text-xs sm:text-sm break-all" id="mcp-url-text">{{mcp_url}}</code>
                         <button
-                            onclick="copyToClipboard('{{mcp_url}}')"
-                            class="ml-4 bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex-shrink-0"
+                            onclick="window.copyToClipboard('{{mcp_url}}')"
+                            class="w-full sm:w-auto sm:ml-4 bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex-shrink-0 flex items-center justify-center"
                         >
                             <i class="fas fa-copy mr-2"></i>Copy URL
                         </button>
@@ -608,18 +625,18 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
         </div>
 
         <!-- Enhanced Stats Section -->
-        <div class="card rounded-2xl p-6 mb-8">
-            <div class="flex items-center justify-between mb-6">
-                <h2 class="text-2xl font-bold flex items-center">
+        <div class="card rounded-2xl p-5 sm:p-6 mb-6">
+            <div class="flex items-center justify-between mb-5">
+                <h2 class="text-xl sm:text-2xl font-bold flex items-center">
                     <i class="fas fa-chart-bar text-orange-400 mr-3"></i>
                     Activity Overview
                 </h2>
-                <div class="text-sm text-gray-400 bg-gray-800 px-3 py-1 rounded-full">
+                <div class="text-xs sm:text-sm text-gray-400 bg-gray-800 px-2 sm:px-3 py-1 rounded-full">
                     <i class="fas fa-calendar mr-1"></i>{{stats_date_range}}
                 </div>
             </div>
             
-            <div class="grid lg:grid-cols-4 gap-6 mb-6">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
                 <div class="text-center">
                     <div class="text-3xl text-orange-400 mb-2">
                         <i class="fas fa-running"></i>
@@ -659,7 +676,7 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
             
             <!-- Additional Insights -->
             <div class="border-t border-gray-700 pt-4">
-                <div class="grid md:grid-cols-3 gap-4 text-sm">
+                <div class="grid grid-cols-3 gap-3 text-sm">
                     <div class="bg-gray-800/30 rounded-lg p-3 text-center">
                         <div class="text-orange-400 font-semibold">{{total_activities}}</div>
                         <div class="text-gray-400">Total Activities</div>
@@ -677,8 +694,8 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
         </div>
 
         <!-- Recent Activities -->
-        <div class="card rounded-2xl p-6 mb-8">
-            <h2 class="text-2xl font-bold mb-6 flex items-center">
+        <div class="card rounded-2xl p-5 sm:p-6 mb-6">
+            <h2 class="text-xl sm:text-2xl font-bold mb-5 flex items-center">
                 <i class="fas fa-list text-orange-400 mr-3"></i>
                 Recent Activities
             </h2>
@@ -711,7 +728,7 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                             </div>
                         </div>
                         
-                        <div class="grid grid-cols-3 gap-4 text-sm">
+                        <div class="grid grid-cols-3 gap-2 sm:gap-4 text-sm">
                             <div class="text-center bg-gray-800/50 rounded p-2">
                                 <div class="text-orange-400 font-semibold">{{distance}}km</div>
                                 <div class="text-xs text-gray-500">Distance</div>
@@ -749,40 +766,15 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
             {{/if}}
         </div>
 
-        <!-- Poke Notifications Setup -->
-        <div class="card rounded-2xl p-6 mb-8">
-            <h2 class="text-2xl font-bold mb-2 flex items-center">
-                <i class="fas fa-bell text-orange-400 mr-3"></i>
-                Poke Notifications
-            </h2>
-            <p class="text-sm text-gray-400 mb-4">
-                Get notified on <a href="https://poke.com" target="_blank" rel="noopener noreferrer" class="text-orange-400 hover:underline">Poke.com</a>
-                when you complete a workout. Enter your personal Poke API key below.
-            </p>
-            <form id="poke-form" class="flex gap-3 items-end" onsubmit="savePokeKey(event)">
-                <div class="flex-1">
-                    <label class="block text-xs text-gray-400 mb-1">Your Poke API Key</label>
-                    <input type="password" id="poke-key-input" placeholder="poke_xxxxxxxxxxxxxxxx"
-                           class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500">
-                </div>
-                <button type="submit"
-                        class="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-4 py-2 rounded-lg text-sm transition-colors">
-                    Save Key
-                </button>
-            </form>
-            <p id="poke-status" class="text-xs mt-2 hidden"></p>
-        </div>
-
         <!-- API Usage & Tools -->
-        <div class="grid lg:grid-cols-2 gap-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 pb-2">
             <!-- Available Tools -->
-            <div class="card rounded-2xl p-6">
-                <h2 class="text-2xl font-bold mb-6 flex items-center">
+            <div class="card rounded-2xl p-5 sm:p-6">
+                <h2 class="text-lg sm:text-xl font-bold mb-4 flex items-center">
                     <i class="fas fa-tools text-orange-400 mr-3"></i>
                     Available MCP Tools
                 </h2>
-                
-                <div class="space-y-3">
+                <div class="space-y-2">
                     <div class="bg-gray-800/30 rounded-lg p-3">
                         <h3 class="font-semibold text-sm">get-recent-activities</h3>
                         <p class="text-xs text-gray-400">Fetch your recent Strava activities</p>
@@ -799,49 +791,45 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                         <h3 class="font-semibold text-sm">get-activity-streams</h3>
                         <p class="text-xs text-gray-400">Access time-series data (GPS, heart rate, etc.)</p>
                     </div>
-                    <div class="text-center mt-4">
-                        <span class="text-sm text-gray-400">And 6 more tools...</span>
+                    <div class="text-center mt-2">
+                        <span class="text-xs text-gray-500">And 6 more tools...</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Usage Stats -->
-            <div class="card rounded-2xl p-6">
-                <h2 class="text-2xl font-bold mb-6 flex items-center">
-                    <i class="fas fa-chart-bar text-orange-400 mr-3"></i>
-                    API Usage
+            <!-- Status & Usage -->
+            <div class="card rounded-2xl p-5 sm:p-6">
+                <h2 class="text-lg sm:text-xl font-bold mb-4 flex items-center">
+                    <i class="fas fa-shield-alt text-orange-400 mr-3"></i>
+                    Status &amp; Usage
                 </h2>
-                
-                <div class="space-y-6">
+                <div class="space-y-4">
                     <div>
-                        <div class="flex justify-between items-center mb-2">
+                        <div class="flex justify-between items-center mb-1">
                             <span class="text-sm text-gray-400">Requests This Month</span>
-                            <span class="font-semibold">0 / 1000</span>
+                            <span class="text-sm font-semibold">0 / 1000</span>
                         </div>
                         <div class="w-full bg-gray-700 rounded-full h-2">
                             <div class="bg-gradient-to-r from-orange-400 to-orange-600 h-2 rounded-full" style="width: 0%"></div>
                         </div>
                         <p class="text-xs text-gray-500 mt-1">Generous limits for personal use</p>
                     </div>
-                    
-                    <div class="bg-gray-800/30 rounded-lg p-4">
-                        <h3 class="font-semibold mb-2 flex items-center">
-                            <i class="fas fa-shield-alt text-green-400 mr-2"></i>
-                            Status: All Systems Operational
-                        </h3>
-                        <div class="space-y-2 text-sm text-gray-400">
-                            <div class="flex justify-between">
-                                <span>OAuth Token:</span>
-                                <span class="text-green-400">Valid</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span>MCP Endpoint:</span>
-                                <span class="text-green-400">Active</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span>Last Refresh:</span>
-                                <span>{{last_refresh}}</span>
-                            </div>
+                    <div class="bg-gray-800/30 rounded-lg p-4 space-y-2 text-sm">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i class="fas fa-circle text-green-400 text-xs"></i>
+                            <span class="font-semibold">All Systems Operational</span>
+                        </div>
+                        <div class="flex justify-between text-gray-400">
+                            <span>OAuth Token:</span>
+                            <span class="text-green-400 font-medium">Valid</span>
+                        </div>
+                        <div class="flex justify-between text-gray-400">
+                            <span>MCP Endpoint:</span>
+                            <span class="text-green-400 font-medium">Active</span>
+                        </div>
+                        <div class="flex justify-between text-gray-400">
+                            <span>Last Refresh:</span>
+                            <span class="text-right text-xs">{{last_refresh}}</span>
                         </div>
                     </div>
                 </div>
