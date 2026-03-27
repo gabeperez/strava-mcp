@@ -462,7 +462,7 @@ export async function handleMCPOverSSE(c: Context) {
     let context: any = {
       baseUrl: (() => {
         const host = c.req.header('host');
-        if (host?.includes('sportsmcp.com')) return 'https://sportsmcp.com';
+        if (host?.includes('stravamcp.com')) return 'https://stravamcp.com';
         return `https://${host || 'your-worker.workers.dev'}`;
       })()
     };

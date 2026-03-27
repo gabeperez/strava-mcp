@@ -192,8 +192,8 @@ export class AuthHandler {
         expires_at: Math.floor(Date.now() / 1000) + (365 * 24 * 60 * 60) // 1 year
       }), { expirationTtl: 365 * 24 * 60 * 60 }); // 1 year
 
-      // Always redirect to sportsmcp.com for better UX, fallback to workers.dev
-      const dashboardDomain = 'https://sportsmcp.com';
+      // Always redirect to stravamcp.com for better UX, fallback to workers.dev
+      const dashboardDomain = 'https://stravamcp.com';
       return c.redirect(`${dashboardDomain}/dashboard?token=${personalMcpToken}`);
     } catch (error: any) {
       console.error('OAuth callback error:', error);
