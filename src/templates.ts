@@ -30,7 +30,14 @@ export class TemplateEngine {
       return value !== undefined ? String(value) : match;
     });
 
-    // Handle simple conditionals {{#if condition}}...{{/if}}
+    // Handle {{#if}}...{{else}}...{{/if}} FIRST (specific pattern must match before simple {{#if}})
+    result = result.replace(/\{\{#if\s+([^}]+)\}\}([\s\S]*?)\{\{else\}\}([\s\S]*?)\{\{\/if\}\}/g, (match, condition, trueContent, falseContent) => {
+      const value = this.getNestedValue(data, condition.trim());
+      const contentToRender = this.isTruthy(value) ? trueContent : falseContent;
+      return this.processTemplate(contentToRender, data);
+    });
+
+    // Handle simple conditionals {{#if condition}}...{{/if}} (no else branch)
     result = result.replace(/\{\{#if\s+([^}]+)\}\}([\s\S]*?)\{\{\/if\}\}/g, (match, condition, content) => {
       const value = this.getNestedValue(data, condition.trim());
       return this.isTruthy(value) ? this.processTemplate(content, data) : '';
@@ -42,13 +49,6 @@ export class TemplateEngine {
       if (!Array.isArray(array)) return '';
       
       return array.map(item => this.processTemplate(content, { ...data, ...item })).join('');
-    });
-
-    // Handle {{else}} in conditionals
-    result = result.replace(/\{\{#if\s+([^}]+)\}\}([\s\S]*?)\{\{else\}\}([\s\S]*?)\{\{\/if\}\}/g, (match, condition, trueContent, falseContent) => {
-      const value = this.getNestedValue(data, condition.trim());
-      const contentToRender = this.isTruthy(value) ? trueContent : falseContent;
-      return this.processTemplate(contentToRender, data);
     });
 
     return result;
