@@ -197,16 +197,21 @@ app.post('/test-poke', async (c) => {
       return c.json({ error: 'No Poke API key saved. Add your key first.' }, 400);
     }
 
-    const testMessage = `🏃 SportsMCP Test Notification
+    const now = new Date().toLocaleString('en-US', {
+      weekday: 'short', month: 'short', day: 'numeric',
+      hour: 'numeric', minute: '2-digit', hour12: true
+    });
+    const testMessage = `👋 Test ping from SportsMCP — your Strava data is now connected to your AI assistant.
 
-Your Strava integration is working! Here's what a real workout notification looks like:
+SportsMCP gives your AI access to your full Strava history: recent activities, lap splits, heart rate zones, segment efforts, gear mileage, clubs, and more.
 
-📍 Morning Run · ${new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
-📏 10.5 km · ⏱ 52 min · 🏔 120m elevation
-⚡ Pace: 4:57 /km · ❤️ Avg HR: 145 bpm
-🏆 2 segment PRs!
+Please reply to confirm you received this and that the SportsMCP + Strava connection is active on your end. You can also try asking:
 
-Your AI assistant can now answer questions about this workout automatically.`;
+• "What were my last 3 workouts?"
+• "What are my heart rate training zones?"
+• "How many miles are on my running shoes?"
+
+— Sent ${now}`;
 
     const response = await fetch('https://poke.com/api/v1/inbound/api-message', {
       method: 'POST',
