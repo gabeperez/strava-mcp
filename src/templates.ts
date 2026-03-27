@@ -335,6 +335,9 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
             80% { opacity: 1; transform: translateY(0); }
             100% { opacity: 0; transform: translateY(-10px); }
         }
+        .active-tab {
+            background-color: rgba(249, 115, 22, 0.15);
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen">
@@ -445,46 +448,169 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                     </div>
                 </div>
 
-                <p class="text-gray-300 mb-6">
-                    Use this URL in your AI assistant to access your Strava data. This URL is unique to you and stays active as long as your account is connected.
+                <p class="text-gray-300 mb-4">
+                    This URL connects <strong>any MCP-compatible AI agent</strong> to your Strava data. It's unique to you and private — never share it publicly.
                 </p>
 
                 <div class="bg-gray-800 rounded-lg p-4 mb-6">
                     <div class="flex items-center justify-between">
-                        <code class="text-orange-400 font-mono text-sm break-all">
-                            {{mcp_url}}
-                        </code>
-                        <button 
-                            onclick="copyToClipboard('{{mcp_url}}')" 
+                        <code class="text-orange-400 font-mono text-sm break-all" id="mcp-url-text">{{mcp_url}}</code>
+                        <button
+                            onclick="copyToClipboard('{{mcp_url}}')"
                             class="ml-4 bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex-shrink-0"
                         >
-                            <i class="fas fa-copy mr-2"></i>Copy
+                            <i class="fas fa-copy mr-2"></i>Copy URL
                         </button>
                     </div>
                 </div>
 
-                <!-- Quick Setup Instructions -->
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div class="bg-gray-800/50 rounded-lg p-4">
-                        <h3 class="font-bold mb-2 text-orange-400">
-                            <i class="fas fa-search mr-2"></i>For Poke.com
-                        </h3>
-                        <ol class="text-sm text-gray-300 space-y-1">
-                            <li>1. Add new MCP server</li>
-                            <li>2. Paste your URL above</li>
-                            <li>3. Save and start chatting!</li>
-                        </ol>
+                <!-- Agent tabs -->
+                <div class="mb-3">
+                    <p class="text-sm text-gray-400 mb-3 font-semibold uppercase tracking-wide">Setup instructions by agent</p>
+                    <div class="flex flex-wrap gap-2 mb-4" id="agent-tabs">
+                        <button onclick="showAgent('claude')" id="tab-claude"
+                            class="agent-tab active-tab px-3 py-1 rounded-full text-xs font-semibold border border-orange-500 text-orange-400">
+                            Claude Desktop
+                        </button>
+                        <button onclick="showAgent('cursor')" id="tab-cursor"
+                            class="agent-tab px-3 py-1 rounded-full text-xs font-semibold border border-gray-600 text-gray-400 hover:border-orange-500 hover:text-orange-400">
+                            Cursor
+                        </button>
+                        <button onclick="showAgent('windsurf')" id="tab-windsurf"
+                            class="agent-tab px-3 py-1 rounded-full text-xs font-semibold border border-gray-600 text-gray-400 hover:border-orange-500 hover:text-orange-400">
+                            Windsurf
+                        </button>
+                        <button onclick="showAgent('cline')" id="tab-cline"
+                            class="agent-tab px-3 py-1 rounded-full text-xs font-semibold border border-gray-600 text-gray-400 hover:border-orange-500 hover:text-orange-400">
+                            Cline
+                        </button>
+                        <button onclick="showAgent('continue')" id="tab-continue"
+                            class="agent-tab px-3 py-1 rounded-full text-xs font-semibold border border-gray-600 text-gray-400 hover:border-orange-500 hover:text-orange-400">
+                            Continue.dev
+                        </button>
+                        <button onclick="showAgent('poke')" id="tab-poke"
+                            class="agent-tab px-3 py-1 rounded-full text-xs font-semibold border border-gray-600 text-gray-400 hover:border-orange-500 hover:text-orange-400">
+                            Poke
+                        </button>
+                        <button onclick="showAgent('other')" id="tab-other"
+                            class="agent-tab px-3 py-1 rounded-full text-xs font-semibold border border-gray-600 text-gray-400 hover:border-orange-500 hover:text-orange-400">
+                            Other
+                        </button>
                     </div>
-                    
-                    <div class="bg-gray-800/50 rounded-lg p-4">
-                        <h3 class="font-bold mb-2 text-orange-400">
-                            <i class="fas fa-desktop mr-2"></i>For Claude Desktop
-                        </h3>
-                        <ol class="text-sm text-gray-300 space-y-1">
-                            <li>1. Open config file</li>
-                            <li>2. Add server entry</li>
-                            <li>3. Use URL as endpoint</li>
-                        </ol>
+
+                    <!-- Claude Desktop -->
+                    <div id="agent-claude" class="agent-panel">
+                        <p class="text-xs text-gray-400 mb-2">Add to <code class="text-orange-300">~/Library/Application Support/Claude/claude_desktop_config.json</code>:</p>
+                        <div class="relative">
+                            <pre class="bg-gray-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto"><code id="claude-config">{
+  "mcpServers": {
+    "sportsmcp": {
+      "url": "{{mcp_url}}"
+    }
+  }
+}</code></pre>
+                            <button onclick="copyConfig('claude-config')"
+                                class="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-xs text-gray-300">
+                                <i class="fas fa-copy mr-1"></i>Copy
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">Restart Claude Desktop after saving.</p>
+                    </div>
+
+                    <!-- Cursor -->
+                    <div id="agent-cursor" class="agent-panel hidden">
+                        <p class="text-xs text-gray-400 mb-2">Go to <strong>Settings → Cursor Settings → MCP</strong> and add:</p>
+                        <div class="relative">
+                            <pre class="bg-gray-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto"><code id="cursor-config">{
+  "mcpServers": {
+    "sportsmcp": {
+      "url": "{{mcp_url}}"
+    }
+  }
+}</code></pre>
+                            <button onclick="copyConfig('cursor-config')"
+                                class="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-xs text-gray-300">
+                                <i class="fas fa-copy mr-1"></i>Copy
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">Cursor auto-reloads MCP servers on save.</p>
+                    </div>
+
+                    <!-- Windsurf -->
+                    <div id="agent-windsurf" class="agent-panel hidden">
+                        <p class="text-xs text-gray-400 mb-2">Go to <strong>Settings → Cascade → MCP Servers</strong> and add:</p>
+                        <div class="relative">
+                            <pre class="bg-gray-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto"><code id="windsurf-config">{
+  "mcpServers": {
+    "sportsmcp": {
+      "url": "{{mcp_url}}"
+    }
+  }
+}</code></pre>
+                            <button onclick="copyConfig('windsurf-config')"
+                                class="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-xs text-gray-300">
+                                <i class="fas fa-copy mr-1"></i>Copy
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Cline -->
+                    <div id="agent-cline" class="agent-panel hidden">
+                        <p class="text-xs text-gray-400 mb-2">In VS Code, open <strong>Cline → MCP Servers → Edit Config</strong> and add:</p>
+                        <div class="relative">
+                            <pre class="bg-gray-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto"><code id="cline-config">{
+  "mcpServers": {
+    "sportsmcp": {
+      "url": "{{mcp_url}}"
+    }
+  }
+}</code></pre>
+                            <button onclick="copyConfig('cline-config')"
+                                class="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-xs text-gray-300">
+                                <i class="fas fa-copy mr-1"></i>Copy
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Continue.dev -->
+                    <div id="agent-continue" class="agent-panel hidden">
+                        <p class="text-xs text-gray-400 mb-2">Add to your <code class="text-orange-300">~/.continue/config.json</code>:</p>
+                        <div class="relative">
+                            <pre class="bg-gray-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto"><code id="continue-config">{
+  "mcpServers": [
+    {
+      "name": "sportsmcp",
+      "transport": {
+        "type": "streamable-http",
+        "url": "{{mcp_url}}"
+      }
+    }
+  ]
+}</code></pre>
+                            <button onclick="copyConfig('continue-config')"
+                                class="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-xs text-gray-300">
+                                <i class="fas fa-copy mr-1"></i>Copy
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Poke -->
+                    <div id="agent-poke" class="agent-panel hidden">
+                        <p class="text-xs text-gray-400 mb-2">Go to <strong>Settings → Integrations → Add MCP Server</strong> in Poke and paste:</p>
+                        <div class="bg-gray-900 rounded-lg p-4">
+                            <code class="text-orange-400 text-sm break-all">{{mcp_url}}</code>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">Poke also supports real-time workout notifications — see the Poke Notifications section below.</p>
+                    </div>
+
+                    <!-- Other -->
+                    <div id="agent-other" class="agent-panel hidden">
+                        <p class="text-xs text-gray-400 mb-2">Any MCP-compatible agent that supports <strong>Streamable HTTP</strong> or <strong>HTTP+SSE</strong> transport works:</p>
+                        <div class="bg-gray-900 rounded-lg p-4 text-xs space-y-1 text-gray-300">
+                            <p><span class="text-orange-400 font-semibold">Streamable HTTP:</span> <code class="text-green-300">POST {{mcp_url}}</code></p>
+                            <p><span class="text-orange-400 font-semibold">SSE transport:</span> <code class="text-green-300">GET {{mcp_sse_url}}</code></p>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">Check your agent's MCP docs for which transport type it uses. Both are supported.</p>
                     </div>
                 </div>
             </div>
@@ -778,6 +904,35 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                     console.error('Fallback: Could not copy text: ', err);
                 }
                 document.body.removeChild(textArea);
+            });
+        }
+
+        // Agent tab switching
+        function showAgent(agent) {
+            document.querySelectorAll('.agent-panel').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.agent-tab').forEach(el => {
+                el.classList.remove('active-tab', 'border-orange-500', 'text-orange-400');
+                el.classList.add('border-gray-600', 'text-gray-400');
+            });
+            document.getElementById('agent-' + agent).classList.remove('hidden');
+            const tab = document.getElementById('tab-' + agent);
+            tab.classList.add('active-tab', 'border-orange-500', 'text-orange-400');
+            tab.classList.remove('border-gray-600', 'text-gray-400');
+        }
+
+        // Copy config snippet
+        function copyConfig(elementId) {
+            const text = document.getElementById(elementId).textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                const successMsg = document.getElementById('copy-success');
+                successMsg.querySelector('span') && (successMsg.querySelector('span').textContent = 'Config copied!');
+                successMsg.textContent = '✅ Config copied to clipboard!';
+                successMsg.classList.remove('hidden');
+                successMsg.classList.add('copy-success');
+                setTimeout(() => {
+                    successMsg.classList.add('hidden');
+                    successMsg.classList.remove('copy-success');
+                }, 2000);
             });
         }
 

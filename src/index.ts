@@ -116,6 +116,57 @@ app.post('/logout', async (c) => {
   return authHandler.logout(c);
 });
 
+// ---------------------------------------------------------------------------
+// SSE transport endpoint (legacy HTTP+SSE transport for Claude Desktop etc.)
+// Clients GET /sse?token=xxx  → receive SSE stream + endpoint event
+// Clients POST /messages?token=xxx → send JSON-RPC (handled below)
+// ---------------------------------------------------------------------------
+app.get('/sse', async (c) => {
+  return handleMCPOverSSE(c);
+});
+
+// /messages — receives JSON-RPC from SSE-transport clients and responds directly.
+// The SSE stream from /sse is used for server→client pushes; for simplicity in
+// Cloudflare Workers (no persistent memory across requests) we respond inline here.
+app.post('/messages', async (c) => {
+  const env = c.env as Env;
+  const mcpServer = new StravaMCPServer(env);
+
+  try {
+    const request = await c.req.json();
+    let context: any = { baseUrl: getCurrentDomain(c) };
+
+    const personalToken = c.req.query('token');
+    if (personalToken) {
+      const personalData = await env.STRAVA_SESSIONS.get(`personal_mcp:${personalToken}`);
+      if (personalData) {
+        const { athlete_id } = JSON.parse(personalData);
+        const sessionManager = new (await import('./session')).KVSessionManager(env);
+        const session = await sessionManager.getSession(athlete_id);
+        if (session) {
+          const now = Math.floor(Date.now() / 1000);
+          if (session.expires_at <= now + 300) {
+            const refreshed = await sessionManager.refreshToken(session);
+            context.session = refreshed;
+            context.token = refreshed.access_token;
+          } else {
+            context.session = session;
+            context.token = session.access_token;
+          }
+        }
+      }
+    }
+
+    const response = await mcpServer.handleMCPRequest(request, context);
+    return c.json(response);
+  } catch (error: any) {
+    return c.json({
+      jsonrpc: '2.0',
+      error: { code: -32700, message: 'Parse error', data: { message: error.message } }
+    }, 400);
+  }
+});
+
 // Webhook endpoints
 app.get('/webhook', async (c) => {
   const webhookHandler = new StravaWebhookHandler(c.env);
@@ -326,6 +377,7 @@ app.get('/dashboard', async (c) => {
       stats,
       recent_activities: formattedActivities,
       mcp_url: `${currentDomain}/mcp?token=${token}`,
+      mcp_sse_url: `${currentDomain}/sse?token=${token}`,
       created_at: new Date(session.created_at * 1000).toLocaleDateString(),
       last_refresh: new Date().toLocaleString(),
       total_time: Math.round((stats.recent_run_totals.moving_time + stats.recent_ride_totals.moving_time) / 3600) + 'h',

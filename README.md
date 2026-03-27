@@ -1,26 +1,29 @@
-# 🌴 SportsMCP - Cloudflare Workers
+# 🏃 SportsMCP — Strava for Any AI Agent
 
-> **Production-ready MCP server** for Strava with OAuth authentication and real-time webhook notifications
+> **Production-ready MCP server** for Strava — works with Claude Desktop, Cursor, Windsurf, Cline, Continue.dev, Poke, and any MCP-compatible AI agent.
 
-⚠️ **IMPORTANT: Personal Use Only** - This project is currently designed for **single-user/personal deployments**. The webhook notification system sends all activity updates to a single Poke API key (yours). Multi-user support with per-user notifications is planned for future releases.
-
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/gabeperez/sportsmcp)
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/gabeperez/strava-mcp)
 
 [![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-F38020?logo=cloudflare)](https://workers.cloudflare.com/)
 [![MCP Protocol](https://img.shields.io/badge/MCP-2024--11--05-blue)](https://modelcontextprotocol.io/)
+[![Compatible with Strava](https://img.shields.io/badge/Compatible%20with-Strava-FC4C02)](https://www.strava.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A complete **Model Context Protocol (MCP) server** for Strava that enables AI assistants (Poke, Claude Desktop, etc.) to access your Strava data through natural language. Plus optional real-time webhook notifications when you complete workouts!
+A complete **[Model Context Protocol](https://modelcontextprotocol.io/) server** that gives any AI assistant secure, read-only access to your personal Strava fitness data. Deploy once to Cloudflare Workers, authenticate with Strava, and paste your personal MCP URL into whichever AI tools you use.
+
+> Compatible with Strava. SportsMCP is not affiliated with, endorsed, or sponsored by Strava.
 
 ## ✨ Features
 
-- 🔐 **Zero-Config OAuth** - Device-based authentication, no URL management
-- 🏃 **9 MCP Tools** - Activities, segments, routes, athlete stats, and more
-- 🔔 **Real-time Webhooks** - Push notifications via Poke for new activities
-- 🔄 **Auto Token Refresh** - Never worry about expired tokens
-- 🎨 **Beautiful Dashboard** - Web UI to view your Strava data
-- ⚡ **Edge Performance** - Global Cloudflare network, <50ms response times
-- 💰 **Free Tier** - 100k requests/day at zero cost
+- 🤖 **Works with any MCP client** — Claude Desktop, Cursor, Windsurf, Cline, Continue.dev, Poke, and more
+- 🔐 **Secure OAuth** — Standard Strava OAuth 2.0, per-user token isolation
+- 🏃 **10 MCP Tools** — Activities, streams, segments, routes, athlete stats, and more
+- 🔔 **Optional Webhooks** — Real-time Poke notifications when workouts complete (per-user keys)
+- 🔄 **Auto Token Refresh** — Tokens renew automatically before expiry
+- 🎨 **Dashboard** — Web UI with one-click config snippets for every major AI agent
+- ⚡ **Edge Performance** — Cloudflare Workers global network, <50ms response times
+- 💰 **Free Tier** — 100k requests/day at zero cost
+- 🛡️ **Compliance** — Full Strava API agreement compliance, deauth cleanup within 48h
 
 ## 🚀 Quick Start
 
@@ -129,11 +132,75 @@ The script automatically:
    - 🔗 Personal MCP URL for AI assistants
    - 🔔 Webhook status (if enabled)
 
-**Step 6: Connect to Poke or Claude**
+**Step 6: Connect to your AI agent**
 
-Copy your MCP URL from the dashboard and add it to:
-- **Poke**: Settings → Integrations → Add MCP Server
-- **Claude Desktop**: Add URL to `claude_desktop_config.json`
+Copy your personal MCP URL from the dashboard and add it to your preferred AI agent:
+
+---
+
+## 🤖 Connecting to AI Agents
+
+SportsMCP uses the standard **Model Context Protocol**, so it works with any MCP-compatible client. Your personal URL looks like:
+```
+https://your-worker.workers.dev/mcp?token=YOUR_TOKEN
+```
+
+### Claude Desktop
+Edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
+```json
+{
+  "mcpServers": {
+    "sportsmcp": {
+      "url": "https://your-worker.workers.dev/mcp?token=YOUR_TOKEN"
+    }
+  }
+}
+```
+Restart Claude Desktop after saving.
+
+### Cursor
+Go to **Settings → Cursor Settings → MCP** and add:
+```json
+{
+  "mcpServers": {
+    "sportsmcp": {
+      "url": "https://your-worker.workers.dev/mcp?token=YOUR_TOKEN"
+    }
+  }
+}
+```
+
+### Windsurf
+Go to **Settings → Cascade → MCP Servers** and add the same JSON block as Cursor above.
+
+### Cline (VS Code)
+Open **Cline → MCP Servers → Edit Config** and add the same JSON block.
+
+### Continue.dev
+Add to `~/.continue/config.json`:
+```json
+{
+  "mcpServers": [
+    {
+      "name": "sportsmcp",
+      "transport": {
+        "type": "streamable-http",
+        "url": "https://your-worker.workers.dev/mcp?token=YOUR_TOKEN"
+      }
+    }
+  ]
+}
+```
+
+### Poke
+Go to **Settings → Integrations → Add MCP Server** and paste your MCP URL directly.
+
+### Any other MCP client
+Two transports are available:
+- **Streamable HTTP** (recommended): `POST /mcp?token=YOUR_TOKEN`
+- **HTTP+SSE** (legacy, e.g. older Claude Desktop): `GET /sse?token=YOUR_TOKEN` + `POST /messages?token=YOUR_TOKEN`
+
+---
 
 That's it! Ask your AI: *"Show me my recent Strava workouts"* 🎉
 

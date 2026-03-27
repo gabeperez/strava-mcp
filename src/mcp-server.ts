@@ -266,10 +266,6 @@ export class StravaMCPServer {
         case 'welcome-strava-mcp':
           const isAuthenticated = !!(context.session && context.token);
           if (isAuthenticated) {
-            result = {
-              message: `Welcome back, ${context.session.athlete.firstname}! Your Strava account is connected.`,
-              status: 'authenticated'
-            };
             return {
               jsonrpc: '2.0',
               id: request.id,
@@ -277,7 +273,7 @@ export class StravaMCPServer {
                 content: [
                   {
                     type: 'text',
-                    text: `🎉 **Welcome back, ${context.session.athlete.firstname}!**\n\nYour Strava account is connected and ready to use.\n\n🏃 **Try asking me:**\n• "Show me my recent activities"\n• "What was my heart rate data from my last run?"\n• "Get the power profile for my weekend ride"\n• "Find challenging climbs near Boulder, Colorado"\n\n📊 I can access all your Strava data including activities, segments, routes, and stats!`
+                    text: `🎉 **Welcome back, ${context.session.athlete.firstname}!**\n\nYour Strava account is connected and ready to use with SportsMCP.\n\n🏃 **Try asking:**\n• "Show me my recent activities"\n• "What was my heart rate on my last run?"\n• "Get the power data from my weekend ride"\n• "Find challenging climbs near Boulder, Colorado"\n• "What are my year-to-date running stats?"\n\n📊 I have access to your activities, segments, routes, streams, and athlete stats — all powered by Strava.`
                   }
                 ]
               }
@@ -290,7 +286,7 @@ export class StravaMCPServer {
                 content: [
                   {
                     type: 'text',
-                    text: `🎉 **Welcome to SportsMCP!**\n\nI can help you access and analyze your Strava data through natural language.\n\n🔐 **Quick Setup (just 2 clicks!):**\n\n1. 👉 [Connect your Strava account](${baseUrl}/auth)\n2. 📎 Copy your personal MCP URL from the success page\n3. 🔄 Replace this connection with your personal URL\n\n🏃 **After setup, I can help you:**\n• View recent activities and detailed workout data\n• Analyze heart rate, power, and performance metrics\n• Explore segments and find new routes\n• Get comprehensive athlete statistics\n\n📊 **Privacy Note:** Each user gets their own personal URL. Your data stays completely private!`
+                    text: `👋 **Welcome to SportsMCP** — your Strava data for any AI agent.\n\nSportsMCP works with **Claude Desktop, Cursor, Windsurf, Cline, Continue.dev, Poke**, and any other MCP-compatible client.\n\n🔐 **Quick Setup:**\n1. Visit [${baseUrl}/auth](${baseUrl}/auth) and connect your Strava account\n2. Copy your personal MCP URL from the dashboard\n3. Paste it into your AI agent's MCP settings\n\n**Config format (works in all major clients):**\n\`\`\`json\n{\n  "mcpServers": {\n    "sportsmcp": {\n      "url": "${baseUrl}/mcp?token=YOUR_TOKEN"\n    }\n  }\n}\n\`\`\`\n\n🏃 **Once connected, you can ask any MCP-compatible AI:**\n• "Show me my recent activities"\n• "Analyze my heart rate trends this month"\n• "Find segments near me"\n• "What are my all-time running stats?"\n\n📊 **Privacy:** Each user gets their own personal URL. Your data is never shared or used for training.`
                   }
                 ]
               }
@@ -456,33 +452,80 @@ export class StravaMCPServer {
 }
 
 // MCP over SSE endpoint handler
+// Supports the legacy HTTP+SSE transport used by Claude Desktop and other clients.
+// For the newer Streamable HTTP transport, use POST /mcp directly.
 export async function handleMCPOverSSE(c: Context) {
   const env = c.env as Env;
   const mcpServer = new StravaMCPServer(env);
 
   return streamSSE(c, async (stream) => {
-    let context: any = {};
-    
-    // Try to get authentication context
-    try {
-      const authMiddleware = new AuthMiddleware(env);
-      // We need to create a mock context for the middleware
-      const mockContext = {
-        req: c.req,
-        env: c.env,
-        get: () => null,
-        set: (key: string, value: any) => {
-          if (key === 'session') context.session = value;
-          if (key === 'token') context.token = value;
+    let context: any = {
+      baseUrl: (() => {
+        const host = c.req.header('host');
+        if (host?.includes('sportsmcp.com')) return 'https://sportsmcp.com';
+        return `https://${host || 'your-worker.workers.dev'}`;
+      })()
+    };
+
+    // --- Authentication: prefer token query param, then fall back to cookie/device ---
+    const personalToken = c.req.query('token');
+    let authenticatedAthleteId: number | null = null;
+
+    if (personalToken) {
+      try {
+        const personalData = await env.STRAVA_SESSIONS.get(`personal_mcp:${personalToken}`);
+        if (personalData) {
+          const tokenInfo = JSON.parse(personalData);
+          authenticatedAthleteId = tokenInfo.athlete_id;
         }
-      };
-      
-      await authMiddleware.authenticate(mockContext as any, async () => {});
-    } catch (error) {
-      // Authentication failed - will be handled in tool calls
+      } catch (_) {}
+    }
+
+    if (!authenticatedAthleteId) {
+      // Fall back to AuthMiddleware (cookie / device fingerprint)
+      try {
+        const authMiddleware = new AuthMiddleware(env);
+        const mockContext = {
+          req: c.req,
+          env: c.env,
+          get: () => null,
+          set: (key: string, value: any) => {
+            if (key === 'session') context.session = value;
+            if (key === 'token') context.token = value;
+          }
+        };
+        await authMiddleware.authenticate(mockContext as any, async () => {});
+        if (context.session) {
+          authenticatedAthleteId = context.session.athlete_id;
+        }
+      } catch (_) {}
+    }
+
+    if (authenticatedAthleteId && !context.session) {
+      try {
+        const { KVSessionManager } = await import('./session');
+        const sessionManager = new KVSessionManager(env);
+        const session = await sessionManager.getSession(authenticatedAthleteId);
+        if (session) {
+          const now = Math.floor(Date.now() / 1000);
+          if (session.expires_at <= now + 300) {
+            const refreshed = await sessionManager.refreshToken(session);
+            context.session = refreshed;
+            context.token = refreshed.access_token;
+          } else {
+            context.session = session;
+            context.token = session.access_token;
+          }
+        }
+      } catch (_) {}
     }
 
     // Send server capabilities
+    await stream.writeSSE({
+      event: 'endpoint',
+      data: `${context.baseUrl}/messages${personalToken ? `?token=${personalToken}` : ''}`
+    });
+
     await stream.writeSSE({
       data: JSON.stringify({
         jsonrpc: '2.0',
