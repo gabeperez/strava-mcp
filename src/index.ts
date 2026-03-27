@@ -427,7 +427,9 @@ app.get('/dashboard', async (c) => {
       poke_key_saved: !!pokeKey,
       poke_masked_key: pokeKey
         ? (pokeKey.length > 9 ? pokeKey.slice(0, 5) + '••••••••' + pokeKey.slice(-4) : '••••••••••••')
-        : ''
+        : '',
+      poke_saved_class: pokeKey ? '' : 'hidden',
+      poke_form_class: pokeKey ? 'hidden' : ''
     };
     
     // Render the beautiful dashboard HTML
