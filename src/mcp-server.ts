@@ -289,6 +289,9 @@ export class SportsMCPServer {
               description: 'Number of routes per page',
               default: 30
             }
+          }
+        }
+      },
       {
         name: 'get-activity-laps',
         description: 'Get the lap splits for a specific Strava activity. Essential for analyzing interval training sessions, tempo runs, and structured workouts.',
