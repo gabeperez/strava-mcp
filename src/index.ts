@@ -45,6 +45,7 @@ app.use('*', async (c, next) => {
 function getCurrentDomain(c: any): string {
   const host = c.req.header('host');
   if (!host) return 'https://strava-mcp-oauth.perez-jg22.workers.dev';
+  // Always use the actual request host — works for workers.dev or any custom domain
   const protocol = host.includes('localhost') ? 'http' : 'https';
   return `${protocol}://${host}`;
 }
@@ -318,7 +319,7 @@ app.get('/dashboard', async (c) => {
       fetch('https://www.strava.com/api/v3/athletes/' + athlete_id + '/stats', {
         headers: { 'Authorization': `Bearer ${session.access_token}` }
       }),
-      fetch('https://www.strava.com/api/v3/athlete/activities?per_page=5', {
+      fetch('https://www.strava.com/api/v3/athlete/activities?per_page=7', {
         headers: { 'Authorization': `Bearer ${session.access_token}` }
       })
     ]);
@@ -328,7 +329,8 @@ app.get('/dashboard', async (c) => {
     const activities = await activitiesResponse.json();
     
     // Format activity data for template
-    const formattedActivities = activities.slice(0, 5).map((activity: any) => ({
+    const activitiesArray = Array.isArray(activities) ? activities : [];
+    const formattedActivities = activitiesArray.slice(0, 7).map((activity: any) => ({
       ...activity,
       distance: Math.round(activity.distance / 1000 * 10) / 10, // Convert to km with 1 decimal
       moving_time: Math.floor(activity.moving_time / 60) + 'min', // Convert to minutes
@@ -388,7 +390,7 @@ app.get('/dashboard', async (c) => {
       insights: {
         most_active_sport: stats.recent_run_totals.count > stats.recent_ride_totals.count ? 'Running' : 'Cycling',
         weekly_average: Math.round(totalActivities / 4 * 10) / 10,
-        longest_activity: activities.length > 0 ? Math.round(Math.max(...activities.map((a: any) => a.distance)) / 1000 * 10) / 10 : 0
+        longest_activity: activitiesArray.length > 0 ? Math.round(Math.max(...activitiesArray.map((a: any) => a.distance)) / 1000 * 10) / 10 : 0
       }
     };
     

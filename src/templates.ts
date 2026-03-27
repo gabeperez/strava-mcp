@@ -94,12 +94,12 @@ export const LANDING_TEMPLATE = `<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SportsMCP - Connect Your AI to Strava</title>
+    <title>StravaMCP - Connect Your AI to Strava</title>
     <meta name="description" content="Get your personal MCP server URL to unlock powerful Strava integration with AI assistants like Poke.com, Claude Desktop, and more.">
     <link rel="icon" type="image/png" href="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png">
     
     <!-- Social Media Meta Tags -->
-    <meta property="og:title" content="SportsMCP - Connect Your AI to Strava">
+    <meta property="og:title" content="StravaMCP - Connect Your AI to Strava">
     <meta property="og:description" content="Get your personal MCP server URL to unlock powerful Strava integration with AI assistants.">
     <meta property="og:image" content="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961568/SportMCP_opengraph.png">
     <meta property="og:image:width" content="1200">
@@ -107,7 +107,7 @@ export const LANDING_TEMPLATE = `<!DOCTYPE html>
     <meta property="og:url" content="{{base_url}}">
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="SportsMCP - Connect Your AI to Strava">
+    <meta name="twitter:title" content="StravaMCP - Connect Your AI to Strava">
     <meta name="twitter:description" content="Get your personal MCP server URL to unlock powerful Strava integration with AI assistants.">
     <meta name="twitter:image" content="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961568/SportMCP_opengraph.png">
     
@@ -278,7 +278,7 @@ export const LANDING_TEMPLATE = `<!DOCTYPE html>
             </p>
             <p class="text-xs mt-3 text-gray-600">
                 Compatible with <a href="https://www.strava.com" target="_blank" rel="noopener noreferrer" class="text-orange-500 font-semibold hover:text-orange-400">Strava</a>.
-                SportsMCP is not affiliated with, endorsed, or sponsored by Strava.
+                StravaMCP is not affiliated with, endorsed, or sponsored by Strava.
             </p>
         </div>
     </footer>
@@ -290,19 +290,19 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - SportsMCP</title>
+    <title>Dashboard - StravaMCP</title>
     <meta name="description" content="Your personal Strava MCP dashboard with activity stats, insights, and your unique MCP URL for AI assistants.">
     <link rel="icon" type="image/png" href="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png">
     
     <!-- Social Media Meta Tags -->
-    <meta property="og:title" content="SportsMCP Dashboard - Your Personal Activity Hub">
+    <meta property="og:title" content="StravaMCP Dashboard - Your Personal Activity Hub">
     <meta property="og:description" content="View your Strava stats, get your personal MCP URL, and connect AI assistants to your fitness data.">
     <meta property="og:image" content="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961568/SportMCP_opengraph.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="SportsMCP Dashboard">
+    <meta name="twitter:title" content="StravaMCP Dashboard">
     <meta name="twitter:description" content="View your Strava stats, get your personal MCP URL, and connect AI assistants to your fitness data.">
     <meta name="twitter:image" content="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961568/SportMCP_opengraph.png">
     
@@ -357,7 +357,7 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
         <!-- Welcome Section -->
         <div class="mb-8">
             <h1 class="text-4xl font-bold mb-4 bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">
-                Your SportsMCP Dashboard
+                Your StravaMCP Dashboard
             </h1>
             <p class="text-xl text-gray-400 mb-6">
                 Everything you need to connect AI assistants to your Strava data
@@ -695,145 +695,181 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
 
         <!-- Recent Activities -->
         <div class="card rounded-2xl p-5 sm:p-6 mb-6">
-            <h2 class="text-xl sm:text-2xl font-bold mb-5 flex items-center">
-                <i class="fas fa-list text-orange-400 mr-3"></i>
-                Recent Activities
-            </h2>
-            
+            <div class="flex items-center justify-between mb-5">
+                <h2 class="text-xl font-bold flex items-center">
+                    <i class="fas fa-bolt text-orange-400 mr-2"></i>
+                    Recent Activities
+                </h2>
+                <span class="text-xs text-gray-500 bg-gray-800 px-2 py-1 rounded-full">Last 7 workouts</span>
+            </div>
+
             {{#if recent_activities}}
-                <div class="space-y-4">
+                <div class="space-y-3">
                     {{#each recent_activities}}
-                    <div class="bg-gray-800/50 rounded-lg p-4">
-                        <div class="flex items-center justify-between mb-2">
-                            <div class="flex items-center space-x-3">
-                                <div class="text-2xl">
+                    <div class="bg-gray-800/40 border border-gray-700/50 rounded-xl p-4 hover:border-orange-500/30 transition-colors">
+                        <!-- Row 1: Emoji + Name + Date + Type badge -->
+                        <div class="flex items-start justify-between gap-2 mb-3">
+                            <div class="flex items-center gap-3">
+                                <span class="text-xl leading-none">
                                     {{#if (eq sport_type "Run")}}🏃{{/if}}
                                     {{#if (eq sport_type "Ride")}}🚴{{/if}}
                                     {{#if (eq sport_type "Swim")}}🏊{{/if}}
                                     {{#if (not (or (eq sport_type "Run") (eq sport_type "Ride") (eq sport_type "Swim")))}}⚡{{/if}}
-                                </div>
+                                </span>
                                 <div>
-                                    <h3 class="font-semibold text-white">{{name}}</h3>
-                                    <div class="text-xs text-gray-500">{{start_date_local}}</div>
+                                    <h3 class="font-semibold text-white text-sm leading-tight">{{name}}</h3>
+                                    <div class="text-xs text-gray-500 mt-0.5">{{start_date_local}}</div>
                                 </div>
                             </div>
-                            <div class="text-right">
-                                <div class="text-sm font-semibold text-orange-400">{{sport_type}}</div>
-                                {{#if pace}}
-                                    <div class="text-xs text-gray-400">{{pace}} pace</div>
-                                {{/if}}
-                                {{#if speed}}
-                                    <div class="text-xs text-gray-400">{{speed}} avg</div>
-                                {{/if}}
+                            <div class="text-right flex-shrink-0">
+                                <span class="text-xs font-semibold text-orange-400 bg-orange-500/10 px-2 py-0.5 rounded-full">{{sport_type}}</span>
+                                {{#if pace}}<div class="text-xs text-gray-500 mt-1">{{pace}} /km</div>{{/if}}
+                                {{#if speed}}<div class="text-xs text-gray-500 mt-1">{{speed}}</div>{{/if}}
                             </div>
                         </div>
-                        
-                        <div class="grid grid-cols-3 gap-2 sm:gap-4 text-sm">
-                            <div class="text-center bg-gray-800/50 rounded p-2">
-                                <div class="text-orange-400 font-semibold">{{distance}}km</div>
-                                <div class="text-xs text-gray-500">Distance</div>
+                        <!-- Row 2: Stats pills -->
+                        <div class="flex gap-2 flex-wrap">
+                            <div class="flex items-center gap-1 bg-gray-800/60 rounded-lg px-3 py-1.5">
+                                <i class="fas fa-route text-orange-400 text-xs"></i>
+                                <span class="text-orange-400 font-semibold text-xs">{{distance}}km</span>
                             </div>
-                            <div class="text-center bg-gray-800/50 rounded p-2">
-                                <div class="text-orange-400 font-semibold">{{moving_time}}</div>
-                                <div class="text-xs text-gray-500">Time</div>
+                            <div class="flex items-center gap-1 bg-gray-800/60 rounded-lg px-3 py-1.5">
+                                <i class="fas fa-clock text-orange-400 text-xs"></i>
+                                <span class="text-orange-400 font-semibold text-xs">{{moving_time}}</span>
                             </div>
-                            <div class="text-center bg-gray-800/50 rounded p-2">
-                                {{#if elevation_gain}}
-                                    <div class="text-orange-400 font-semibold">{{elevation_gain}}m</div>
-                                    <div class="text-xs text-gray-500">Elevation</div>
-                                {{else}}
-                                    <div class="text-orange-400 font-semibold">--</div>
-                                    <div class="text-xs text-gray-500">Elevation</div>
-                                {{/if}}
+                            {{#if elevation_gain}}
+                            <div class="flex items-center gap-1 bg-gray-800/60 rounded-lg px-3 py-1.5">
+                                <i class="fas fa-mountain text-orange-400 text-xs"></i>
+                                <span class="text-orange-400 font-semibold text-xs">{{elevation_gain}}m</span>
                             </div>
-                        </div>
-                        <div class="mt-3 text-right">
+                            {{/if}}
                             <a href="https://www.strava.com/activities/{{id}}" target="_blank" rel="noopener noreferrer"
-                               class="inline-flex items-center text-xs font-bold text-orange-400 underline hover:text-orange-300 transition-colors">
-                                <svg class="w-3 h-3 mr-1" viewBox="0 0 24 24" fill="currentColor"><path d="M13.49 5.48c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-3.6 13.9l1-4.4 2.1 2v6h2v-7.5l-2.1-2 .6-3c1.3 1.5 3.3 2.5 5.5 2.5v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1l-5.2 2.2v4.7h2v-3.4l1.8-.7-1.6 8.1-4.9-1-.4 2 7 1.4z"/></svg>
-                                View on Strava
+                               class="ml-auto flex items-center gap-1 text-xs text-gray-500 hover:text-orange-400 transition-colors">
+                                <i class="fas fa-external-link-alt text-xs"></i>
+                                Strava
                             </a>
                         </div>
                     </div>
                     {{/each}}
                 </div>
             {{else}}
-                <div class="text-center py-8 text-gray-400">
-                    <i class="fas fa-running text-4xl mb-4"></i>
-                    <p>No recent activities found</p>
-                    <p class="text-sm">Go get moving! 🏃‍♂️</p>
+                <div class="text-center py-10 text-gray-500">
+                    <div class="text-4xl mb-3">🏃‍♂️</div>
+                    <p class="font-medium">No recent activities yet</p>
+                    <p class="text-sm mt-1">Log a workout on Strava and it'll appear here.</p>
                 </div>
             {{/if}}
         </div>
 
-        <!-- API Usage & Tools -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 pb-2">
-            <!-- Available Tools -->
-            <div class="card rounded-2xl p-5 sm:p-6">
-                <h2 class="text-lg sm:text-xl font-bold mb-4 flex items-center">
-                    <i class="fas fa-tools text-orange-400 mr-3"></i>
-                    Available MCP Tools
-                </h2>
+        <!-- Tools, Status & Poke — 3-col on lg, stacked on mobile -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 pb-2">
+
+            <!-- Available MCP Tools -->
+            <div class="card rounded-2xl p-5">
+                <h3 class="font-bold text-base mb-4 flex items-center">
+                    <i class="fas fa-tools text-orange-400 mr-2"></i>
+                    MCP Tools
+                </h3>
                 <div class="space-y-2">
-                    <div class="bg-gray-800/30 rounded-lg p-3">
-                        <h3 class="font-semibold text-sm">get-recent-activities</h3>
-                        <p class="text-xs text-gray-400">Fetch your recent Strava activities</p>
+                    <div class="flex items-start gap-2 p-2 rounded-lg bg-gray-800/30">
+                        <i class="fas fa-check-circle text-orange-400 text-xs mt-0.5"></i>
+                        <div>
+                            <div class="text-xs font-semibold text-white">get-recent-activities</div>
+                            <div class="text-xs text-gray-500">Fetch your recent workouts</div>
+                        </div>
                     </div>
-                    <div class="bg-gray-800/30 rounded-lg p-3">
-                        <h3 class="font-semibold text-sm">get-athlete-profile</h3>
-                        <p class="text-xs text-gray-400">Get your athlete profile information</p>
+                    <div class="flex items-start gap-2 p-2 rounded-lg bg-gray-800/30">
+                        <i class="fas fa-check-circle text-orange-400 text-xs mt-0.5"></i>
+                        <div>
+                            <div class="text-xs font-semibold text-white">get-athlete-profile</div>
+                            <div class="text-xs text-gray-500">Your athlete profile & stats</div>
+                        </div>
                     </div>
-                    <div class="bg-gray-800/30 rounded-lg p-3">
-                        <h3 class="font-semibold text-sm">get-activity-details</h3>
-                        <p class="text-xs text-gray-400">Get detailed info about specific activities</p>
+                    <div class="flex items-start gap-2 p-2 rounded-lg bg-gray-800/30">
+                        <i class="fas fa-check-circle text-orange-400 text-xs mt-0.5"></i>
+                        <div>
+                            <div class="text-xs font-semibold text-white">get-activity-details</div>
+                            <div class="text-xs text-gray-500">Deep-dive on any activity</div>
+                        </div>
                     </div>
-                    <div class="bg-gray-800/30 rounded-lg p-3">
-                        <h3 class="font-semibold text-sm">get-activity-streams</h3>
-                        <p class="text-xs text-gray-400">Access time-series data (GPS, heart rate, etc.)</p>
+                    <div class="flex items-start gap-2 p-2 rounded-lg bg-gray-800/30">
+                        <i class="fas fa-check-circle text-orange-400 text-xs mt-0.5"></i>
+                        <div>
+                            <div class="text-xs font-semibold text-white">get-activity-streams</div>
+                            <div class="text-xs text-gray-500">GPS, HR, power time-series</div>
+                        </div>
                     </div>
-                    <div class="text-center mt-2">
-                        <span class="text-xs text-gray-500">And 6 more tools...</span>
+                    <div class="flex items-start gap-2 p-2 rounded-lg bg-gray-800/30">
+                        <i class="fas fa-check-circle text-orange-400 text-xs mt-0.5"></i>
+                        <div>
+                            <div class="text-xs font-semibold text-white">explore-segments</div>
+                            <div class="text-xs text-gray-500">Find Strava segments near you</div>
+                        </div>
+                    </div>
+                    <div class="text-center pt-1">
+                        <span class="text-xs text-gray-500">+ 5 more tools available</span>
                     </div>
                 </div>
             </div>
 
             <!-- Status & Usage -->
-            <div class="card rounded-2xl p-5 sm:p-6">
-                <h2 class="text-lg sm:text-xl font-bold mb-4 flex items-center">
-                    <i class="fas fa-shield-alt text-orange-400 mr-3"></i>
+            <div class="card rounded-2xl p-5">
+                <h3 class="font-bold text-base mb-4 flex items-center">
+                    <i class="fas fa-shield-alt text-orange-400 mr-2"></i>
                     Status &amp; Usage
-                </h2>
-                <div class="space-y-4">
-                    <div>
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="text-sm text-gray-400">Requests This Month</span>
-                            <span class="text-sm font-semibold">0 / 1000</span>
-                        </div>
-                        <div class="w-full bg-gray-700 rounded-full h-2">
-                            <div class="bg-gradient-to-r from-orange-400 to-orange-600 h-2 rounded-full" style="width: 0%"></div>
-                        </div>
-                        <p class="text-xs text-gray-500 mt-1">Generous limits for personal use</p>
+                </h3>
+                <!-- System status badge -->
+                <div class="flex items-center gap-2 bg-green-500/10 border border-green-500/20 rounded-xl px-3 py-2 mb-4">
+                    <span class="w-2 h-2 bg-green-400 rounded-full flex-shrink-0 animate-pulse"></span>
+                    <span class="text-xs font-semibold text-green-400">All Systems Operational</span>
+                </div>
+                <div class="space-y-2 text-xs">
+                    <div class="flex justify-between items-center py-1.5 border-b border-gray-700/50">
+                        <span class="text-gray-400">OAuth Token</span>
+                        <span class="text-green-400 font-semibold">✓ Valid</span>
                     </div>
-                    <div class="bg-gray-800/30 rounded-lg p-4 space-y-2 text-sm">
-                        <div class="flex items-center gap-2 mb-2">
-                            <i class="fas fa-circle text-green-400 text-xs"></i>
-                            <span class="font-semibold">All Systems Operational</span>
-                        </div>
-                        <div class="flex justify-between text-gray-400">
-                            <span>OAuth Token:</span>
-                            <span class="text-green-400 font-medium">Valid</span>
-                        </div>
-                        <div class="flex justify-between text-gray-400">
-                            <span>MCP Endpoint:</span>
-                            <span class="text-green-400 font-medium">Active</span>
-                        </div>
-                        <div class="flex justify-between text-gray-400">
-                            <span>Last Refresh:</span>
-                            <span class="text-right text-xs">{{last_refresh}}</span>
-                        </div>
+                    <div class="flex justify-between items-center py-1.5 border-b border-gray-700/50">
+                        <span class="text-gray-400">MCP Endpoint</span>
+                        <span class="text-green-400 font-semibold">✓ Active</span>
+                    </div>
+                    <div class="flex justify-between items-center py-1.5 border-b border-gray-700/50">
+                        <span class="text-gray-400">Last Refresh</span>
+                        <span class="text-gray-300">{{last_refresh}}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-1.5">
+                        <span class="text-gray-400">API Calls / Month</span>
+                        <span class="text-gray-300">0 / 1,000</span>
                     </div>
                 </div>
+                <div class="mt-3">
+                    <div class="w-full bg-gray-700 rounded-full h-1.5">
+                        <div class="bg-gradient-to-r from-orange-400 to-orange-600 h-1.5 rounded-full" style="width: 0%"></div>
+                    </div>
+                    <p class="text-xs text-gray-600 mt-1">Generous limits for personal use</p>
+                </div>
             </div>
+
+            <!-- Poke Notifications -->
+            <div class="card rounded-2xl p-5">
+                <h3 class="font-bold text-base mb-1 flex items-center">
+                    <i class="fas fa-bell text-orange-400 mr-2"></i>
+                    Poke Notifications
+                </h3>
+                <p class="text-xs text-gray-500 mb-4">
+                    Get pinged on <a href="https://poke.com" target="_blank" rel="noopener noreferrer" class="text-orange-400 hover:underline">Poke.com</a> whenever you finish a workout.
+                </p>
+                <form id="poke-form" onsubmit="savePokeKey(event)">
+                    <label class="block text-xs text-gray-400 mb-1">Your Poke API Key</label>
+                    <input type="password" id="poke-key-input" placeholder="poke_xxxxxxxxxxxxxxxx"
+                           class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-orange-500 mb-3">
+                    <button type="submit"
+                            class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 rounded-lg text-xs transition-colors">
+                        Save Key
+                    </button>
+                </form>
+                <p id="poke-status" class="text-xs mt-2 hidden"></p>
+            </div>
+
         </div>
     </div>
 
@@ -841,7 +877,7 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
     <footer class="bg-gray-950 py-4 mt-8 text-center">
         <p class="text-xs text-gray-600">
             Compatible with <a href="https://www.strava.com" target="_blank" rel="noopener noreferrer" class="text-orange-500 font-semibold hover:text-orange-400">Strava</a>.
-            SportsMCP is not affiliated with, endorsed, or sponsored by Strava.
+            StravaMCP is not affiliated with, endorsed, or sponsored by Strava.
         </p>
     </footer>
 
