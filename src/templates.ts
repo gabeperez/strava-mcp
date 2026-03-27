@@ -953,7 +953,7 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                     body: JSON.stringify({ token, poke_api_key: key })
                 });
                 if (res.ok) {
-                    status.textContent = '✅ Poke API key saved! You\'ll now get personal notifications.';
+                    status.textContent = "✅ Poke API key saved! You'll now get personal notifications.";
                     status.className = 'text-xs mt-2 text-green-400';
                     document.getElementById('poke-key-input').value = '';
                 } else {
