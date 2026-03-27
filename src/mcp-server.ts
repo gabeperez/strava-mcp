@@ -89,7 +89,7 @@ export class StravaMCPServer {
           tools: {}
         },
         serverInfo: {
-          name: 'Strava MCP Server',
+          name: 'SportsMCP',
           version: '1.0.0'
         }
       }
@@ -290,7 +290,7 @@ export class StravaMCPServer {
                 content: [
                   {
                     type: 'text',
-                    text: `🎉 **Welcome to Strava MCP!**\n\nI can help you access and analyze your Strava data through natural language.\n\n🔐 **Quick Setup (just 2 clicks!):**\n\n1. 👉 [Connect your Strava account](${baseUrl}/auth)\n2. 📎 Copy your personal MCP URL from the success page\n3. 🔄 Replace this connection with your personal URL\n\n🏃 **After setup, I can help you:**\n• View recent activities and detailed workout data\n• Analyze heart rate, power, and performance metrics\n• Explore segments and find new routes\n• Get comprehensive athlete statistics\n\n📊 **Privacy Note:** Each user gets their own personal URL. Your data stays completely private!`
+                    text: `🎉 **Welcome to SportsMCP!**\n\nI can help you access and analyze your Strava data through natural language.\n\n🔐 **Quick Setup (just 2 clicks!):**\n\n1. 👉 [Connect your Strava account](${baseUrl}/auth)\n2. 📎 Copy your personal MCP URL from the success page\n3. 🔄 Replace this connection with your personal URL\n\n🏃 **After setup, I can help you:**\n• View recent activities and detailed workout data\n• Analyze heart rate, power, and performance metrics\n• Explore segments and find new routes\n• Get comprehensive athlete statistics\n\n📊 **Privacy Note:** Each user gets their own personal URL. Your data stays completely private!`
                   }
                 ]
               }
@@ -396,6 +396,38 @@ export class StravaMCPServer {
           };
       }
 
+      // Append "View on Strava" links where applicable (Strava brand requirement)
+      let stravaLinks = '';
+      if (name === 'get-recent-activities' && Array.isArray(result)) {
+        stravaLinks = '\n\n---\n**View on Strava:**\n' +
+          result.slice(0, 10).map((a: any) =>
+            `• [${a.name || 'Activity'}](https://www.strava.com/activities/${a.id})`
+          ).join('\n');
+      } else if (name === 'get-activity-details' && result?.id) {
+        stravaLinks = `\n\n[View on Strava](https://www.strava.com/activities/${result.id})`;
+      } else if (name === 'get-activity-streams' && args?.id) {
+        stravaLinks = `\n\n[View on Strava](https://www.strava.com/activities/${args.id})`;
+      } else if (name === 'get-athlete-profile' && result?.id) {
+        stravaLinks = `\n\n[View profile on Strava](https://www.strava.com/athletes/${result.id})`;
+      } else if (name === 'get-athlete-routes' && Array.isArray(result)) {
+        stravaLinks = '\n\n---\n**View on Strava:**\n' +
+          result.slice(0, 10).map((r: any) =>
+            `• [${r.name || 'Route'}](https://www.strava.com/routes/${r.id})`
+          ).join('\n');
+      } else if (name === 'get-starred-segments' && Array.isArray(result)) {
+        stravaLinks = '\n\n---\n**View on Strava:**\n' +
+          result.slice(0, 10).map((s: any) =>
+            `• [${s.name || 'Segment'}](https://www.strava.com/segments/${s.id})`
+          ).join('\n');
+      } else if (name === 'explore-segments' && result?.segments) {
+        stravaLinks = '\n\n---\n**View on Strava:**\n' +
+          result.segments.slice(0, 10).map((s: any) =>
+            `• [${s.name || 'Segment'}](https://www.strava.com/segments/${s.id})`
+          ).join('\n');
+      }
+
+      const resultText = typeof result === 'string' ? result : JSON.stringify(result, null, 2);
+
       return {
         jsonrpc: '2.0',
         id: request.id,
@@ -403,7 +435,7 @@ export class StravaMCPServer {
           content: [
             {
               type: 'text',
-              text: typeof result === 'string' ? result : JSON.stringify(result, null, 2)
+              text: resultText + stravaLinks
             }
           ]
         }

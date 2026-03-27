@@ -96,11 +96,63 @@ export class StravaWebhookHandler {
 
     console.log(`👤 Processing athlete event for ${owner_id}:`, aspect_type);
 
-    // Handle app deauthorization
+    // Handle app deauthorization — full data deletion required within 48 hours (API agreement)
     if (aspect_type === 'update' && updates?.authorized === 'false') {
-      console.log(`🔒 Athlete ${owner_id} deauthorized the app - cleaning up session`);
+      console.log(`🔒 Athlete ${owner_id} deauthorized the app - deleting all user data`);
       const sessionManager = new KVSessionManager(this.env);
+
+      // 1. Delete the main session token
       await sessionManager.deleteSession(owner_id);
+
+      // 2. Delete personal MCP token mappings for this athlete
+      //    We store personal_mcp:<token> → { athlete_id }, so list and delete matches
+      try {
+        const mcpList = await this.env.STRAVA_SESSIONS.list({ prefix: 'personal_mcp:' });
+        const deletePromises = mcpList.keys
+          .map(async (k) => {
+            const val = await this.env.STRAVA_SESSIONS.get(k.name);
+            if (val) {
+              try {
+                const parsed = JSON.parse(val);
+                if (parsed.athlete_id === owner_id) {
+                  await this.env.STRAVA_SESSIONS.delete(k.name);
+                  console.log(`🗑️  Deleted personal MCP token: ${k.name}`);
+                }
+              } catch (_) {}
+            }
+          });
+        await Promise.all(deletePromises);
+      } catch (err: any) {
+        console.error(`⚠️  Failed to clean up personal_mcp keys for ${owner_id}:`, err.message);
+      }
+
+      // 3. Delete device_auth mappings for this athlete
+      try {
+        const devList = await this.env.STRAVA_SESSIONS.list({ prefix: 'device_auth:' });
+        const deletePromises = devList.keys
+          .map(async (k) => {
+            const val = await this.env.STRAVA_SESSIONS.get(k.name);
+            if (val) {
+              try {
+                const parsed = JSON.parse(val);
+                if (parsed.athlete_id === owner_id) {
+                  await this.env.STRAVA_SESSIONS.delete(k.name);
+                  console.log(`🗑️  Deleted device auth key: ${k.name}`);
+                }
+              } catch (_) {}
+            }
+          });
+        await Promise.all(deletePromises);
+      } catch (err: any) {
+        console.error(`⚠️  Failed to clean up device_auth keys for ${owner_id}:`, err.message);
+      }
+
+      // 4. Delete per-user Poke API key if stored
+      try {
+        await this.env.STRAVA_SESSIONS.delete(`poke_key:${owner_id}`);
+      } catch (_) {}
+
+      console.log(`✅ Full data cleanup complete for athlete ${owner_id}`);
     }
   }
 
@@ -139,13 +191,29 @@ export class StravaWebhookHandler {
 
       // Format and send notification
       const message = this.formatActivityMessage(activity);
-      
-      // Send to Poke if API key is configured
-      if (this.env.POKE_API_KEY) {
-        await this.sendToPoke(message);
+
+      // Resolve Poke API key: prefer per-user key, fall back to global env key
+      let pokeApiKey: string | null = null;
+      try {
+        const userPokeKey = await this.env.STRAVA_SESSIONS.get(`poke_key:${ownerId}`);
+        if (userPokeKey) {
+          pokeApiKey = userPokeKey;
+          console.log(`🔑 Using per-user Poke API key for athlete ${ownerId}`);
+        } else if (this.env.POKE_API_KEY) {
+          pokeApiKey = this.env.POKE_API_KEY;
+          console.log(`🔑 Using global Poke API key (no per-user key found for athlete ${ownerId})`);
+        }
+      } catch (err: any) {
+        console.error(`⚠️  Failed to look up per-user Poke key:`, err.message);
+        if (this.env.POKE_API_KEY) pokeApiKey = this.env.POKE_API_KEY;
+      }
+
+      // Send to Poke if a key is available
+      if (pokeApiKey) {
+        await this.sendToPoke(message, pokeApiKey);
         console.log(`✅ Successfully sent activity ${activityId} to Poke`);
       } else {
-        console.log(`ℹ️ Poke API key not configured, skipping notification`);
+        console.log(`ℹ️ No Poke API key configured for athlete ${ownerId}, skipping notification`);
         console.log(`📝 Activity message:\n${message}`);
       }
 
@@ -246,15 +314,15 @@ export class StravaWebhookHandler {
   /**
    * Send notification to Poke API
    */
-  private async sendToPoke(message: string): Promise<void> {
-    if (!this.env.POKE_API_KEY) {
+  private async sendToPoke(message: string, apiKey: string): Promise<void> {
+    if (!apiKey) {
       throw new Error('Poke API key not configured');
     }
 
     const response = await fetch('https://poke.com/api/v1/inbound-sms/webhook', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${this.env.POKE_API_KEY}`,
+        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ message }),

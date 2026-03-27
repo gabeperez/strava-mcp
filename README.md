@@ -1,10 +1,10 @@
-# 🌴 Strava MCP OAuth - Cloudflare Workers
+# 🌴 SportsMCP - Cloudflare Workers
 
 > **Production-ready MCP server** for Strava with OAuth authentication and real-time webhook notifications
 
 ⚠️ **IMPORTANT: Personal Use Only** - This project is currently designed for **single-user/personal deployments**. The webhook notification system sends all activity updates to a single Poke API key (yours). Multi-user support with per-user notifications is planned for future releases.
 
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/gabeperez/strava-mcp-oauth)
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/gabeperez/sportsmcp)
 
 [![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-F38020?logo=cloudflare)](https://workers.cloudflare.com/)
 [![MCP Protocol](https://img.shields.io/badge/MCP-2024--11--05-blue)](https://modelcontextprotocol.io/)
@@ -37,7 +37,7 @@ Best for users who prefer clicking buttons over typing commands.
 
 **Step 1: Click Deploy to Cloudflare**
 
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/gabeperez/strava-mcp-oauth)
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/gabeperez/sportsmcp)
 
 This will:
 1. Deploy it to your Cloudflare account
@@ -52,8 +52,8 @@ After deployment, you need to configure secrets and webhooks:
 2. **Clone YOUR fork and run setup:**
    ```bash
    # Replace YOUR-USERNAME with your GitHub username
-   git clone https://github.com/YOUR-USERNAME/strava-mcp-oauth.git
-   cd strava-mcp-oauth
+   git clone https://github.com/YOUR-USERNAME/sportsmcp.git
+   cd sportsmcp
    npm install
    node scripts/setup.js
    ```
@@ -86,10 +86,10 @@ Paste these commands **one at a time** (press Enter after each):
 
 ```bash
 # Download the project
-git clone https://github.com/gabeperez/strava-mcp-oauth.git
+git clone https://github.com/gabeperez/sportsmcp.git
 
 # Go into the folder
-cd strava-mcp-oauth
+cd sportsmcp
 
 # Install dependencies (takes ~30 seconds)
 npm install
@@ -121,7 +121,7 @@ The script automatically:
 
 **Step 5: Visit Your Dashboard**
 
-1. Open the URL the script gave you (looks like `https://strava-mcp-oauth.yourname.workers.dev`)
+1. Open the URL the script gave you (looks like `https://sportsmcp.yourname.workers.dev`)
 2. Click "Authenticate with Strava"
 3. You'll see your beautiful dashboard with:
    - 🏃 Recent activities
@@ -155,8 +155,8 @@ If you prefer to configure everything manually instead of using the automated sc
 
 ```bash
 # 1. Download and install
-git clone https://github.com/gabeperez/strava-mcp-oauth.git
-cd strava-mcp-oauth
+git clone https://github.com/gabeperez/sportsmcp.git
+cd sportsmcp
 npm install
 
 # 2. Login to Cloudflare (opens browser)
@@ -431,13 +431,13 @@ See [.env.example](.env.example) for all configuration options.
 ### Coming Soon
 
 - [ ] **Multi-user Webhook Support** - Per-user Poke API keys and notification routing
-- [ ] **Public stravamcp.com Service** - Hosted version for non-technical users
+- [ ] **Public sportsmcp.com Service** - Hosted version for non-technical users
 - [ ] **More Notification Channels** - Discord, Slack, email, etc.
 - [ ] **Activity Analytics** - Trends, insights, and training load tracking
 - [ ] **Custom Webhook Filters** - Choose which activities trigger notifications
 - [ ] **Web Dashboard Enhancements** - More stats, charts, and visualizations
 
-Interested in contributing to any of these? [Open a discussion](https://github.com/gabeperez/strava-mcp-oauth/discussions)!
+Interested in contributing to any of these? [Open a discussion](https://github.com/gabeperez/sportsmcp/discussions)!
 
 ## 🤝 Contributing
 
@@ -469,4 +469,4 @@ If this project helped you, consider giving it a star!
 
 **Made with ❤️ for athletes who love data**
 
-[Report Bug](https://github.com/gabeperez/strava-mcp-oauth/issues) · [Request Feature](https://github.com/gabeperez/strava-mcp-oauth/issues) · [Discussions](https://github.com/gabeperez/strava-mcp-oauth/discussions)
+[Report Bug](https://github.com/gabeperez/sportsmcp/issues) · [Request Feature](https://github.com/gabeperez/sportsmcp/issues) · [Discussions](https://github.com/gabeperez/sportsmcp/discussions)

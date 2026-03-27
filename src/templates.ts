@@ -94,12 +94,12 @@ export const LANDING_TEMPLATE = `<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Strava MCP Server - Connect Your AI to Strava</title>
+    <title>SportsMCP - Connect Your AI to Strava</title>
     <meta name="description" content="Get your personal MCP server URL to unlock powerful Strava integration with AI assistants like Poke.com, Claude Desktop, and more.">
-    <link rel="icon" type="image/png" href="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png">
+    <link rel="icon" type="image/png" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23FC4C02'/%3E%3Cstop offset='100%25' stop-color='%23FF7B00'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='40' height='40' rx='8' fill='url(%23g)'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial,sans-serif' font-weight='bold' font-size='20' fill='white' text-anchor='middle' dominant-baseline='central'%3ES%3C/text%3E%3C/svg%3E">
     
     <!-- Social Media Meta Tags -->
-    <meta property="og:title" content="Strava MCP Server - Connect Your AI to Strava">
+    <meta property="og:title" content="SportsMCP - Connect Your AI to Strava">
     <meta property="og:description" content="Get your personal MCP server URL to unlock powerful Strava integration with AI assistants.">
     <meta property="og:image" content="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961568/SportMCP_opengraph.png">
     <meta property="og:image:width" content="1200">
@@ -107,7 +107,7 @@ export const LANDING_TEMPLATE = `<!DOCTYPE html>
     <meta property="og:url" content="{{base_url}}">
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Strava MCP Server - Connect Your AI to Strava">
+    <meta name="twitter:title" content="SportsMCP - Connect Your AI to Strava">
     <meta name="twitter:description" content="Get your personal MCP server URL to unlock powerful Strava integration with AI assistants.">
     <meta name="twitter:image" content="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961568/SportMCP_opengraph.png">
     
@@ -135,8 +135,8 @@ export const LANDING_TEMPLATE = `<!DOCTYPE html>
     <nav class="relative z-10 px-6 py-4">
         <div class="max-w-7xl mx-auto flex items-center justify-between">
             <div class="flex items-center space-x-3">
-                <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="Strava MCP Logo" class="w-10 h-10 rounded-lg">
-                <span class="text-xl font-bold">Strava MCP Server</span>
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23FC4C02'/%3E%3Cstop offset='100%25' stop-color='%23FF7B00'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='40' height='40' rx='8' fill='url(%23g)'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial,sans-serif' font-weight='bold' font-size='20' fill='white' text-anchor='middle' dominant-baseline='central'%3ES%3C/text%3E%3C/svg%3E" alt="SportsMCP Logo" class="w-10 h-10 rounded-lg">
+                <span class="text-xl font-bold">SportsMCP</span>
             </div>
             <div class="flex items-center space-x-6">
                 <a href="/about" class="text-gray-300 hover:text-white transition-colors">About</a>
@@ -156,7 +156,7 @@ export const LANDING_TEMPLATE = `<!DOCTYPE html>
             <div class="text-center max-w-4xl mx-auto">
                 <!-- Hero Logo -->
                 <div class="flex justify-center mb-8">
-                    <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="Strava MCP Logo" class="w-32 h-32 rounded-2xl shadow-2xl">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23FC4C02'/%3E%3Cstop offset='100%25' stop-color='%23FF7B00'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='40' height='40' rx='8' fill='url(%23g)'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial,sans-serif' font-weight='bold' font-size='20' fill='white' text-anchor='middle' dominant-baseline='central'%3ES%3C/text%3E%3C/svg%3E" alt="SportsMCP Logo" class="w-32 h-32 rounded-2xl shadow-2xl">
                 </div>
                 
                 <h1 class="text-5xl md:text-7xl font-bold mb-8 bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">
@@ -169,14 +169,19 @@ export const LANDING_TEMPLATE = `<!DOCTYPE html>
                 </p>
                 
                 <div class="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
-                    <a href="/auth" class="group relative overflow-hidden bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-4 px-8 rounded-xl text-lg transition-all duration-300 transform hover:scale-105 shadow-xl">
-                        <span class="relative z-10 flex items-center">
-                            <i class="fab fa-strava mr-3"></i>
-                            Connect with Strava
+                    <!-- Official Strava Connect button per brand guidelines -->
+                    <a href="/auth">
+                        <img src="https://www.strava.com/images/connect/oauth_connect_with_strava@2x.png"
+                             alt="Connect with Strava"
+                             height="48"
+                             style="height:48px;width:auto;"
+                             onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                        <!-- Fallback button if image fails -->
+                        <span style="display:none;" class="items-center bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors">
+                            <i class="fab fa-strava mr-2"></i>Connect with Strava
                         </span>
-                        <div class="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
                     </a>
-                    
+
                     <div class="text-gray-400 flex items-center">
                         <i class="fas fa-shield-alt mr-2"></i>
                         Secure OAuth Authentication
@@ -273,12 +278,16 @@ export const LANDING_TEMPLATE = `<!DOCTYPE html>
             </div>
             
             <div class="flex items-center justify-center space-x-3 mb-4">
-                <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="Strava MCP Logo" class="w-8 h-8 rounded-lg">
-                <span class="font-bold">Strava MCP Server</span>
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23FC4C02'/%3E%3Cstop offset='100%25' stop-color='%23FF7B00'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='40' height='40' rx='8' fill='url(%23g)'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial,sans-serif' font-weight='bold' font-size='20' fill='white' text-anchor='middle' dominant-baseline='central'%3ES%3C/text%3E%3C/svg%3E" alt="SportsMCP Logo" class="w-8 h-8 rounded-lg">
+                <span class="font-bold">SportsMCP</span>
             </div>
             
             <p class="text-sm">
                 Powered by Cloudflare Workers • Built for the Model Context Protocol
+            </p>
+            <p class="text-xs mt-3 text-gray-600">
+                Compatible with <a href="https://www.strava.com" target="_blank" rel="noopener noreferrer" class="text-orange-500 font-semibold hover:text-orange-400">Strava</a>.
+                SportsMCP is not affiliated with, endorsed, or sponsored by Strava.
             </p>
         </div>
     </footer>
@@ -290,19 +299,19 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Strava MCP Server</title>
+    <title>Dashboard - SportsMCP</title>
     <meta name="description" content="Your personal Strava MCP dashboard with activity stats, insights, and your unique MCP URL for AI assistants.">
-    <link rel="icon" type="image/png" href="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png">
+    <link rel="icon" type="image/png" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23FC4C02'/%3E%3Cstop offset='100%25' stop-color='%23FF7B00'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='40' height='40' rx='8' fill='url(%23g)'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial,sans-serif' font-weight='bold' font-size='20' fill='white' text-anchor='middle' dominant-baseline='central'%3ES%3C/text%3E%3C/svg%3E">
     
     <!-- Social Media Meta Tags -->
-    <meta property="og:title" content="Strava MCP Dashboard - Your Personal Activity Hub">
+    <meta property="og:title" content="SportsMCP Dashboard - Your Personal Activity Hub">
     <meta property="og:description" content="View your Strava stats, get your personal MCP URL, and connect AI assistants to your fitness data.">
     <meta property="og:image" content="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961568/SportMCP_opengraph.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Strava MCP Dashboard">
+    <meta name="twitter:title" content="SportsMCP Dashboard">
     <meta name="twitter:description" content="View your Strava stats, get your personal MCP URL, and connect AI assistants to your fitness data.">
     <meta name="twitter:image" content="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961568/SportMCP_opengraph.png">
     
@@ -334,8 +343,8 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
         <div class="max-w-7xl mx-auto px-6 py-4">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-3">
-                    <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="Strava MCP Logo" class="w-10 h-10 rounded-lg">
-                    <span class="text-xl font-bold">Strava MCP Server</span>
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23FC4C02'/%3E%3Cstop offset='100%25' stop-color='%23FF7B00'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='40' height='40' rx='8' fill='url(%23g)'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial,sans-serif' font-weight='bold' font-size='20' fill='white' text-anchor='middle' dominant-baseline='central'%3ES%3C/text%3E%3C/svg%3E" alt="SportsMCP Logo" class="w-10 h-10 rounded-lg">
+                    <span class="text-xl font-bold">SportsMCP</span>
                 </div>
                 <div class="flex items-center space-x-6">
                     <a href="/about" class="text-gray-300 hover:text-white transition-colors">About</a>
@@ -355,7 +364,7 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
         <!-- Welcome Section -->
         <div class="mb-8">
             <h1 class="text-4xl font-bold mb-4 bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">
-                Your Strava MCP Dashboard
+                Your SportsMCP Dashboard
             </h1>
             <p class="text-xl text-gray-400 mb-6">
                 Everything you need to connect AI assistants to your Strava data
@@ -604,6 +613,13 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                                 {{/if}}
                             </div>
                         </div>
+                        <div class="mt-3 text-right">
+                            <a href="https://www.strava.com/activities/{{id}}" target="_blank" rel="noopener noreferrer"
+                               class="inline-flex items-center text-xs font-bold text-orange-400 underline hover:text-orange-300 transition-colors">
+                                <svg class="w-3 h-3 mr-1" viewBox="0 0 24 24" fill="currentColor"><path d="M13.49 5.48c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-3.6 13.9l1-4.4 2.1 2v6h2v-7.5l-2.1-2 .6-3c1.3 1.5 3.3 2.5 5.5 2.5v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1l-5.2 2.2v4.7h2v-3.4l1.8-.7-1.6 8.1-4.9-1-.4 2 7 1.4z"/></svg>
+                                View on Strava
+                            </a>
+                        </div>
                     </div>
                     {{/each}}
                 </div>
@@ -614,6 +630,30 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                     <p class="text-sm">Go get moving! 🏃‍♂️</p>
                 </div>
             {{/if}}
+        </div>
+
+        <!-- Poke Notifications Setup -->
+        <div class="card rounded-2xl p-6 mb-8">
+            <h2 class="text-2xl font-bold mb-2 flex items-center">
+                <i class="fas fa-bell text-orange-400 mr-3"></i>
+                Poke Notifications
+            </h2>
+            <p class="text-sm text-gray-400 mb-4">
+                Get notified on <a href="https://poke.com" target="_blank" rel="noopener noreferrer" class="text-orange-400 hover:underline">Poke.com</a>
+                when you complete a workout. Enter your personal Poke API key below.
+            </p>
+            <form id="poke-form" class="flex gap-3 items-end" onsubmit="savePokeKey(event)">
+                <div class="flex-1">
+                    <label class="block text-xs text-gray-400 mb-1">Your Poke API Key</label>
+                    <input type="password" id="poke-key-input" placeholder="poke_xxxxxxxxxxxxxxxx"
+                           class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500">
+                </div>
+                <button type="submit"
+                        class="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-4 py-2 rounded-lg text-sm transition-colors">
+                    Save Key
+                </button>
+            </form>
+            <p id="poke-status" class="text-xs mt-2 hidden"></p>
         </div>
 
         <!-- API Usage & Tools -->
@@ -692,6 +732,14 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
         </div>
     </div>
 
+    <!-- Footer attribution -->
+    <footer class="bg-gray-950 py-4 mt-8 text-center">
+        <p class="text-xs text-gray-600">
+            Compatible with <a href="https://www.strava.com" target="_blank" rel="noopener noreferrer" class="text-orange-500 font-semibold hover:text-orange-400">Strava</a>.
+            SportsMCP is not affiliated with, endorsed, or sponsored by Strava.
+        </p>
+    </footer>
+
     <!-- Copy Success Message -->
     <div id="copy-success" class="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg hidden">
         <i class="fas fa-check mr-2"></i>MCP URL copied to clipboard!
@@ -737,6 +785,42 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
         setTimeout(() => {
             window.location.reload();
         }, 5 * 60 * 1000);
+
+        // Save per-user Poke API key
+        async function savePokeKey(event) {
+            event.preventDefault();
+            const key = document.getElementById('poke-key-input').value.trim();
+            const status = document.getElementById('poke-status');
+            if (!key) {
+                status.textContent = 'Please enter a Poke API key.';
+                status.className = 'text-xs mt-2 text-red-400';
+                status.classList.remove('hidden');
+                return;
+            }
+            try {
+                // Extract token from current URL
+                const params = new URLSearchParams(window.location.search);
+                const token = params.get('token') || '';
+                const res = await fetch('/settings/poke-key', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token, poke_api_key: key })
+                });
+                if (res.ok) {
+                    status.textContent = '✅ Poke API key saved! You\'ll now get personal notifications.';
+                    status.className = 'text-xs mt-2 text-green-400';
+                    document.getElementById('poke-key-input').value = '';
+                } else {
+                    const err = await res.json();
+                    status.textContent = '❌ Error: ' + (err.error || 'Failed to save key.');
+                    status.className = 'text-xs mt-2 text-red-400';
+                }
+            } catch (e) {
+                status.textContent = '❌ Network error. Please try again.';
+                status.className = 'text-xs mt-2 text-red-400';
+            }
+            status.classList.remove('hidden');
+        }
     </script>
 </body>
 </html>`;

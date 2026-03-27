@@ -44,8 +44,8 @@ app.use('*', async (c, next) => {
 // Helper function to get current domain
 function getCurrentDomain(c: any): string {
   const host = c.req.header('host');
-  if (host?.includes('stravamcp.com')) {
-    return 'https://stravamcp.com';
+  if (host?.includes('sportsmcp.com')) {
+    return 'https://sportsmcp.com';
   }
   return 'https://your-worker-name.your-subdomain.workers.dev';
 }
@@ -59,7 +59,7 @@ app.get('/', (c) => {
   // If requesting JSON (for API or MCP clients), return server info
   if (acceptHeader?.includes('application/json')) {
     return c.json({
-      name: 'Strava MCP Server',
+      name: 'SportsMCP',
       version: '1.0.0',
       description: 'Model Context Protocol server for Strava API with OAuth authentication',
       protocol: 'mcp',
@@ -70,7 +70,7 @@ app.get('/', (c) => {
         }
       },
       serverInfo: {
-        name: 'Strava MCP Server',
+        name: 'SportsMCP',
         version: '1.0.0'
       },
       endpoints: {
@@ -130,8 +130,21 @@ app.post('/webhook', async (c) => {
 // Test endpoint for Poke notifications
 app.post('/test-poke', async (c) => {
   try {
-    if (!c.env.POKE_API_KEY) {
-      return c.json({ error: 'POKE_API_KEY not configured' }, 400);
+    // Resolve Poke key: check for per-user key via token param, then fall back to global
+    let pokeApiKey: string | null = null;
+    const token = c.req.query('token');
+    if (token) {
+      const personalData = await c.env.STRAVA_SESSIONS.get(`personal_mcp:${token}`);
+      if (personalData) {
+        const { athlete_id } = JSON.parse(personalData);
+        const userKey = await c.env.STRAVA_SESSIONS.get(`poke_key:${athlete_id}`);
+        if (userKey) pokeApiKey = userKey;
+      }
+    }
+    if (!pokeApiKey) pokeApiKey = c.env.POKE_API_KEY || null;
+
+    if (!pokeApiKey) {
+      return c.json({ error: 'No Poke API key configured. Save your personal Poke key from the dashboard first.' }, 400);
     }
 
     const testMessage = `🏃 Test Strava Webhook!
@@ -146,12 +159,12 @@ Elevation: 120m
 Avg HR: 145 bpm
 🏆 2 PRs!
 
-✨ This is a test notification from your Strava MCP webhook integration!`;
+✨ This is a test notification from your SportsMCP Strava integration!`;
 
     const response = await fetch('https://poke.com/api/v1/inbound-sms/webhook', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${c.env.POKE_API_KEY}`,
+        'Authorization': `Bearer ${pokeApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ message: testMessage }),
@@ -199,6 +212,30 @@ app.get('/privacy', (c) => {
 app.get('/terms', (c) => {
   const html = templates.render('terms');
   return c.html(html);
+});
+
+// Per-user Poke API key endpoint
+app.post('/settings/poke-key', async (c) => {
+  try {
+    const { token, poke_api_key } = await c.req.json() as { token: string; poke_api_key: string };
+    if (!token || !poke_api_key) {
+      return c.json({ error: 'token and poke_api_key are required' }, 400);
+    }
+
+    // Validate the MCP token and resolve athlete ID
+    const personalData = await c.env.STRAVA_SESSIONS.get(`personal_mcp:${token}`);
+    if (!personalData) {
+      return c.json({ error: 'Invalid or expired token' }, 401);
+    }
+    const { athlete_id } = JSON.parse(personalData);
+
+    // Store per-user Poke key (no expiry — persists until deauth)
+    await c.env.STRAVA_SESSIONS.put(`poke_key:${athlete_id}`, poke_api_key.trim());
+
+    return c.json({ success: true });
+  } catch (err: any) {
+    return c.json({ error: err.message }, 500);
+  }
 });
 
 // Dashboard endpoint
@@ -341,7 +378,7 @@ app.get('/mcp', async (c) => {
         }
       },
       serverInfo: {
-        name: 'Strava MCP Server',
+        name: 'SportsMCP',
         version: '1.0.0'
       },
       authenticated: isAuthenticated,
