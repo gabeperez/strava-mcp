@@ -611,6 +611,7 @@ export class SportsMCPServer {
           ).join('\n');
       } else if (name === 'get-club' && result?.id) {
         stravaLinks = `\n\n[View club on Strava](https://www.strava.com/clubs/${result.id})`;
+      }
 
       const resultText = typeof result === 'string' ? result : JSON.stringify(result, null, 2);
 
