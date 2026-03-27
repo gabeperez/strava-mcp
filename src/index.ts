@@ -182,6 +182,9 @@ app.post('/webhook', async (c) => {
 app.post('/test-poke', async (c) => {
   try {
     let pokeApiKey: string | null = null;
+    let accessToken: string | null = null;
+    let athleteFirstName = 'athlete';
+
     const token = c.req.query('token');
     if (token) {
       const personalData = await c.env.STRAVA_SESSIONS.get(`personal_mcp:${token}`);
@@ -189,6 +192,14 @@ app.post('/test-poke', async (c) => {
         const { athlete_id } = JSON.parse(personalData);
         const userKey = await c.env.STRAVA_SESSIONS.get(`poke_key:${athlete_id}`);
         if (userKey) pokeApiKey = userKey;
+
+        // Fetch session to get Strava access token
+        const sessionData = await c.env.STRAVA_SESSIONS.get(`user:${athlete_id}`);
+        if (sessionData) {
+          const session = JSON.parse(sessionData);
+          accessToken = session.access_token || null;
+          athleteFirstName = session.athlete?.firstname || 'athlete';
+        }
       }
     }
     if (!pokeApiKey) pokeApiKey = c.env.POKE_API_KEY || null;
@@ -201,15 +212,63 @@ app.post('/test-poke', async (c) => {
       weekday: 'short', month: 'short', day: 'numeric',
       hour: 'numeric', minute: '2-digit', hour12: true
     });
-    const testMessage = `👋 Test ping from SportsMCP — your Strava data is now connected to your AI assistant.
 
-SportsMCP gives your AI access to your full Strava history: recent activities, lap splits, heart rate zones, segment efforts, gear mileage, clubs, and more.
+    // Fetch the athlete's actual most recent Strava activity
+    let recentActivityBlock = '';
+    if (accessToken) {
+      try {
+        const actRes = await fetch('https://www.strava.com/api/v3/athlete/activities?per_page=1', {
+          headers: { 'Authorization': `Bearer ${accessToken}` }
+        });
+        if (actRes.ok) {
+          const activities = await actRes.json() as any[];
+          if (activities && activities.length > 0) {
+            const act = activities[0];
+            const lines: string[] = [];
+            lines.push(`**${act.name}**`);
+            lines.push(`Type: ${act.sport_type || act.type}`);
+            if (act.start_date_local) {
+              lines.push(`Date: ${new Date(act.start_date_local).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}`);
+            }
+            if (act.distance) {
+              const km = (act.distance / 1000).toFixed(2);
+              const mi = (act.distance / 1609.344).toFixed(2);
+              lines.push(`Distance: ${km} km (${mi} mi)`);
+            }
+            if (act.moving_time) {
+              const h = Math.floor(act.moving_time / 3600);
+              const m = Math.floor((act.moving_time % 3600) / 60);
+              const s = act.moving_time % 60;
+              lines.push(`Duration: ${h > 0 ? `${h}h ${m}m ${s}s` : `${m}m ${s}s`}`);
+            }
+            if (act.distance && act.moving_time) {
+              const paceSecPerKm = act.moving_time / (act.distance / 1000);
+              const pm = Math.floor(paceSecPerKm / 60);
+              const ps = Math.round(paceSecPerKm % 60);
+              lines.push(`Pace: ${pm}:${ps.toString().padStart(2, '0')} /km`);
+            }
+            if (act.total_elevation_gain) {
+              lines.push(`Elevation: ${Math.round(act.total_elevation_gain)}m`);
+            }
+            if (act.average_heartrate) {
+              lines.push(`Avg HR: ${Math.round(act.average_heartrate)} bpm`);
+            }
+            if (act.average_watts) {
+              lines.push(`Avg Power: ${Math.round(act.average_watts)}W`);
+            }
+            if (act.pr_count && act.pr_count > 0) {
+              lines.push(`🏆 ${act.pr_count} PR${act.pr_count > 1 ? 's' : ''}!`);
+            }
+            recentActivityBlock = `\n\nHere is ${athleteFirstName}'s most recent Strava workout:\n\n${lines.join('\n')}\n\nPlease reply acknowledging this test ping from SportsMCP and confirm you can see the workout data above.`;
+          }
+        }
+      } catch (_) {
+        // Silently skip if activity fetch fails
+      }
+    }
 
-Please reply to confirm you received this and that the SportsMCP + Strava connection is active on your end. You can also try asking:
-
-• "What were my last 3 workouts?"
-• "What are my heart rate training zones?"
-• "How many miles are on my running shoes?"
+    const fallback = `\n\nSportsMCP gives your AI access to your full Strava history: recent activities, lap splits, heart rate zones, segment efforts, gear mileage, clubs, and more.\n\nPlease reply to confirm you received this and that the SportsMCP + Strava connection is active on your end.`;
+    const testMessage = `👋 Test ping from SportsMCP — your Strava data is now connected to your AI assistant.${recentActivityBlock || fallback}
 
 — Sent ${now}`;
 
