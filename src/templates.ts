@@ -96,7 +96,7 @@ export const LANDING_TEMPLATE = `<!DOCTYPE html>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SportsMCP - Connect Your AI to Strava</title>
     <meta name="description" content="Get your personal MCP server URL to unlock powerful Strava integration with AI assistants like Poke.com, Claude Desktop, and more.">
-    <link rel="icon" type="image/png" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23FC4C02'/%3E%3Cstop offset='100%25' stop-color='%23FF7B00'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='40' height='40' rx='8' fill='url(%23g)'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial,sans-serif' font-weight='bold' font-size='20' fill='white' text-anchor='middle' dominant-baseline='central'%3ES%3C/text%3E%3C/svg%3E">
+    <link rel="icon" type="image/png" href="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png">
     
     <!-- Social Media Meta Tags -->
     <meta property="og:title" content="SportsMCP - Connect Your AI to Strava">
@@ -135,7 +135,7 @@ export const LANDING_TEMPLATE = `<!DOCTYPE html>
     <nav class="relative z-10 px-6 py-4">
         <div class="max-w-7xl mx-auto flex items-center justify-between">
             <div class="flex items-center space-x-3">
-                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23FC4C02'/%3E%3Cstop offset='100%25' stop-color='%23FF7B00'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='40' height='40' rx='8' fill='url(%23g)'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial,sans-serif' font-weight='bold' font-size='20' fill='white' text-anchor='middle' dominant-baseline='central'%3ES%3C/text%3E%3C/svg%3E" alt="SportsMCP Logo" class="w-10 h-10 rounded-lg">
+                <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="SportsMCP Logo" class="w-10 h-10 rounded-lg">
                 <span class="text-xl font-bold">SportsMCP</span>
             </div>
             <div class="flex items-center space-x-6">
@@ -156,7 +156,7 @@ export const LANDING_TEMPLATE = `<!DOCTYPE html>
             <div class="text-center max-w-4xl mx-auto">
                 <!-- Hero Logo -->
                 <div class="flex justify-center mb-8">
-                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23FC4C02'/%3E%3Cstop offset='100%25' stop-color='%23FF7B00'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='40' height='40' rx='8' fill='url(%23g)'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial,sans-serif' font-weight='bold' font-size='20' fill='white' text-anchor='middle' dominant-baseline='central'%3ES%3C/text%3E%3C/svg%3E" alt="SportsMCP Logo" class="w-32 h-32 rounded-2xl shadow-2xl">
+                    <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="SportsMCP Logo" class="w-32 h-32 rounded-2xl shadow-2xl">
                 </div>
                 
                 <h1 class="text-5xl md:text-7xl font-bold mb-8 bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">
@@ -169,19 +169,10 @@ export const LANDING_TEMPLATE = `<!DOCTYPE html>
                 </p>
                 
                 <div class="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
-                    <!-- Official Strava Connect button per brand guidelines -->
-                    <a href="/auth">
-                        <img src="https://www.strava.com/images/connect/oauth_connect_with_strava@2x.png"
-                             alt="Connect with Strava"
-                             height="48"
-                             style="height:48px;width:auto;"
-                             onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
-                        <!-- Fallback button if image fails -->
-                        <span style="display:none;" class="items-center bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors">
-                            <i class="fab fa-strava mr-2"></i>Connect with Strava
-                        </span>
+                    <a href="/auth" class="gradient-bg hover:opacity-90 text-white font-bold py-4 px-8 rounded-lg text-lg transition-all transform hover:scale-105 shadow-lg flex items-center">
+                        <i class="fab fa-strava mr-2"></i>
+                        Connect with Strava
                     </a>
-
                     <div class="text-gray-400 flex items-center">
                         <i class="fas fa-shield-alt mr-2"></i>
                         Secure OAuth Authentication
@@ -278,7 +269,7 @@ export const LANDING_TEMPLATE = `<!DOCTYPE html>
             </div>
             
             <div class="flex items-center justify-center space-x-3 mb-4">
-                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23FC4C02'/%3E%3Cstop offset='100%25' stop-color='%23FF7B00'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='40' height='40' rx='8' fill='url(%23g)'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial,sans-serif' font-weight='bold' font-size='20' fill='white' text-anchor='middle' dominant-baseline='central'%3ES%3C/text%3E%3C/svg%3E" alt="SportsMCP Logo" class="w-8 h-8 rounded-lg">
+                <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="SportsMCP Logo" class="w-8 h-8 rounded-lg">
                 <span class="font-bold">SportsMCP</span>
             </div>
             
@@ -301,7 +292,7 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - SportsMCP</title>
     <meta name="description" content="Your personal Strava MCP dashboard with activity stats, insights, and your unique MCP URL for AI assistants.">
-    <link rel="icon" type="image/png" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23FC4C02'/%3E%3Cstop offset='100%25' stop-color='%23FF7B00'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='40' height='40' rx='8' fill='url(%23g)'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial,sans-serif' font-weight='bold' font-size='20' fill='white' text-anchor='middle' dominant-baseline='central'%3ES%3C/text%3E%3C/svg%3E">
+    <link rel="icon" type="image/png" href="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png">
     
     <!-- Social Media Meta Tags -->
     <meta property="og:title" content="SportsMCP Dashboard - Your Personal Activity Hub">
@@ -346,7 +337,7 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
         <div class="max-w-7xl mx-auto px-6 py-4">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-3">
-                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23FC4C02'/%3E%3Cstop offset='100%25' stop-color='%23FF7B00'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='40' height='40' rx='8' fill='url(%23g)'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial,sans-serif' font-weight='bold' font-size='20' fill='white' text-anchor='middle' dominant-baseline='central'%3ES%3C/text%3E%3C/svg%3E" alt="SportsMCP Logo" class="w-10 h-10 rounded-lg">
+                    <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="SportsMCP Logo" class="w-10 h-10 rounded-lg">
                     <span class="text-xl font-bold">SportsMCP</span>
                 </div>
                 <div class="flex items-center space-x-6">

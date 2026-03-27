@@ -7,7 +7,7 @@ export const ABOUT_TEMPLATE = `<!DOCTYPE html>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About - SportsMCP</title>
     <meta name="description" content="Learn about SportsMCP - a secure bridge connecting AI assistants to your personal Strava data through the Model Context Protocol.">
-    <link rel="icon" type="image/png" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23FC4C02'/%3E%3Cstop offset='100%25' stop-color='%23FF7B00'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='40' height='40' rx='8' fill='url(%23g)'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial,sans-serif' font-weight='bold' font-size='20' fill='white' text-anchor='middle' dominant-baseline='central'%3ES%3C/text%3E%3C/svg%3E">
+    <link rel="icon" type="image/png" href="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -21,7 +21,7 @@ export const ABOUT_TEMPLATE = `<!DOCTYPE html>
         <div class="max-w-7xl mx-auto px-6 py-4">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-3">
-                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23FC4C02'/%3E%3Cstop offset='100%25' stop-color='%23FF7B00'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='40' height='40' rx='8' fill='url(%23g)'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial,sans-serif' font-weight='bold' font-size='20' fill='white' text-anchor='middle' dominant-baseline='central'%3ES%3C/text%3E%3C/svg%3E" alt="SportsMCP Logo" class="w-10 h-10 rounded-lg">
+                    <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="SportsMCP Logo" class="w-10 h-10 rounded-lg">
                     <span class="text-xl font-bold">SportsMCP</span>
                 </div>
                 <div class="flex items-center space-x-6">
@@ -270,7 +270,7 @@ export const ABOUT_TEMPLATE = `<!DOCTYPE html>
                 <a href="/support" class="hover:text-white transition-colors">Support</a>
             </div>
             <div class="flex items-center justify-center space-x-3 mb-4">
-                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23FC4C02'/%3E%3Cstop offset='100%25' stop-color='%23FF7B00'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='40' height='40' rx='8' fill='url(%23g)'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial,sans-serif' font-weight='bold' font-size='20' fill='white' text-anchor='middle' dominant-baseline='central'%3ES%3C/text%3E%3C/svg%3E" alt="SportsMCP Logo" class="w-8 h-8 rounded-lg">
+                <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="SportsMCP Logo" class="w-8 h-8 rounded-lg">
                 <span class="font-bold">SportsMCP</span>
             </div>
             <p class="text-sm">
@@ -292,7 +292,7 @@ export const SUPPORT_TEMPLATE = `<!DOCTYPE html>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Support Center - SportsMCP</title>
     <meta name="description" content="Get help with SportsMCP setup, troubleshooting, and integration with AI assistants. Comprehensive support documentation and contact information.">
-    <link rel="icon" type="image/png" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23FC4C02'/%3E%3Cstop offset='100%25' stop-color='%23FF7B00'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='40' height='40' rx='8' fill='url(%23g)'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial,sans-serif' font-weight='bold' font-size='20' fill='white' text-anchor='middle' dominant-baseline='central'%3ES%3C/text%3E%3C/svg%3E">
+    <link rel="icon" type="image/png" href="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -306,7 +306,7 @@ export const SUPPORT_TEMPLATE = `<!DOCTYPE html>
         <div class="max-w-7xl mx-auto px-6 py-4">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-3">
-                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23FC4C02'/%3E%3Cstop offset='100%25' stop-color='%23FF7B00'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='40' height='40' rx='8' fill='url(%23g)'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial,sans-serif' font-weight='bold' font-size='20' fill='white' text-anchor='middle' dominant-baseline='central'%3ES%3C/text%3E%3C/svg%3E" alt="SportsMCP Logo" class="w-10 h-10 rounded-lg">
+                    <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="SportsMCP Logo" class="w-10 h-10 rounded-lg">
                     <span class="text-xl font-bold">SportsMCP</span>
                 </div>
                 <div class="flex items-center space-x-6">
@@ -694,7 +694,7 @@ export const SUPPORT_TEMPLATE = `<!DOCTYPE html>
                 <a href="/about" class="hover:text-white transition-colors">About</a>
             </div>
             <div class="flex items-center justify-center space-x-3 mb-4">
-                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23FC4C02'/%3E%3Cstop offset='100%25' stop-color='%23FF7B00'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='40' height='40' rx='8' fill='url(%23g)'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial,sans-serif' font-weight='bold' font-size='20' fill='white' text-anchor='middle' dominant-baseline='central'%3ES%3C/text%3E%3C/svg%3E" alt="SportsMCP Logo" class="w-8 h-8 rounded-lg">
+                <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="SportsMCP Logo" class="w-8 h-8 rounded-lg">
                 <span class="font-bold">SportsMCP</span>
             </div>
             <p class="text-sm">
@@ -727,7 +727,7 @@ export const PRIVACY_TEMPLATE = `<!DOCTYPE html>
         <div class="max-w-7xl mx-auto px-6 py-4">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-3">
-                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23FC4C02'/%3E%3Cstop offset='100%25' stop-color='%23FF7B00'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='40' height='40' rx='8' fill='url(%23g)'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial,sans-serif' font-weight='bold' font-size='20' fill='white' text-anchor='middle' dominant-baseline='central'%3ES%3C/text%3E%3C/svg%3E" alt="SportsMCP Logo" class="w-10 h-10 rounded-lg">
+                    <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="SportsMCP Logo" class="w-10 h-10 rounded-lg">
                     <span class="text-xl font-bold">SportsMCP</span>
                 </div>
                 <div class="flex items-center space-x-6">
@@ -1070,7 +1070,7 @@ export const PRIVACY_TEMPLATE = `<!DOCTYPE html>
                 <a href="/support" class="hover:text-white transition-colors">Support</a>
             </div>
             <div class="flex items-center justify-center space-x-3 mb-4">
-                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23FC4C02'/%3E%3Cstop offset='100%25' stop-color='%23FF7B00'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='40' height='40' rx='8' fill='url(%23g)'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial,sans-serif' font-weight='bold' font-size='20' fill='white' text-anchor='middle' dominant-baseline='central'%3ES%3C/text%3E%3C/svg%3E" alt="SportsMCP Logo" class="w-8 h-8 rounded-lg">
+                <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="SportsMCP Logo" class="w-8 h-8 rounded-lg">
                 <span class="font-bold">SportsMCP</span>
             </div>
             <p class="text-sm">
@@ -1092,7 +1092,7 @@ export const TERMS_TEMPLATE = `<!DOCTYPE html>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Terms of Service - SportsMCP</title>
     <meta name="description" content="Terms of Service for SportsMCP - Legal terms and conditions for using our Model Context Protocol service.">
-    <link rel="icon" type="image/png" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23FC4C02'/%3E%3Cstop offset='100%25' stop-color='%23FF7B00'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='40' height='40' rx='8' fill='url(%23g)'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial,sans-serif' font-weight='bold' font-size='20' fill='white' text-anchor='middle' dominant-baseline='central'%3ES%3C/text%3E%3C/svg%3E">
+    <link rel="icon" type="image/png" href="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -1103,7 +1103,7 @@ export const TERMS_TEMPLATE = `<!DOCTYPE html>
         <div class="max-w-7xl mx-auto px-6 py-4">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-3">
-                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23FC4C02'/%3E%3Cstop offset='100%25' stop-color='%23FF7B00'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='40' height='40' rx='8' fill='url(%23g)'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial,sans-serif' font-weight='bold' font-size='20' fill='white' text-anchor='middle' dominant-baseline='central'%3ES%3C/text%3E%3C/svg%3E" alt="SportsMCP Logo" class="w-10 h-10 rounded-lg">
+                    <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="SportsMCP Logo" class="w-10 h-10 rounded-lg">
                     <span class="text-xl font-bold">SportsMCP</span>
                 </div>
                 <div class="flex items-center space-x-6">
@@ -1496,7 +1496,7 @@ export const TERMS_TEMPLATE = `<!DOCTYPE html>
                 <a href="/support" class="hover:text-white transition-colors">Support</a>
             </div>
             <div class="flex items-center justify-center space-x-3 mb-4">
-                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23FC4C02'/%3E%3Cstop offset='100%25' stop-color='%23FF7B00'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='40' height='40' rx='8' fill='url(%23g)'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial,sans-serif' font-weight='bold' font-size='20' fill='white' text-anchor='middle' dominant-baseline='central'%3ES%3C/text%3E%3C/svg%3E" alt="SportsMCP Logo" class="w-8 h-8 rounded-lg">
+                <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="SportsMCP Logo" class="w-8 h-8 rounded-lg">
                 <span class="font-bold">SportsMCP</span>
             </div>
             <p class="text-sm">
