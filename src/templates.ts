@@ -388,6 +388,53 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
             </div>
         </div>
 
+        <!-- Poke Notifications bar -->
+        <div class="card rounded-2xl p-4 mb-6" id="poke-top-bar">
+            {{#if poke_key_saved}}
+            <!-- Key saved: show status + quick test -->
+            <div class="flex flex-wrap items-center gap-3">
+                <div class="flex items-center gap-2 flex-shrink-0">
+                    <i class="fas fa-bell text-orange-400"></i>
+                    <span class="font-semibold text-sm">Poke Notifications</span>
+                    <span class="flex items-center gap-1 text-xs font-semibold text-green-400 bg-green-500/10 border border-green-500/20 px-2 py-0.5 rounded-full">
+                        <span class="w-1.5 h-1.5 bg-green-400 rounded-full"></span>Active
+                    </span>
+                </div>
+                <span class="text-xs text-gray-500 font-mono">{{poke_masked_key}}</span>
+                <div class="flex items-center gap-2 ml-auto">
+                    <button onclick="window.testPokeKey()" id="poke-top-test-btn"
+                            class="text-xs font-semibold text-orange-400 border border-orange-500/40 hover:bg-orange-500/10 px-3 py-1.5 rounded-lg transition-colors">
+                        <i class="fas fa-paper-plane mr-1"></i>Send Test Ping
+                    </button>
+                    <button onclick="window.scrollToPokeCard()"
+                            class="text-xs text-gray-500 hover:text-gray-300 transition-colors">
+                        Manage →
+                    </button>
+                </div>
+            </div>
+            {{else}}
+            <!-- No key: compact save form -->
+            <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                <div class="flex items-center gap-2 flex-shrink-0">
+                    <i class="fas fa-bell text-orange-400"></i>
+                    <span class="font-semibold text-sm">Poke Notifications</span>
+                </div>
+                <p class="text-xs text-gray-400 flex-shrink-0">Get pinged on <a href="https://poke.com" target="_blank" rel="noopener noreferrer" class="text-orange-400 hover:underline">Poke.com</a> after each workout.</p>
+                <form id="poke-top-form" class="flex gap-2 flex-1 min-w-0" onsubmit="window.savePokeKey(event, 'top')">
+                    <input type="password" id="poke-key-input-top" placeholder="poke_xxxxxxxxxxxxxxxx"
+                           class="flex-1 min-w-0 bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-orange-500">
+                    <button type="submit"
+                            class="flex-shrink-0 bg-orange-500 hover:bg-orange-600 text-white font-semibold px-4 py-1.5 rounded-lg text-sm transition-colors whitespace-nowrap">
+                        Save Key
+                    </button>
+                </form>
+            </div>
+            {{/if}}
+            <div id="poke-top-status-bar" class="mt-2 hidden">
+                <div id="poke-top-status" class="text-xs rounded-lg px-3 py-2"></div>
+            </div>
+        </div>
+
         <!-- Profile & MCP URL Section -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
             <!-- Profile Card -->
@@ -863,7 +910,7 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                 <div id="poke-saved-view" class="hidden"></div>
                 <div id="poke-form-view">
                 {{/if}}
-                    <form id="poke-form" onsubmit="window.savePokeKey(event)">
+                    <form id="poke-form" onsubmit="window.savePokeKey(event, 'card')">
                         <label class="block text-xs text-gray-400 mb-1">Your Poke API Key</label>
                         <input type="password" id="poke-key-input" placeholder="poke_xxxxxxxxxxxxxxxx"
                                class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-orange-500 mb-3">
@@ -972,24 +1019,54 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
         function _pokeToken() {
             return new URLSearchParams(window.location.search).get('token') || '';
         }
-        function _pokeStatus(msg, isError) {
-            const bar = document.getElementById('poke-status-bar');
-            const el = document.getElementById('poke-status');
-            el.textContent = msg;
-            el.className = 'text-xs rounded-lg px-3 py-2 ' + (isError ? 'bg-red-500/10 text-red-400' : 'bg-green-500/10 text-green-400');
-            bar.classList.remove('hidden');
+        // Show status in either the top bar or the bottom card
+        function _pokeStatus(msg, isError, location) {
+            // location: 'top', 'card', or 'both' (default)
+            const target = location || 'both';
+            function _setStatus(barId, elId) {
+                const bar = document.getElementById(barId);
+                const el = document.getElementById(elId);
+                if (!bar || !el) return;
+                el.textContent = msg;
+                el.className = 'text-xs rounded-lg px-3 py-2 ' + (isError ? 'bg-red-500/10 text-red-400' : 'bg-green-500/10 text-green-400');
+                bar.classList.remove('hidden');
+            }
+            if (target === 'top' || target === 'both') _setStatus('poke-top-status-bar', 'poke-top-status');
+            if (target === 'card' || target === 'both') _setStatus('poke-status-bar', 'poke-status');
         }
         function _showPokeView(view) {
-            // view: 'saved' or 'form'
             document.getElementById('poke-saved-view').classList.toggle('hidden', view !== 'saved');
             document.getElementById('poke-form-view').classList.toggle('hidden', view !== 'form');
         }
+        // Transition top bar from form to active state after save
+        function _updateTopBar(masked) {
+            const bar = document.getElementById('poke-top-bar');
+            if (!bar) return;
+            // Replace the form row with the active row
+            const inner = bar.querySelector(':scope > div:first-child');
+            if (inner) {
+                inner.outerHTML = '<div class="flex flex-wrap items-center gap-3">' +
+                    '<div class="flex items-center gap-2 flex-shrink-0">' +
+                        '<i class="fas fa-bell text-orange-400"></i>' +
+                        '<span class="font-semibold text-sm">Poke Notifications</span>' +
+                        '<span class="flex items-center gap-1 text-xs font-semibold text-green-400 bg-green-500/10 border border-green-500/20 px-2 py-0.5 rounded-full"><span class="w-1.5 h-1.5 bg-green-400 rounded-full"></span>Active</span>' +
+                    '</div>' +
+                    '<span class="text-xs text-gray-500 font-mono">' + masked + '</span>' +
+                    '<div class="flex items-center gap-2 ml-auto">' +
+                        '<button onclick="window.testPokeKey(\'top\')" id="poke-top-test-btn" class="text-xs font-semibold text-orange-400 border border-orange-500/40 hover:bg-orange-500/10 px-3 py-1.5 rounded-lg transition-colors"><i class="fas fa-paper-plane mr-1"></i>Send Test Ping</button>' +
+                        '<button onclick="window.scrollToPokeCard()" class="text-xs text-gray-500 hover:text-gray-300 transition-colors">Manage →</button>' +
+                    '</div>' +
+                '</div>';
+            }
+        }
 
-        // Save key
-        window.savePokeKey = async function savePokeKey(event) {
+        // Save key — works from top bar ('top') or bottom card (no arg / 'card')
+        window.savePokeKey = async function savePokeKey(event, source) {
             event.preventDefault();
-            const key = document.getElementById('poke-key-input').value.trim();
-            if (!key) { _pokeStatus('Please enter a Poke API key.', true); return; }
+            const inputId = source === 'top' ? 'poke-key-input-top' : 'poke-key-input';
+            const key = document.getElementById(inputId).value.trim();
+            const statusLoc = source === 'top' ? 'top' : 'card';
+            if (!key) { _pokeStatus('Please enter a Poke API key.', true, statusLoc); return; }
             try {
                 const res = await fetch('/settings/poke-key', {
                     method: 'POST',
@@ -997,45 +1074,51 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                     body: JSON.stringify({ token: _pokeToken(), poke_api_key: key })
                 });
                 if (res.ok) {
-                    document.getElementById('poke-key-input').value = '';
-                    // Show masked key — server will return full masked on next page load;
-                    // for now just show generic masked version
+                    document.getElementById(inputId).value = '';
                     const masked = key.slice(0, 5) + '••••••••' + key.slice(-4);
-                    const savedView = document.getElementById('poke-saved-view');
-                    // Update the masked key text inside the saved view badge
-                    const monoBadge = savedView.querySelector('.font-mono');
+                    // Update bottom card
+                    const monoBadge = document.querySelector('#poke-saved-view .font-mono');
                     if (monoBadge) monoBadge.textContent = masked;
                     _showPokeView('saved');
-                    _pokeStatus("✅ Key saved! You'll get a ping after every workout.", false);
+                    // Update top bar
+                    _updateTopBar(masked);
+                    _pokeStatus("✅ Key saved! You'll get a ping after every workout.", false, 'card');
+                    _pokeStatus("✅ Active — you'll be pinged after every workout.", false, 'top');
                 } else {
                     const err = await res.json();
-                    _pokeStatus('❌ ' + (err.error || 'Failed to save key.'), true);
+                    _pokeStatus('❌ ' + (err.error || 'Failed to save key.'), true, statusLoc);
                 }
             } catch (e) {
-                _pokeStatus('❌ Network error. Please try again.', true);
+                _pokeStatus('❌ Network error. Please try again.', true, statusLoc);
             }
         };
 
-        // Test ping
-        window.testPokeKey = async function testPokeKey() {
-            const btn = document.getElementById('poke-test-btn');
-            const origHTML = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Sending…';
-            btn.disabled = true;
+        // Test ping — source: 'top' or 'card'
+        window.testPokeKey = async function testPokeKey(source) {
+            const btnId = source === 'top' ? 'poke-top-test-btn' : 'poke-test-btn';
+            const btn = document.getElementById(btnId);
+            const origHTML = btn ? btn.innerHTML : '';
+            if (btn) { btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Sending…'; btn.disabled = true; }
+            const statusLoc = source === 'top' ? 'top' : 'card';
             try {
                 const res = await fetch('/test-poke?token=' + _pokeToken(), { method: 'POST' });
                 const data = await res.json();
                 if (res.ok && data.success) {
-                    _pokeStatus('📱 ' + data.message + ' — check your messages!', false);
+                    _pokeStatus('📱 ' + data.message + ' — check your messages!', false, statusLoc);
                 } else {
-                    _pokeStatus('❌ ' + (data.error || 'Test failed. Check your key.'), true);
+                    _pokeStatus('❌ ' + (data.error || 'Test failed. Check your key.'), true, statusLoc);
                 }
             } catch (e) {
-                _pokeStatus('❌ Network error. Please try again.', true);
+                _pokeStatus('❌ Network error. Please try again.', true, statusLoc);
             } finally {
-                btn.innerHTML = origHTML;
-                btn.disabled = false;
+                if (btn) { btn.innerHTML = origHTML; btn.disabled = false; }
             }
+        };
+
+        // Scroll to bottom Poke card
+        window.scrollToPokeCard = function scrollToPokeCard() {
+            const card = document.getElementById('poke-card');
+            if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
         };
 
         // Remove key
