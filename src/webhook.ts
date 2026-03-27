@@ -358,7 +358,7 @@ export class StravaWebhookHandler {
     await this.env.STRAVA_SESSIONS.put(
       key, 
       JSON.stringify(summary),
-      { expirationTtl: 60 * 60 * 24 * 30 } // 30 days
+      { expirationTtl: 60 * 60 * 24 * 7 }  // 7-day max per Strava API agreement
     );
   }
 

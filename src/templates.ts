@@ -94,12 +94,12 @@ export const LANDING_TEMPLATE = `<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StravaMCP - Connect Your AI to Strava</title>
+    <title>SportsMCP - Connect Your AI to Strava</title>
     <meta name="description" content="Get your personal MCP server URL to unlock powerful Strava integration with AI assistants like Poke.com, Claude Desktop, and more.">
     <link rel="icon" type="image/png" href="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png">
     
     <!-- Social Media Meta Tags -->
-    <meta property="og:title" content="StravaMCP - Connect Your AI to Strava">
+    <meta property="og:title" content="SportsMCP - Connect Your AI to Strava">
     <meta property="og:description" content="Get your personal MCP server URL to unlock powerful Strava integration with AI assistants.">
     <meta property="og:image" content="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961568/SportMCP_opengraph.png">
     <meta property="og:image:width" content="1200">
@@ -107,7 +107,7 @@ export const LANDING_TEMPLATE = `<!DOCTYPE html>
     <meta property="og:url" content="{{base_url}}">
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="StravaMCP - Connect Your AI to Strava">
+    <meta name="twitter:title" content="SportsMCP - Connect Your AI to Strava">
     <meta name="twitter:description" content="Get your personal MCP server URL to unlock powerful Strava integration with AI assistants.">
     <meta name="twitter:image" content="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961568/SportMCP_opengraph.png">
     
@@ -135,8 +135,8 @@ export const LANDING_TEMPLATE = `<!DOCTYPE html>
     <nav class="relative z-10 px-6 py-4">
         <div class="max-w-7xl mx-auto flex items-center justify-between">
             <div class="flex items-center space-x-3">
-                <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="StravaMCP Logo" class="w-10 h-10 rounded-lg">
-                <span class="text-xl font-bold">StravaMCP</span>
+                <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="SportsMCP Logo" class="w-10 h-10 rounded-lg">
+                <span class="text-xl font-bold">SportsMCP</span>
             </div>
             <div class="flex items-center space-x-6">
                 <a href="/about" class="text-gray-300 hover:text-white transition-colors">About</a>
@@ -156,7 +156,7 @@ export const LANDING_TEMPLATE = `<!DOCTYPE html>
             <div class="text-center max-w-4xl mx-auto">
                 <!-- Hero Logo -->
                 <div class="flex justify-center mb-8">
-                    <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="StravaMCP Logo" class="w-32 h-32 rounded-2xl shadow-2xl">
+                    <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="SportsMCP Logo" class="w-32 h-32 rounded-2xl shadow-2xl">
                 </div>
                 
                 <h1 class="text-5xl md:text-7xl font-bold mb-8 bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">
@@ -269,8 +269,8 @@ export const LANDING_TEMPLATE = `<!DOCTYPE html>
             </div>
             
             <div class="flex items-center justify-center space-x-3 mb-4">
-                <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="StravaMCP Logo" class="w-8 h-8 rounded-lg">
-                <span class="font-bold">StravaMCP</span>
+                <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="SportsMCP Logo" class="w-8 h-8 rounded-lg">
+                <span class="font-bold">SportsMCP</span>
             </div>
             
             <div class="flex justify-center mb-4">
@@ -282,7 +282,7 @@ export const LANDING_TEMPLATE = `<!DOCTYPE html>
                 Powered by Cloudflare Workers • Built for the Model Context Protocol
             </p>
             <p class="text-xs mt-3 text-gray-600">
-                StravaMCP is not affiliated with, endorsed, or sponsored by Strava.<br>
+                SportsMCP is not affiliated with, endorsed, or sponsored by Strava.<br>
                 Data accessed via the official <a href="https://developers.strava.com" target="_blank" rel="noopener noreferrer" class="text-orange-500 font-semibold hover:text-orange-400">Strava API</a>.
             </p>
         </div>
@@ -295,19 +295,19 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - StravaMCP</title>
+    <title>Dashboard - SportsMCP</title>
     <meta name="description" content="Your personal Strava MCP dashboard with activity stats, insights, and your unique MCP URL for AI assistants.">
     <link rel="icon" type="image/png" href="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png">
     
     <!-- Social Media Meta Tags -->
-    <meta property="og:title" content="StravaMCP Dashboard - Your Personal Activity Hub">
+    <meta property="og:title" content="SportsMCP Dashboard - Your Personal Activity Hub">
     <meta property="og:description" content="View your Strava stats, get your personal MCP URL, and connect AI assistants to your fitness data.">
     <meta property="og:image" content="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961568/SportMCP_opengraph.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="StravaMCP Dashboard">
+    <meta name="twitter:title" content="SportsMCP Dashboard">
     <meta name="twitter:description" content="View your Strava stats, get your personal MCP URL, and connect AI assistants to your fitness data.">
     <meta name="twitter:image" content="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961568/SportMCP_opengraph.png">
     
@@ -342,8 +342,8 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-3">
-                    <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="StravaMCP Logo" class="w-9 h-9 rounded-lg">
-                    <span class="text-lg font-bold">StravaMCP</span>
+                    <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="SportsMCP Logo" class="w-9 h-9 rounded-lg">
+                    <span class="text-lg font-bold">SportsMCP</span>
                 </div>
                 <div class="flex items-center space-x-3 sm:space-x-5">
                     <a href="/about" class="hidden sm:block text-gray-300 hover:text-white transition-colors text-sm">About</a>
@@ -362,7 +362,7 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
         <!-- Welcome Section -->
         <div class="mb-8">
             <h1 class="text-4xl font-bold mb-4 bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">
-                Your StravaMCP Dashboard
+                Your SportsMCP Dashboard
             </h1>
             <p class="text-xl text-gray-400 mb-6">
                 Everything you need to connect AI assistants to your Strava data
@@ -541,7 +541,7 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                         <div class="relative">
                             <pre class="bg-gray-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto"><code id="claude-config">{
   "mcpServers": {
-    "stravamcp": {
+    "sportsmcp": {
       "url": "{{mcp_url}}"
     }
   }
@@ -560,7 +560,7 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                         <div class="relative">
                             <pre class="bg-gray-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto"><code id="cursor-config">{
   "mcpServers": {
-    "stravamcp": {
+    "sportsmcp": {
       "url": "{{mcp_url}}"
     }
   }
@@ -579,7 +579,7 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                         <div class="relative">
                             <pre class="bg-gray-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto"><code id="windsurf-config">{
   "mcpServers": {
-    "stravamcp": {
+    "sportsmcp": {
       "url": "{{mcp_url}}"
     }
   }
@@ -597,7 +597,7 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                         <div class="relative">
                             <pre class="bg-gray-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto"><code id="cline-config">{
   "mcpServers": {
-    "stravamcp": {
+    "sportsmcp": {
       "url": "{{mcp_url}}"
     }
   }
@@ -616,7 +616,7 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                             <pre class="bg-gray-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto"><code id="continue-config">{
   "mcpServers": [
     {
-      "name": "stravamcp",
+      "name": "sportsmcp",
       "transport": {
         "type": "streamable-http",
         "url": "{{mcp_url}}"
@@ -941,7 +941,7 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                 <img src="https://www.strava.com/assets/api/badge-strava-light.svg" alt="Powered by Strava" class="h-8 opacity-70 hover:opacity-100 transition-opacity">
             </a>
             <p class="text-xs text-gray-600 text-center">
-                StravaMCP is not affiliated with, endorsed, or sponsored by Strava.<br>
+                SportsMCP is not affiliated with, endorsed, or sponsored by Strava.<br>
                 Your data is accessed via the official <a href="https://developers.strava.com" target="_blank" rel="noopener noreferrer" class="text-orange-500 hover:underline">Strava API</a>.
             </p>
             <div class="flex gap-4 text-xs text-gray-600">

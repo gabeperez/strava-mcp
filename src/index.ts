@@ -3,7 +3,7 @@ import { Env } from './types';
 import { AuthHandler } from './auth';
 import { AuthMiddleware } from './middleware';
 import { StravaApiHandlers } from './api';
-import { StravaMCPServer, handleMCPOverSSE } from './mcp-server';
+import { SportsMCPServer, handleMCPOverSSE } from './mcp-server';
 import { TemplateEngine, LANDING_TEMPLATE, DASHBOARD_TEMPLATE } from './templates';
 import { ABOUT_TEMPLATE, SUPPORT_TEMPLATE, PRIVACY_TEMPLATE, TERMS_TEMPLATE } from './legal-templates';
 import { StravaWebhookHandler } from './webhook';
@@ -59,7 +59,7 @@ app.get('/', (c) => {
   // If requesting JSON (for API or MCP clients), return server info
   if (acceptHeader?.includes('application/json')) {
     return c.json({
-      name: 'StravaMCP',
+      name: 'SportsMCP',
       version: '1.0.0',
       description: 'Model Context Protocol server for Strava API with OAuth authentication',
       protocol: 'mcp',
@@ -70,7 +70,7 @@ app.get('/', (c) => {
         }
       },
       serverInfo: {
-        name: 'StravaMCP',
+        name: 'SportsMCP',
         version: '1.0.0'
       },
       endpoints: {
@@ -130,7 +130,7 @@ app.get('/sse', async (c) => {
 // Cloudflare Workers (no persistent memory across requests) we respond inline here.
 app.post('/messages', async (c) => {
   const env = c.env as Env;
-  const mcpServer = new StravaMCPServer(env);
+  const mcpServer = new SportsMCPServer(env);
 
   try {
     const request = await c.req.json();
@@ -197,7 +197,7 @@ app.post('/test-poke', async (c) => {
       return c.json({ error: 'No Poke API key saved. Add your key first.' }, 400);
     }
 
-    const testMessage = `🏃 StravaMCP Test Notification
+    const testMessage = `🏃 SportsMCP Test Notification
 
 Your Strava integration is working! Here's what a real workout notification looks like:
 
@@ -469,7 +469,7 @@ app.get('/mcp', async (c) => {
         }
       },
       serverInfo: {
-        name: 'StravaMCP',
+        name: 'SportsMCP',
         version: '1.0.0'
       },
       authenticated: isAuthenticated,
@@ -486,7 +486,7 @@ app.get('/mcp', async (c) => {
 // MCP JSON-RPC endpoint for direct calls  
 app.post('/mcp', async (c) => {
   const env = c.env as Env;
-  const mcpServer = new StravaMCPServer(env);
+  const mcpServer = new SportsMCPServer(env);
   
   try {
     const request = await c.req.json();
