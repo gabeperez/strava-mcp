@@ -21,10 +21,9 @@ export class AuthHandler {
   // Get current domain for dynamic URL generation
   private getCurrentDomain(c: Context): string {
     const host = c.req.header('host');
-    if (host?.includes('sportsmcp.com')) {
-      return 'https://sportsmcp.com';
-    }
-    return 'https://your-worker-name.your-subdomain.workers.dev';
+    if (!host) return 'https://strava-mcp-oauth.perez-jg22.workers.dev';
+    const protocol = host.includes('localhost') ? 'http' : 'https';
+    return `${protocol}://${host}`;
   }
 
   // GET /auth - Initiate OAuth flow

@@ -44,10 +44,9 @@ app.use('*', async (c, next) => {
 // Helper function to get current domain
 function getCurrentDomain(c: any): string {
   const host = c.req.header('host');
-  if (host?.includes('sportsmcp.com')) {
-    return 'https://sportsmcp.com';
-  }
-  return 'https://your-worker-name.your-subdomain.workers.dev';
+  if (!host) return 'https://strava-mcp-oauth.perez-jg22.workers.dev';
+  const protocol = host.includes('localhost') ? 'http' : 'https';
+  return `${protocol}://${host}`;
 }
 
 
