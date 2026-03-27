@@ -319,7 +319,7 @@ export class StravaWebhookHandler {
       throw new Error('Poke API key not configured');
     }
 
-    const response = await fetch('https://poke.com/api/v1/inbound-sms/webhook', {
+    const response = await fetch('https://poke.com/api/v1/inbound/api-message', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,

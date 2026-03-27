@@ -59,7 +59,7 @@ app.get('/', (c) => {
   // If requesting JSON (for API or MCP clients), return server info
   if (acceptHeader?.includes('application/json')) {
     return c.json({
-      name: 'SportsMCP',
+      name: 'StravaMCP',
       version: '1.0.0',
       description: 'Model Context Protocol server for Strava API with OAuth authentication',
       protocol: 'mcp',
@@ -70,7 +70,7 @@ app.get('/', (c) => {
         }
       },
       serverInfo: {
-        name: 'SportsMCP',
+        name: 'StravaMCP',
         version: '1.0.0'
       },
       endpoints: {
@@ -469,7 +469,7 @@ app.get('/mcp', async (c) => {
         }
       },
       serverInfo: {
-        name: 'SportsMCP',
+        name: 'StravaMCP',
         version: '1.0.0'
       },
       authenticated: isAuthenticated,

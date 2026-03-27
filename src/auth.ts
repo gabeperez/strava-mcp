@@ -2,7 +2,7 @@ import { Context } from 'hono';
 import { Env, StravaTokenResponse, StravaSession } from './types';
 import { KVSessionManager, getCookieValue, createCookie, deleteCookie, generateState } from './session';
 
-const REQUIRED_SCOPES = 'profile:read_all,activity:read_all,activity:read,profile:write';
+const REQUIRED_SCOPES = 'profile:read_all,activity:read_all,activity:read';
 
 export class AuthHandler {
   private sessionManager: KVSessionManager;

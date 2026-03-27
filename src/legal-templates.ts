@@ -5,8 +5,8 @@ export const ABOUT_TEMPLATE = `<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About - SportsMCP</title>
-    <meta name="description" content="Learn about SportsMCP - a secure bridge connecting AI assistants to your personal Strava data through the Model Context Protocol.">
+    <title>About - StravaMCP</title>
+    <meta name="description" content="Learn about StravaMCP - a secure bridge connecting AI assistants to your personal Strava data through the Model Context Protocol.">
     <link rel="icon" type="image/png" href="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png">
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -21,8 +21,8 @@ export const ABOUT_TEMPLATE = `<!DOCTYPE html>
         <div class="max-w-7xl mx-auto px-6 py-4">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-3">
-                    <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="SportsMCP Logo" class="w-10 h-10 rounded-lg">
-                    <span class="text-xl font-bold">SportsMCP</span>
+                    <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="StravaMCP Logo" class="w-10 h-10 rounded-lg">
+                    <span class="text-xl font-bold">StravaMCP</span>
                 </div>
                 <div class="flex items-center space-x-6">
                     <a href="/" class="text-gray-300 hover:text-white transition-colors">Home</a>
@@ -37,7 +37,7 @@ export const ABOUT_TEMPLATE = `<!DOCTYPE html>
     <div class="max-w-4xl mx-auto px-6 py-12">
         <div class="text-center mb-12">
             <h1 class="text-5xl font-bold mb-6 bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">
-                About SportsMCP
+                About StravaMCP
             </h1>
             <p class="text-xl text-gray-400">
                 Bridging the gap between AI assistants and your personal fitness data
@@ -51,7 +51,7 @@ export const ABOUT_TEMPLATE = `<!DOCTYPE html>
                 Our Mission
             </h2>
             <p class="text-lg text-gray-300 leading-relaxed mb-6">
-                SportsMCP empowers athletes to unlock the full potential of their fitness data through natural language interactions with AI assistants. We believe your workout data should be easily accessible, securely managed, and seamlessly integrated with the AI tools you already use.
+                StravaMCP empowers athletes to unlock the full potential of their fitness data through natural language interactions with AI assistants. We believe your workout data should be easily accessible, securely managed, and seamlessly integrated with the AI tools you already use.
             </p>
             <p class="text-lg text-gray-300 leading-relaxed">
                 By implementing the Model Context Protocol (MCP), we create a standardized bridge between your Strava account and any compatible AI assistant, enabling personalized insights, training analysis, and fitness coaching at scale.
@@ -233,7 +233,7 @@ export const ABOUT_TEMPLATE = `<!DOCTYPE html>
                 <div>
                     <h3 class="text-xl font-semibold text-orange-400 mb-4">Need Help?</h3>
                     <p class="text-gray-300 mb-4">
-                        Our support team is here to help you get the most out of your SportsMCP integration.
+                        Our support team is here to help you get the most out of your StravaMCP integration.
                     </p>
                     <a href="/support" class="inline-flex items-center bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
                         <i class="fas fa-life-ring mr-2"></i>
@@ -270,15 +270,16 @@ export const ABOUT_TEMPLATE = `<!DOCTYPE html>
                 <a href="/support" class="hover:text-white transition-colors">Support</a>
             </div>
             <div class="flex items-center justify-center space-x-3 mb-4">
-                <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="SportsMCP Logo" class="w-8 h-8 rounded-lg">
-                <span class="font-bold">SportsMCP</span>
+                <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="StravaMCP Logo" class="w-8 h-8 rounded-lg">
+                <span class="font-bold">StravaMCP</span>
             </div>
             <p class="text-sm">
                 Powered by Cloudflare Workers • Built for the Model Context Protocol
             </p>
             <p class="text-xs mt-2 text-gray-600">
                 Compatible with <a href="https://www.strava.com" target="_blank" rel="noopener noreferrer" class="text-orange-500 font-semibold hover:text-orange-400">Strava</a>.
-                SportsMCP is not affiliated with, endorsed, or sponsored by Strava.
+                StravaMCP is not affiliated with, endorsed, or sponsored by Strava.<br>
+                Data accessed via the official <a href="https://developers.strava.com" class="text-orange-400 hover:underline">Strava API</a>.
             </p>
         </div>
     </footer>
@@ -290,8 +291,8 @@ export const SUPPORT_TEMPLATE = `<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Support Center - SportsMCP</title>
-    <meta name="description" content="Get help with SportsMCP setup, troubleshooting, and integration with AI assistants. Comprehensive support documentation and contact information.">
+    <title>Support Center - StravaMCP</title>
+    <meta name="description" content="Get help with StravaMCP setup, troubleshooting, and integration with AI assistants. Comprehensive support documentation and contact information.">
     <link rel="icon" type="image/png" href="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png">
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -306,8 +307,8 @@ export const SUPPORT_TEMPLATE = `<!DOCTYPE html>
         <div class="max-w-7xl mx-auto px-6 py-4">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-3">
-                    <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="SportsMCP Logo" class="w-10 h-10 rounded-lg">
-                    <span class="text-xl font-bold">SportsMCP</span>
+                    <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="StravaMCP Logo" class="w-10 h-10 rounded-lg">
+                    <span class="text-xl font-bold">StravaMCP</span>
                 </div>
                 <div class="flex items-center space-x-6">
                     <a href="/" class="text-gray-300 hover:text-white transition-colors">Home</a>
@@ -325,7 +326,7 @@ export const SUPPORT_TEMPLATE = `<!DOCTYPE html>
                 Support Center
             </h1>
             <p class="text-xl text-gray-400">
-                Everything you need to get up and running with SportsMCP
+                Everything you need to get up and running with StravaMCP
             </p>
         </div>
 
@@ -619,7 +620,7 @@ export const SUPPORT_TEMPLATE = `<!DOCTYPE html>
                 <div>
                     <h3 class="text-xl font-semibold text-orange-400 mb-4">Get Personal Help</h3>
                     <p class="text-gray-300 mb-6">
-                        Can't find the answer you're looking for? Our support team is here to help you resolve any issues with your SportsMCP integration.
+                        Can't find the answer you're looking for? Our support team is here to help you resolve any issues with your StravaMCP integration.
                     </p>
                     
                     <div class="space-y-4">
@@ -694,15 +695,16 @@ export const SUPPORT_TEMPLATE = `<!DOCTYPE html>
                 <a href="/about" class="hover:text-white transition-colors">About</a>
             </div>
             <div class="flex items-center justify-center space-x-3 mb-4">
-                <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="SportsMCP Logo" class="w-8 h-8 rounded-lg">
-                <span class="font-bold">SportsMCP</span>
+                <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="StravaMCP Logo" class="w-8 h-8 rounded-lg">
+                <span class="font-bold">StravaMCP</span>
             </div>
             <p class="text-sm">
                 Powered by Cloudflare Workers • Built for the Model Context Protocol
             </p>
             <p class="text-xs mt-2 text-gray-600">
                 Compatible with <a href="https://www.strava.com" target="_blank" rel="noopener noreferrer" class="text-orange-500 font-semibold hover:text-orange-400">Strava</a>.
-                SportsMCP is not affiliated with, endorsed, or sponsored by Strava.
+                StravaMCP is not affiliated with, endorsed, or sponsored by Strava.<br>
+                Data accessed via the official <a href="https://developers.strava.com" class="text-orange-400 hover:underline">Strava API</a>.
             </p>
         </div>
     </footer>
@@ -714,8 +716,8 @@ export const PRIVACY_TEMPLATE = `<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Privacy Policy - SportsMCP</title>
-    <meta name="description" content="Privacy Policy for SportsMCP - Learn how we protect your personal information and Strava data.">
+    <title>Privacy Policy - StravaMCP</title>
+    <meta name="description" content="Privacy Policy for StravaMCP - Learn how we protect your personal information and Strava data.">
     <link rel="icon" type="image/png" href="https://res.cloudflare.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png">
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -727,8 +729,8 @@ export const PRIVACY_TEMPLATE = `<!DOCTYPE html>
         <div class="max-w-7xl mx-auto px-6 py-4">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-3">
-                    <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="SportsMCP Logo" class="w-10 h-10 rounded-lg">
-                    <span class="text-xl font-bold">SportsMCP</span>
+                    <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="StravaMCP Logo" class="w-10 h-10 rounded-lg">
+                    <span class="text-xl font-bold">StravaMCP</span>
                 </div>
                 <div class="flex items-center space-x-6">
                     <a href="/" class="text-gray-300 hover:text-white transition-colors">Home</a>
@@ -762,7 +764,7 @@ export const PRIVACY_TEMPLATE = `<!DOCTYPE html>
                 </h2>
                 <div class="space-y-4 text-gray-300">
                     <p class="text-lg">
-                        At SportsMCP, we are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, and safeguard your data when you use our Model Context Protocol (MCP) server service.
+                        At StravaMCP, we are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, and safeguard your data when you use our Model Context Protocol (MCP) server service.
                     </p>
                     <p>
                         <strong>Contact Information:</strong><br>
@@ -1070,15 +1072,16 @@ export const PRIVACY_TEMPLATE = `<!DOCTYPE html>
                 <a href="/support" class="hover:text-white transition-colors">Support</a>
             </div>
             <div class="flex items-center justify-center space-x-3 mb-4">
-                <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="SportsMCP Logo" class="w-8 h-8 rounded-lg">
-                <span class="font-bold">SportsMCP</span>
+                <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="StravaMCP Logo" class="w-8 h-8 rounded-lg">
+                <span class="font-bold">StravaMCP</span>
             </div>
             <p class="text-sm">
                 Powered by Cloudflare Workers • Built for the Model Context Protocol
             </p>
             <p class="text-xs mt-2 text-gray-600">
                 Compatible with <a href="https://www.strava.com" target="_blank" rel="noopener noreferrer" class="text-orange-500 font-semibold hover:text-orange-400">Strava</a>.
-                SportsMCP is not affiliated with, endorsed, or sponsored by Strava.
+                StravaMCP is not affiliated with, endorsed, or sponsored by Strava.<br>
+                Data accessed via the official <a href="https://developers.strava.com" class="text-orange-400 hover:underline">Strava API</a>.
             </p>
         </div>
     </footer>
@@ -1090,8 +1093,8 @@ export const TERMS_TEMPLATE = `<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terms of Service - SportsMCP</title>
-    <meta name="description" content="Terms of Service for SportsMCP - Legal terms and conditions for using our Model Context Protocol service.">
+    <title>Terms of Service - StravaMCP</title>
+    <meta name="description" content="Terms of Service for StravaMCP - Legal terms and conditions for using our Model Context Protocol service.">
     <link rel="icon" type="image/png" href="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png">
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -1103,8 +1106,8 @@ export const TERMS_TEMPLATE = `<!DOCTYPE html>
         <div class="max-w-7xl mx-auto px-6 py-4">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-3">
-                    <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="SportsMCP Logo" class="w-10 h-10 rounded-lg">
-                    <span class="text-xl font-bold">SportsMCP</span>
+                    <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="StravaMCP Logo" class="w-10 h-10 rounded-lg">
+                    <span class="text-xl font-bold">StravaMCP</span>
                 </div>
                 <div class="flex items-center space-x-6">
                     <a href="/" class="text-gray-300 hover:text-white transition-colors">Home</a>
@@ -1122,7 +1125,7 @@ export const TERMS_TEMPLATE = `<!DOCTYPE html>
                 Terms of Service
             </h1>
             <p class="text-xl text-gray-400">
-                Legal terms and conditions for using SportsMCP
+                Legal terms and conditions for using StravaMCP
             </p>
             <p class="text-sm text-gray-500 mt-2">
                 Last updated: October 2025
@@ -1138,14 +1141,14 @@ export const TERMS_TEMPLATE = `<!DOCTYPE html>
                 </h2>
                 <div class="space-y-4 text-gray-300">
                     <p>
-                        By accessing or using SportsMCP ("the Service"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, do not use the Service.
+                        By accessing or using StravaMCP ("the Service"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, do not use the Service.
                     </p>
                     <p>
-                        These Terms constitute a legally binding agreement between you and SportsMCP. Your use of the Service is also subject to our Privacy Policy.
+                        These Terms constitute a legally binding agreement between you and StravaMCP. Your use of the Service is also subject to our Privacy Policy.
                     </p>
                     <div class="bg-blue-900/30 border border-blue-400 rounded-lg p-4">
                         <p class="text-blue-300">
-                            <strong>Service Provider:</strong> SportsMCP<br>
+                            <strong>Service Provider:</strong> StravaMCP<br>
                             <strong>Contact:</strong> <a href="mailto:help@stravamcp.com" class="text-blue-400 hover:text-blue-300">help@stravamcp.com</a>
                         </p>
                     </div>
@@ -1160,7 +1163,7 @@ export const TERMS_TEMPLATE = `<!DOCTYPE html>
                 </h2>
                 <div class="space-y-4 text-gray-300">
                     <p>
-                        SportsMCP provides a Model Context Protocol (MCP) interface that enables AI assistants to access your personal Strava fitness data with your explicit authorization.
+                        StravaMCP provides a Model Context Protocol (MCP) interface that enables AI assistants to access your personal Strava fitness data with your explicit authorization.
                     </p>
                     <div class="bg-gray-900 rounded-lg p-6">
                         <h3 class="text-xl font-semibold text-orange-400 mb-4">The Service Includes:</h3>
@@ -1293,7 +1296,7 @@ export const TERMS_TEMPLATE = `<!DOCTYPE html>
                     <div class="bg-gray-900 rounded-lg p-6">
                         <h3 class="text-xl font-semibold text-orange-400 mb-4">Our Intellectual Property</h3>
                         <p class="mb-3">
-                            The Service, including its software, design, and documentation, is owned by SportsMCP and protected by intellectual property laws.
+                            The Service, including its software, design, and documentation, is owned by StravaMCP and protected by intellectual property laws.
                         </p>
                         <p>
                             We grant you a limited, non-exclusive, non-transferable license to use the Service for its intended purpose.
@@ -1496,15 +1499,16 @@ export const TERMS_TEMPLATE = `<!DOCTYPE html>
                 <a href="/support" class="hover:text-white transition-colors">Support</a>
             </div>
             <div class="flex items-center justify-center space-x-3 mb-4">
-                <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="SportsMCP Logo" class="w-8 h-8 rounded-lg">
-                <span class="font-bold">SportsMCP</span>
+                <img src="https://res.cloudinary.com/dxoyxnrjl/image/upload/v1758961029/Strava_MCP_Logo_4_u0pe64.png" alt="StravaMCP Logo" class="w-8 h-8 rounded-lg">
+                <span class="font-bold">StravaMCP</span>
             </div>
             <p class="text-sm">
                 Powered by Cloudflare Workers • Built for the Model Context Protocol
             </p>
             <p class="text-xs mt-2 text-gray-600">
                 Compatible with <a href="https://www.strava.com" target="_blank" rel="noopener noreferrer" class="text-orange-500 font-semibold hover:text-orange-400">Strava</a>.
-                SportsMCP is not affiliated with, endorsed, or sponsored by Strava.
+                StravaMCP is not affiliated with, endorsed, or sponsored by Strava.<br>
+                Data accessed via the official <a href="https://developers.strava.com" class="text-orange-400 hover:underline">Strava API</a>.
             </p>
         </div>
     </footer>

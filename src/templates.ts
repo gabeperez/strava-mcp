@@ -273,12 +273,17 @@ export const LANDING_TEMPLATE = `<!DOCTYPE html>
                 <span class="font-bold">StravaMCP</span>
             </div>
             
+            <div class="flex justify-center mb-4">
+                <a href="https://www.strava.com" target="_blank" rel="noopener noreferrer">
+                    <img src="https://www.strava.com/assets/api/badge-strava-light.svg" alt="Powered by Strava" class="h-8 opacity-70 hover:opacity-100 transition-opacity">
+                </a>
+            </div>
             <p class="text-sm">
                 Powered by Cloudflare Workers • Built for the Model Context Protocol
             </p>
             <p class="text-xs mt-3 text-gray-600">
-                Compatible with <a href="https://www.strava.com" target="_blank" rel="noopener noreferrer" class="text-orange-500 font-semibold hover:text-orange-400">Strava</a>.
-                StravaMCP is not affiliated with, endorsed, or sponsored by Strava.
+                StravaMCP is not affiliated with, endorsed, or sponsored by Strava.<br>
+                Data accessed via the official <a href="https://developers.strava.com" target="_blank" rel="noopener noreferrer" class="text-orange-500 font-semibold hover:text-orange-400">Strava API</a>.
             </p>
         </div>
     </footer>
@@ -536,7 +541,7 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                         <div class="relative">
                             <pre class="bg-gray-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto"><code id="claude-config">{
   "mcpServers": {
-    "sportsmcp": {
+    "stravamcp": {
       "url": "{{mcp_url}}"
     }
   }
@@ -555,7 +560,7 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                         <div class="relative">
                             <pre class="bg-gray-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto"><code id="cursor-config">{
   "mcpServers": {
-    "sportsmcp": {
+    "stravamcp": {
       "url": "{{mcp_url}}"
     }
   }
@@ -574,7 +579,7 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                         <div class="relative">
                             <pre class="bg-gray-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto"><code id="windsurf-config">{
   "mcpServers": {
-    "sportsmcp": {
+    "stravamcp": {
       "url": "{{mcp_url}}"
     }
   }
@@ -592,7 +597,7 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                         <div class="relative">
                             <pre class="bg-gray-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto"><code id="cline-config">{
   "mcpServers": {
-    "sportsmcp": {
+    "stravamcp": {
       "url": "{{mcp_url}}"
     }
   }
@@ -611,7 +616,7 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                             <pre class="bg-gray-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto"><code id="continue-config">{
   "mcpServers": [
     {
-      "name": "sportsmcp",
+      "name": "stravamcp",
       "transport": {
         "type": "streamable-http",
         "url": "{{mcp_url}}"
@@ -930,11 +935,21 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
     </div>
 
     <!-- Footer attribution -->
-    <footer class="bg-gray-950 py-4 mt-8 text-center">
-        <p class="text-xs text-gray-600">
-            Compatible with <a href="https://www.strava.com" target="_blank" rel="noopener noreferrer" class="text-orange-500 font-semibold hover:text-orange-400">Strava</a>.
-            StravaMCP is not affiliated with, endorsed, or sponsored by Strava.
-        </p>
+    <footer class="bg-gray-950 py-6 mt-8">
+        <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <a href="https://www.strava.com" target="_blank" rel="noopener noreferrer">
+                <img src="https://www.strava.com/assets/api/badge-strava-light.svg" alt="Powered by Strava" class="h-8 opacity-70 hover:opacity-100 transition-opacity">
+            </a>
+            <p class="text-xs text-gray-600 text-center">
+                StravaMCP is not affiliated with, endorsed, or sponsored by Strava.<br>
+                Your data is accessed via the official <a href="https://developers.strava.com" target="_blank" rel="noopener noreferrer" class="text-orange-500 hover:underline">Strava API</a>.
+            </p>
+            <div class="flex gap-4 text-xs text-gray-600">
+                <a href="/privacy" class="hover:text-gray-400">Privacy Policy</a>
+                <a href="/terms" class="hover:text-gray-400">Terms</a>
+                <a href="/about" class="hover:text-gray-400">About</a>
+            </div>
+        </div>
     </footer>
 
     <!-- Copy Success Message -->
