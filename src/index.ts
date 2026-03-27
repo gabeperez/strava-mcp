@@ -181,7 +181,6 @@ app.post('/webhook', async (c) => {
 // Test endpoint for Poke notifications
 app.post('/test-poke', async (c) => {
   try {
-    // Resolve Poke key: check for per-user key via token param, then fall back to global
     let pokeApiKey: string | null = null;
     const token = c.req.query('token');
     if (token) {
@@ -195,24 +194,21 @@ app.post('/test-poke', async (c) => {
     if (!pokeApiKey) pokeApiKey = c.env.POKE_API_KEY || null;
 
     if (!pokeApiKey) {
-      return c.json({ error: 'No Poke API key configured. Save your personal Poke key from the dashboard first.' }, 400);
+      return c.json({ error: 'No Poke API key saved. Add your key first.' }, 400);
     }
 
-    const testMessage = `🏃 Test Strava Webhook!
+    const testMessage = `🏃 StravaMCP Test Notification
 
-**Morning Run - Webhook Integration Test**
-Type: Run
-Date: ${new Date().toLocaleString()}
-Distance: 10.5 km
-Duration: 52 minutes
-Pace: 4:57 min/km
-Elevation: 120m
-Avg HR: 145 bpm
-🏆 2 PRs!
+Your Strava integration is working! Here's what a real workout notification looks like:
 
-✨ This is a test notification from your SportsMCP Strava integration!`;
+📍 Morning Run · ${new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+📏 10.5 km · ⏱ 52 min · 🏔 120m elevation
+⚡ Pace: 4:57 /km · ❤️ Avg HR: 145 bpm
+🏆 2 segment PRs!
 
-    const response = await fetch('https://poke.com/api/v1/inbound-sms/webhook', {
+Your AI assistant can now answer questions about this workout automatically.`;
+
+    const response = await fetch('https://poke.com/api/v1/inbound/api-message', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${pokeApiKey}`,
@@ -225,22 +221,57 @@ Avg HR: 145 bpm
       const errorText = await response.text();
       return c.json({
         success: false,
-        error: `Poke API error: ${response.status}`,
+        error: `Poke returned ${response.status} — double-check your API key.`,
         details: errorText
       }, response.status);
     }
 
     const data = await response.json();
-    return c.json({
-      success: true,
-      message: 'Test notification sent to Poke!',
-      poke_response: data
-    });
+    return c.json({ success: true, message: 'Test ping sent! Check your messages 📱', poke_response: data });
   } catch (error: any) {
-    return c.json({
-      success: false,
-      error: error.message
-    }, 500);
+    return c.json({ success: false, error: error.message }, 500);
+  }
+});
+
+// Get Poke key status for dashboard display
+app.get('/settings/poke-key', async (c) => {
+  try {
+    const token = c.req.query('token');
+    if (!token) return c.json({ error: 'token required' }, 400);
+
+    const personalData = await c.env.STRAVA_SESSIONS.get(`personal_mcp:${token}`);
+    if (!personalData) return c.json({ error: 'Invalid token' }, 401);
+
+    const { athlete_id } = JSON.parse(personalData);
+    const key = await c.env.STRAVA_SESSIONS.get(`poke_key:${athlete_id}`);
+
+    if (!key) return c.json({ hasKey: false });
+
+    // Return a masked version — show first 5 chars + last 4 chars
+    const masked = key.length > 9
+      ? key.slice(0, 5) + '••••••••' + key.slice(-4)
+      : '••••••••••••';
+
+    return c.json({ hasKey: true, maskedKey: masked });
+  } catch (err: any) {
+    return c.json({ error: err.message }, 500);
+  }
+});
+
+// Delete saved Poke key
+app.delete('/settings/poke-key', async (c) => {
+  try {
+    const { token } = await c.req.json() as { token: string };
+    if (!token) return c.json({ error: 'token required' }, 400);
+
+    const personalData = await c.env.STRAVA_SESSIONS.get(`personal_mcp:${token}`);
+    if (!personalData) return c.json({ error: 'Invalid token' }, 401);
+
+    const { athlete_id } = JSON.parse(personalData);
+    await c.env.STRAVA_SESSIONS.delete(`poke_key:${athlete_id}`);
+    return c.json({ success: true });
+  } catch (err: any) {
+    return c.json({ error: err.message }, 500);
   }
 });
 
@@ -311,8 +342,8 @@ app.get('/dashboard', async (c) => {
       return c.redirect('/auth');
     }
     
-    // Fetch user's Strava data for dashboard
-    const [profileResponse, statsResponse, activitiesResponse] = await Promise.all([
+    // Fetch user's Strava data + poke key status in parallel
+    const [profileResponse, statsResponse, activitiesResponse, pokeKey] = await Promise.all([
       fetch('https://www.strava.com/api/v3/athlete', {
         headers: { 'Authorization': `Bearer ${session.access_token}` }
       }),
@@ -321,7 +352,8 @@ app.get('/dashboard', async (c) => {
       }),
       fetch('https://www.strava.com/api/v3/athlete/activities?per_page=7', {
         headers: { 'Authorization': `Bearer ${session.access_token}` }
-      })
+      }),
+      c.env.STRAVA_SESSIONS.get(`poke_key:${athlete_id}`)
     ]);
     
     const profile = await profileResponse.json();
@@ -391,7 +423,11 @@ app.get('/dashboard', async (c) => {
         most_active_sport: stats.recent_run_totals.count > stats.recent_ride_totals.count ? 'Running' : 'Cycling',
         weekly_average: Math.round(totalActivities / 4 * 10) / 10,
         longest_activity: activitiesArray.length > 0 ? Math.round(Math.max(...activitiesArray.map((a: any) => a.distance)) / 1000 * 10) / 10 : 0
-      }
+      },
+      poke_key_saved: !!pokeKey,
+      poke_masked_key: pokeKey
+        ? (pokeKey.length > 9 ? pokeKey.slice(0, 5) + '••••••••' + pokeKey.slice(-4) : '••••••••••••')
+        : ''
     };
     
     // Render the beautiful dashboard HTML
