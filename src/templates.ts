@@ -243,6 +243,216 @@ export const LANDING_TEMPLATE = `<!DOCTYPE html>
         </div>
     </section>
 
+
+    <!-- MCP Tools Showcase Section -->
+    <section class="py-24 bg-gray-900" id="tools-section">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-14">
+                <span class="inline-block bg-orange-500/10 text-orange-400 text-sm font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full border border-orange-500/20 mb-4">21 Available Tools</span>
+                <h2 class="text-4xl font-bold mb-5">Full Strava API Coverage</h2>
+                <p class="text-xl text-gray-400 max-w-2xl mx-auto">Every piece of your Strava data, accessible to any AI assistant through a single endpoint.</p>
+            </div>
+
+            <!-- Category Cards -->
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-12">
+                <button onclick="openToolsModal('activities')" class="group bg-gray-800 hover:bg-gray-750 border border-gray-700/50 hover:border-orange-500/40 rounded-2xl p-5 text-center transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-orange-500/10 cursor-pointer w-full">
+                    <div class="text-3xl mb-3">🏃</div>
+                    <div class="font-semibold text-sm text-white mb-1">Activities</div>
+                    <div class="text-orange-400 text-xs font-medium">5 tools</div>
+                </button>
+                <button onclick="openToolsModal('segments')" class="group bg-gray-800 hover:bg-gray-750 border border-gray-700/50 hover:border-orange-500/40 rounded-2xl p-5 text-center transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-orange-500/10 cursor-pointer w-full">
+                    <div class="text-3xl mb-3">📍</div>
+                    <div class="font-semibold text-sm text-white mb-1">Segments</div>
+                    <div class="text-orange-400 text-xs font-medium">5 tools</div>
+                </button>
+                <button onclick="openToolsModal('profile')" class="group bg-gray-800 hover:bg-gray-750 border border-gray-700/50 hover:border-orange-500/40 rounded-2xl p-5 text-center transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-orange-500/10 cursor-pointer w-full">
+                    <div class="text-3xl mb-3">👤</div>
+                    <div class="font-semibold text-sm text-white mb-1">Profile & Gear</div>
+                    <div class="text-orange-400 text-xs font-medium">3 tools</div>
+                </button>
+                <button onclick="openToolsModal('social')" class="group bg-gray-800 hover:bg-gray-750 border border-gray-700/50 hover:border-orange-500/40 rounded-2xl p-5 text-center transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-orange-500/10 cursor-pointer w-full">
+                    <div class="text-3xl mb-3">👥</div>
+                    <div class="font-semibold text-sm text-white mb-1">Social & Clubs</div>
+                    <div class="text-orange-400 text-xs font-medium">4 tools</div>
+                </button>
+                <button onclick="openToolsModal('routes')" class="group bg-gray-800 hover:bg-gray-750 border border-gray-700/50 hover:border-orange-500/40 rounded-2xl p-5 text-center transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-orange-500/10 cursor-pointer w-full col-span-2 md:col-span-1">
+                    <div class="text-3xl mb-3">🗺️</div>
+                    <div class="font-semibold text-sm text-white mb-1">Routes</div>
+                    <div class="text-orange-400 text-xs font-medium">2 tools</div>
+                </button>
+            </div>
+
+            <!-- Example prompts teaser -->
+            <div class="bg-gray-800/50 border border-gray-700/40 rounded-2xl p-6 mb-12">
+                <p class="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-4">Ask your AI assistant things like:</p>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div class="flex items-start gap-2 text-sm text-gray-300"><span class="text-orange-400 mt-0.5">›</span>"Break down the laps on my last interval run"</div>
+                    <div class="flex items-start gap-2 text-sm text-gray-300"><span class="text-orange-400 mt-0.5">›</span>"What are my heart rate training zones?"</div>
+                    <div class="flex items-start gap-2 text-sm text-gray-300"><span class="text-orange-400 mt-0.5">›</span>"How many miles are on my running shoes?"</div>
+                    <div class="flex items-start gap-2 text-sm text-gray-300"><span class="text-orange-400 mt-0.5">›</span>"Show me my personal bests on segment 12345"</div>
+                    <div class="flex items-start gap-2 text-sm text-gray-300"><span class="text-orange-400 mt-0.5">›</span>"Find popular climbs near Boulder, CO"</div>
+                    <div class="flex items-start gap-2 text-sm text-gray-300"><span class="text-orange-400 mt-0.5">›</span>"What are my year-to-date cycling stats?"</div>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button onclick="openToolsModal()" class="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3.5 px-10 rounded-xl transition-colors shadow-lg shadow-orange-500/20">
+                    <i class="fas fa-tools"></i>
+                    Explore All 21 Tools
+                    <i class="fas fa-chevron-right text-xs"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── TOOLS MODAL ─────────────────────────────────────────────────────── -->
+    <div id="tools-modal" class="fixed inset-0 z-50 hidden" aria-modal="true" role="dialog">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeToolsModal()"></div>
+        <!-- Panel -->
+        <div class="relative z-10 flex items-center justify-center min-h-screen p-4">
+            <div class="bg-gray-900 border border-gray-700/60 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+                <!-- Header -->
+                <div class="flex items-center justify-between px-6 py-5 border-b border-gray-700/50 flex-shrink-0">
+                    <div>
+                        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                            <i class="fas fa-tools text-orange-400"></i>
+                            SportsMCP Tools
+                        </h2>
+                        <p class="text-xs text-gray-500 mt-0.5">21 tools powered by the official Strava API</p>
+                    </div>
+                    <!-- Category filter tabs -->
+                    <div class="hidden md:flex items-center gap-1 bg-gray-800 rounded-xl p-1">
+                        <button onclick="filterTools('all')" id="tab-all" class="modal-tab active px-3 py-1.5 rounded-lg text-xs font-medium transition-colors">All</button>
+                        <button onclick="filterTools('activities')" id="tab-activities" class="modal-tab px-3 py-1.5 rounded-lg text-xs font-medium transition-colors">🏃 Activities</button>
+                        <button onclick="filterTools('segments')" id="tab-segments" class="modal-tab px-3 py-1.5 rounded-lg text-xs font-medium transition-colors">📍 Segments</button>
+                        <button onclick="filterTools('profile')" id="tab-profile" class="modal-tab px-3 py-1.5 rounded-lg text-xs font-medium transition-colors">👤 Profile</button>
+                        <button onclick="filterTools('social')" id="tab-social" class="modal-tab px-3 py-1.5 rounded-lg text-xs font-medium transition-colors">👥 Social</button>
+                        <button onclick="filterTools('routes')" id="tab-routes" class="modal-tab px-3 py-1.5 rounded-lg text-xs font-medium transition-colors">🗺️ Routes</button>
+                    </div>
+                    <button onclick="closeToolsModal()" class="ml-4 text-gray-400 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-gray-700">
+                        <i class="fas fa-times text-lg"></i>
+                    </button>
+                </div>
+                <!-- Mobile tabs -->
+                <div class="md:hidden flex gap-1 px-4 pt-3 overflow-x-auto flex-shrink-0">
+                    <button onclick="filterTools('all')" id="tab-all-m" class="modal-tab-m active whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex-shrink-0">All 21</button>
+                    <button onclick="filterTools('activities')" id="tab-activities-m" class="modal-tab-m whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex-shrink-0">🏃 Activities</button>
+                    <button onclick="filterTools('segments')" id="tab-segments-m" class="modal-tab-m whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex-shrink-0">📍 Segments</button>
+                    <button onclick="filterTools('profile')" id="tab-profile-m" class="modal-tab-m whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex-shrink-0">👤 Profile</button>
+                    <button onclick="filterTools('social')" id="tab-social-m" class="modal-tab-m whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex-shrink-0">👥 Social</button>
+                    <button onclick="filterTools('routes')" id="tab-routes-m" class="modal-tab-m whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex-shrink-0">🗺️ Routes</button>
+                </div>
+                <!-- Tool list -->
+                <div class="overflow-y-auto flex-1 px-6 py-4" id="modal-tools-list">
+                    <!-- Populated by JS -->
+                </div>
+                <!-- Footer -->
+                <div class="border-t border-gray-700/50 px-6 py-4 flex-shrink-0 flex items-center justify-between">
+                    <p class="text-xs text-gray-500">All tools use your personal OAuth token — your data is never shared.</p>
+                    <a href="/auth" class="bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-colors">Connect Strava →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .modal-tab { color: #9ca3af; }
+        .modal-tab.active, .modal-tab:hover { background: #374151; color: #fff; }
+        .modal-tab.active { color: #fb923c; }
+        .modal-tab-m { color: #9ca3af; background: #1f2937; }
+        .modal-tab-m.active, .modal-tab-m:hover { background: #374151; color: #fb923c; }
+        .tool-row { display: flex; }
+        .tool-row.hidden { display: none; }
+    </style>
+
+    <script>
+    const TOOLS_DATA = [
+      { name: 'get-recent-activities', cat: 'activities', emoji: '📋', title: 'Recent Activities', desc: 'Fetch your latest workouts with distance, time, pace, and sport type.', example: '"Show me my last 10 runs"' },
+      { name: 'get-activity-details', cat: 'activities', emoji: '🔍', title: 'Activity Details', desc: 'Full breakdown of any activity — HR, power, elevation, pace, cadence, and more.', example: '"Deep-dive on my last ride"' },
+      { name: 'get-activity-streams', cat: 'activities', emoji: '📈', title: 'Activity Streams', desc: 'Time-series data: GPS coordinates, heart rate, power, cadence, altitude, and velocity.', example: '"Show power data from my last workout"' },
+      { name: 'get-activity-laps', cat: 'activities', emoji: '⏱️', title: 'Activity Laps', desc: 'Lap splits for interval sessions and structured workouts — essential for training analysis.', example: '"Break down the laps on my interval run"' },
+      { name: 'get-athlete-stats', cat: 'activities', emoji: '📊', title: 'Athlete Stats', desc: 'All-time, year-to-date, and recent totals for running, cycling, and swimming.', example: '"What are my YTD cycling stats?"' },
+      { name: 'explore-segments', cat: 'segments', emoji: '🔭', title: 'Explore Segments', desc: 'Discover popular Strava segments in any geographic area, filtered by activity type.', example: '"Find climbs near Boulder, CO"' },
+      { name: 'get-starred-segments', cat: 'segments', emoji: '⭐', title: 'Starred Segments', desc: 'List all the segments you have starred on Strava.', example: '"Show my starred segments"' },
+      { name: 'get-segment', cat: 'segments', emoji: '📌', title: 'Segment Details', desc: 'Full details about a specific segment: distance, elevation, grade, and KOM/QOM time.', example: '"Tell me about segment 12345"' },
+      { name: 'get-segment-efforts', cat: 'segments', emoji: '🏆', title: 'Segment Efforts', desc: 'Your complete effort history on a segment — see your PRs and improvement over time.', example: '"Show my history on that climb"' },
+      { name: 'get-segment-effort', cat: 'segments', emoji: '🎯', title: 'Segment Effort Detail', desc: 'Details on a specific effort: elapsed time, avg HR, power output, and whether it set a PR.', example: '"How did I do on that effort?"' },
+      { name: 'get-athlete-profile', cat: 'profile', emoji: '🏅', title: 'Athlete Profile', desc: 'Your Strava profile info including name, location, follower counts, and gear list.', example: '"Show me my Strava profile"' },
+      { name: 'get-athlete-zones', cat: 'profile', emoji: '❤️', title: 'Training Zones', desc: 'Your heart rate and power training zones for targeted workout intensity.', example: '"What are my HR zones?"' },
+      { name: 'get-gear', cat: 'profile', emoji: '👟', title: 'Gear & Equipment', desc: 'Details on any piece of gear (bike or shoes) including total mileage and brand info.', example: '"How many miles on my shoes?"' },
+      { name: 'get-activity-kudos', cat: 'social', emoji: '👍', title: 'Activity Kudos', desc: 'List the athletes who have given kudos on a specific activity.', example: '"Who kudoed my last run?"' },
+      { name: 'get-activity-comments', cat: 'social', emoji: '💬', title: 'Activity Comments', desc: 'Read comments left on a specific activity.', example: '"Show comments on my last race"' },
+      { name: 'get-athlete-clubs', cat: 'social', emoji: '🏟️', title: 'Your Clubs', desc: 'List all the Strava clubs you are a member of.', example: '"What clubs am I in?"' },
+      { name: 'get-club', cat: 'social', emoji: '🤝', title: 'Club Details', desc: 'Info about a specific club: member count, sport type, city, and description.', example: '"Tell me about club 67890"' },
+      { name: 'get-athlete-routes', cat: 'routes', emoji: '🛤️', title: 'Your Routes', desc: 'List all routes you have created on Strava with distance and elevation.', example: '"Show my saved routes"' },
+      { name: 'get-route', cat: 'routes', emoji: '🗺️', title: 'Route Details', desc: 'Full details for a specific route including distance, elevation gain, and estimated time.', example: '"Tell me about route 99999"' },
+    ];
+
+    let activeCategory = 'all';
+
+    function renderTools(cat) {
+      const list = document.getElementById('modal-tools-list');
+      if (!list) return;
+      const filtered = cat === 'all' ? TOOLS_DATA : TOOLS_DATA.filter(t => t.cat === cat);
+      let html = '<div class="grid gap-2">';
+      const catLabels = { activities: '🏃 Activities', segments: '📍 Segments', profile: '👤 Profile & Gear', social: '👥 Social & Clubs', routes: '🗺️ Routes' };
+      let lastCat = null;
+      for (const t of filtered) {
+        if (cat === 'all' && t.cat !== lastCat) {
+          if (lastCat) html += '</div></div>';
+          html += '<div class="mt-4 first:mt-0"><p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 px-1">' + catLabels[t.cat] + '</p><div class="grid gap-2">';
+          lastCat = t.cat;
+        }
+        html += '<div class="flex items-start gap-3 p-3 rounded-xl bg-gray-800/60 hover:bg-gray-800 transition-colors border border-gray-700/30 hover:border-orange-500/20">';
+        html += '<span class="text-xl flex-shrink-0 mt-0.5">' + t.emoji + '</span>';
+        html += '<div class="flex-1 min-w-0">';
+        html += '<div class="flex items-center gap-2 flex-wrap">';
+        html += '<code class="text-orange-300 text-xs font-mono bg-gray-900/60 px-2 py-0.5 rounded">' + t.name + '</code>';
+        html += '<span class="font-medium text-sm text-white">' + t.title + '</span>';
+        html += '</div>';
+        html += '<p class="text-xs text-gray-400 mt-1">' + t.desc + '</p>';
+        html += '<p class="text-xs text-gray-600 mt-1 italic">' + t.example + '</p>';
+        html += '</div></div>';
+      }
+      if (cat === 'all' && lastCat) html += '</div></div>';
+      html += '</div>';
+      list.innerHTML = html;
+    }
+
+    function filterTools(cat) {
+      activeCategory = cat;
+      // Update desktop tabs
+      document.querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active'));
+      const dt = document.getElementById('tab-' + cat);
+      if (dt) dt.classList.add('active');
+      // Update mobile tabs
+      document.querySelectorAll('.modal-tab-m').forEach(t => t.classList.remove('active'));
+      const mt = document.getElementById('tab-' + cat + '-m');
+      if (mt) mt.classList.add('active');
+      renderTools(cat);
+    }
+
+    window.openToolsModal = function(cat) {
+      const modal = document.getElementById('tools-modal');
+      if (!modal) return;
+      modal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      filterTools(cat || 'all');
+    };
+
+    window.closeToolsModal = function() {
+      const modal = document.getElementById('tools-modal');
+      if (!modal) return;
+      modal.classList.add('hidden');
+      document.body.style.overflow = '';
+    };
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') window.closeToolsModal();
+    });
+    </script>
+
     <!-- CTA Section -->
     <section class="py-24 gradient-bg">
         <div class="max-w-4xl mx-auto text-center px-6">
@@ -795,53 +1005,38 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
 
             <!-- Available MCP Tools -->
             <div class="card rounded-2xl p-5">
-                <h3 class="font-bold text-base mb-4 flex items-center">
-                    <i class="fas fa-tools text-orange-400 mr-2"></i>
-                    MCP Tools
+                <h3 class="font-bold text-base mb-4 flex items-center justify-between">
+                    <span class="flex items-center"><i class="fas fa-tools text-orange-400 mr-2"></i>MCP Tools</span>
+                    <span class="text-xs bg-orange-500/10 text-orange-400 border border-orange-500/20 px-2 py-0.5 rounded-full font-semibold">21 tools</span>
                 </h3>
-                <div class="space-y-2">
-                    <div class="flex items-start gap-2 p-2 rounded-lg bg-gray-800/30">
-                        <i class="fas fa-check-circle text-orange-400 text-xs mt-0.5"></i>
-                        <div>
-                            <div class="text-xs font-semibold text-white">get-recent-activities</div>
-                            <div class="text-xs text-gray-500">Fetch your recent workouts</div>
-                        </div>
+                <div class="grid grid-cols-1 gap-1.5 mb-4">
+                    <div class="flex items-center justify-between py-1 border-b border-gray-700/30">
+                        <span class="text-xs text-gray-400">🏃 Activities &amp; Laps</span>
+                        <span class="text-xs font-semibold text-white">5 tools</span>
                     </div>
-                    <div class="flex items-start gap-2 p-2 rounded-lg bg-gray-800/30">
-                        <i class="fas fa-check-circle text-orange-400 text-xs mt-0.5"></i>
-                        <div>
-                            <div class="text-xs font-semibold text-white">get-athlete-profile</div>
-                            <div class="text-xs text-gray-500">Your athlete profile & stats</div>
-                        </div>
+                    <div class="flex items-center justify-between py-1 border-b border-gray-700/30">
+                        <span class="text-xs text-gray-400">📍 Segments &amp; Efforts</span>
+                        <span class="text-xs font-semibold text-white">5 tools</span>
                     </div>
-                    <div class="flex items-start gap-2 p-2 rounded-lg bg-gray-800/30">
-                        <i class="fas fa-check-circle text-orange-400 text-xs mt-0.5"></i>
-                        <div>
-                            <div class="text-xs font-semibold text-white">get-activity-details</div>
-                            <div class="text-xs text-gray-500">Deep-dive on any activity</div>
-                        </div>
+                    <div class="flex items-center justify-between py-1 border-b border-gray-700/30">
+                        <span class="text-xs text-gray-400">👥 Social &amp; Clubs</span>
+                        <span class="text-xs font-semibold text-white">4 tools</span>
                     </div>
-                    <div class="flex items-start gap-2 p-2 rounded-lg bg-gray-800/30">
-                        <i class="fas fa-check-circle text-orange-400 text-xs mt-0.5"></i>
-                        <div>
-                            <div class="text-xs font-semibold text-white">get-activity-streams</div>
-                            <div class="text-xs text-gray-500">GPS, HR, power time-series</div>
-                        </div>
+                    <div class="flex items-center justify-between py-1 border-b border-gray-700/30">
+                        <span class="text-xs text-gray-400">👤 Profile &amp; Gear</span>
+                        <span class="text-xs font-semibold text-white">3 tools</span>
                     </div>
-                    <div class="flex items-start gap-2 p-2 rounded-lg bg-gray-800/30">
-                        <i class="fas fa-check-circle text-orange-400 text-xs mt-0.5"></i>
-                        <div>
-                            <div class="text-xs font-semibold text-white">explore-segments</div>
-                            <div class="text-xs text-gray-500">Find Strava segments near you</div>
-                        </div>
-                    </div>
-                    <div class="text-center pt-1">
-                        <span class="text-xs text-gray-500">+ 5 more tools available</span>
+                    <div class="flex items-center justify-between py-1">
+                        <span class="text-xs text-gray-400">🗺️ Routes</span>
+                        <span class="text-xs font-semibold text-white">2 tools</span>
                     </div>
                 </div>
+                <button onclick="window.openToolsModal()" class="w-full bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold py-2 rounded-lg transition-colors flex items-center justify-center gap-1.5">
+                    <i class="fas fa-th-list"></i> View All 21 Tools
+                </button>
             </div>
 
-            <!-- Status & Usage -->
+                        <!-- Status & Usage -->
             <div class="card rounded-2xl p-5">
                 <h3 class="font-bold text-base mb-4 flex items-center">
                     <i class="fas fa-shield-alt text-orange-400 mr-2"></i>
@@ -952,12 +1147,134 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
         </div>
     </footer>
 
+    <!-- Tools Modal (shared with homepage) -->
+    <div id="tools-modal" class="fixed inset-0 z-50 hidden" aria-modal="true" role="dialog">
+        <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="window.closeToolsModal()"></div>
+        <div class="relative z-10 flex items-center justify-center min-h-screen p-4">
+            <div class="bg-gray-900 border border-gray-700/60 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+                <div class="flex items-center justify-between px-6 py-5 border-b border-gray-700/50 flex-shrink-0">
+                    <div>
+                        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                            <i class="fas fa-tools text-orange-400"></i> SportsMCP Tools
+                        </h2>
+                        <p class="text-xs text-gray-500 mt-0.5">21 tools powered by the official Strava API</p>
+                    </div>
+                    <div class="hidden md:flex items-center gap-1 bg-gray-800 rounded-xl p-1">
+                        <button onclick="window.filterTools('all')" id="dtab-all" class="dtab active px-3 py-1.5 rounded-lg text-xs font-medium transition-colors">All</button>
+                        <button onclick="window.filterTools('activities')" id="dtab-activities" class="dtab px-3 py-1.5 rounded-lg text-xs font-medium transition-colors">🏃 Activities</button>
+                        <button onclick="window.filterTools('segments')" id="dtab-segments" class="dtab px-3 py-1.5 rounded-lg text-xs font-medium transition-colors">📍 Segments</button>
+                        <button onclick="window.filterTools('profile')" id="dtab-profile" class="dtab px-3 py-1.5 rounded-lg text-xs font-medium transition-colors">👤 Profile</button>
+                        <button onclick="window.filterTools('social')" id="dtab-social" class="dtab px-3 py-1.5 rounded-lg text-xs font-medium transition-colors">👥 Social</button>
+                        <button onclick="window.filterTools('routes')" id="dtab-routes" class="dtab px-3 py-1.5 rounded-lg text-xs font-medium transition-colors">🗺️ Routes</button>
+                    </div>
+                    <button onclick="window.closeToolsModal()" class="ml-4 text-gray-400 hover:text-white p-1.5 rounded-lg hover:bg-gray-700 transition-colors">
+                        <i class="fas fa-times text-lg"></i>
+                    </button>
+                </div>
+                <div class="md:hidden flex gap-1 px-4 pt-3 overflow-x-auto flex-shrink-0">
+                    <button onclick="window.filterTools('all')" id="dtab-all-m" class="dtab-m active whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-medium flex-shrink-0">All 21</button>
+                    <button onclick="window.filterTools('activities')" id="dtab-activities-m" class="dtab-m whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-medium flex-shrink-0">🏃 Activities</button>
+                    <button onclick="window.filterTools('segments')" id="dtab-segments-m" class="dtab-m whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-medium flex-shrink-0">📍 Segments</button>
+                    <button onclick="window.filterTools('profile')" id="dtab-profile-m" class="dtab-m whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-medium flex-shrink-0">👤 Profile</button>
+                    <button onclick="window.filterTools('social')" id="dtab-social-m" class="dtab-m whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-medium flex-shrink-0">👥 Social</button>
+                    <button onclick="window.filterTools('routes')" id="dtab-routes-m" class="dtab-m whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-medium flex-shrink-0">🗺️ Routes</button>
+                </div>
+                <div class="overflow-y-auto flex-1 px-6 py-4" id="dashboard-tools-list"></div>
+                <div class="border-t border-gray-700/50 px-6 py-4 flex-shrink-0 flex items-center justify-between">
+                    <p class="text-xs text-gray-500">All tools use your personal OAuth token — your data stays private.</p>
+                    <button onclick="window.closeToolsModal()" class="text-sm text-gray-400 hover:text-white transition-colors">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <style>
+        .dtab { color: #9ca3af; }
+        .dtab.active, .dtab:hover { background: #374151; color: #fb923c; }
+        .dtab-m { color: #9ca3af; background: #1f2937; }
+        .dtab-m.active, .dtab-m:hover { background: #374151; color: #fb923c; }
+    </style>
+
     <!-- Copy Success Message -->
     <div id="copy-success" class="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg hidden">
         <i class="fas fa-check mr-2"></i>MCP URL copied to clipboard!
     </div>
 
     <script>
+        // ── Tools Modal ──────────────────────────────────────────────────────
+        const D_TOOLS = [
+          { name: 'get-recent-activities', cat: 'activities', emoji: '📋', title: 'Recent Activities', desc: 'Fetch your latest workouts with distance, time, pace, and sport type.', example: '"Show me my last 10 runs"' },
+          { name: 'get-activity-details', cat: 'activities', emoji: '🔍', title: 'Activity Details', desc: 'Full breakdown of any activity — HR, power, elevation, pace, cadence, and more.', example: '"Deep-dive on my last ride"' },
+          { name: 'get-activity-streams', cat: 'activities', emoji: '📈', title: 'Activity Streams', desc: 'Time-series data: GPS coordinates, heart rate, power, cadence, altitude, and velocity.', example: '"Show power data from my last workout"' },
+          { name: 'get-activity-laps', cat: 'activities', emoji: '⏱️', title: 'Activity Laps', desc: 'Lap splits for interval sessions and structured workouts.', example: '"Break down the laps on my interval run"' },
+          { name: 'get-athlete-stats', cat: 'activities', emoji: '📊', title: 'Athlete Stats', desc: 'All-time, year-to-date, and recent totals for running, cycling, and swimming.', example: '"What are my YTD cycling stats?"' },
+          { name: 'explore-segments', cat: 'segments', emoji: '🔭', title: 'Explore Segments', desc: 'Discover popular Strava segments in any geographic area, filtered by activity type.', example: '"Find climbs near Boulder, CO"' },
+          { name: 'get-starred-segments', cat: 'segments', emoji: '⭐', title: 'Starred Segments', desc: 'List all the segments you have starred on Strava.', example: '"Show my starred segments"' },
+          { name: 'get-segment', cat: 'segments', emoji: '📌', title: 'Segment Details', desc: 'Full details about a segment: distance, elevation, grade, and KOM/QOM time.', example: '"Tell me about segment 12345"' },
+          { name: 'get-segment-efforts', cat: 'segments', emoji: '🏆', title: 'Segment Efforts', desc: 'Your complete effort history on a segment — see your PRs and improvement over time.', example: '"Show my history on that climb"' },
+          { name: 'get-segment-effort', cat: 'segments', emoji: '🎯', title: 'Segment Effort Detail', desc: 'Details on a specific effort: elapsed time, avg HR, power, and whether it set a PR.', example: '"How did I do on that effort?"' },
+          { name: 'get-athlete-profile', cat: 'profile', emoji: '🏅', title: 'Athlete Profile', desc: 'Your Strava profile info including name, location, follower counts, and gear list.', example: '"Show me my Strava profile"' },
+          { name: 'get-athlete-zones', cat: 'profile', emoji: '❤️', title: 'Training Zones', desc: 'Your heart rate and power training zones for targeted workout intensity.', example: '"What are my HR zones?"' },
+          { name: 'get-gear', cat: 'profile', emoji: '👟', title: 'Gear & Equipment', desc: 'Details on any gear (bike or shoes) including total mileage and brand info.', example: '"How many miles on my shoes?"' },
+          { name: 'get-activity-kudos', cat: 'social', emoji: '👍', title: 'Activity Kudos', desc: 'List the athletes who have given kudos on a specific activity.', example: '"Who kudoed my last run?"' },
+          { name: 'get-activity-comments', cat: 'social', emoji: '💬', title: 'Activity Comments', desc: 'Read comments left on a specific activity.', example: '"Show comments on my last race"' },
+          { name: 'get-athlete-clubs', cat: 'social', emoji: '🏟️', title: 'Your Clubs', desc: 'List all the Strava clubs you are a member of.', example: '"What clubs am I in?"' },
+          { name: 'get-club', cat: 'social', emoji: '🤝', title: 'Club Details', desc: 'Info about a specific club: member count, sport type, city, and description.', example: '"Tell me about club 67890"' },
+          { name: 'get-athlete-routes', cat: 'routes', emoji: '🛤️', title: 'Your Routes', desc: 'List all routes you have created on Strava with distance and elevation.', example: '"Show my saved routes"' },
+          { name: 'get-route', cat: 'routes', emoji: '🗺️', title: 'Route Details', desc: 'Full details for a specific route including distance, elevation gain, and estimated time.', example: '"Tell me about route 99999"' },
+        ];
+
+        function dRenderTools(cat) {
+          const list = document.getElementById('dashboard-tools-list');
+          if (!list) return;
+          const filtered = cat === 'all' ? D_TOOLS : D_TOOLS.filter(t => t.cat === cat);
+          const catLabels = { activities: '🏃 Activities', segments: '📍 Segments', profile: '👤 Profile & Gear', social: '👥 Social & Clubs', routes: '🗺️ Routes' };
+          let html = '<div class="grid gap-2">', lastCat = null;
+          for (const t of filtered) {
+            if (cat === 'all' && t.cat !== lastCat) {
+              if (lastCat) html += '</div></div>';
+              html += '<div class="mt-4 first:mt-0"><p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 px-1">' + catLabels[t.cat] + '</p><div class="grid gap-2">';
+              lastCat = t.cat;
+            }
+            html += '<div class="flex items-start gap-3 p-3 rounded-xl bg-gray-800/60 hover:bg-gray-800 transition-colors border border-gray-700/30 hover:border-orange-500/20">';
+            html += '<span class="text-xl flex-shrink-0 mt-0.5">' + t.emoji + '</span><div class="flex-1 min-w-0">';
+            html += '<div class="flex items-center gap-2 flex-wrap"><code class="text-orange-300 text-xs font-mono bg-gray-900/60 px-2 py-0.5 rounded">' + t.name + '</code>';
+            html += '<span class="font-medium text-sm text-white">' + t.title + '</span></div>';
+            html += '<p class="text-xs text-gray-400 mt-1">' + t.desc + '</p>';
+            html += '<p class="text-xs text-gray-600 mt-1 italic">' + t.example + '</p>';
+            html += '</div></div>';
+          }
+          if (cat === 'all' && lastCat) html += '</div></div>';
+          list.innerHTML = html + '</div>';
+        }
+
+        window.filterTools = function(cat) {
+          document.querySelectorAll('.dtab').forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.dtab-m').forEach(t => t.classList.remove('active'));
+          const dt = document.getElementById('dtab-' + cat);
+          const mt = document.getElementById('dtab-' + cat + '-m');
+          if (dt) dt.classList.add('active');
+          if (mt) mt.classList.add('active');
+          dRenderTools(cat);
+        };
+
+        window.openToolsModal = function(cat) {
+          const m = document.getElementById('tools-modal');
+          if (!m) return;
+          m.classList.remove('hidden');
+          document.body.style.overflow = 'hidden';
+          window.filterTools(cat || 'all');
+        };
+
+        window.closeToolsModal = function() {
+          const m = document.getElementById('tools-modal');
+          if (!m) return;
+          m.classList.add('hidden');
+          document.body.style.overflow = '';
+        };
+
+        document.addEventListener('keydown', function(e) { if (e.key === 'Escape') window.closeToolsModal(); });
+        // ─────────────────────────────────────────────────────────────────────
+
         window.copyToClipboard = function copyToClipboard(text) {
             navigator.clipboard.writeText(text).then(function() {
                 const successMsg = document.getElementById('copy-success');
