@@ -739,6 +739,18 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                             class="agent-tab px-3 py-1 rounded-full text-xs font-semibold border border-gray-600 text-gray-400 hover:border-orange-500 hover:text-orange-400">
                             Poke
                         </button>
+                        <button onclick="showAgent('manus')" id="tab-manus"
+                            class="agent-tab px-3 py-1 rounded-full text-xs font-semibold border border-gray-600 text-gray-400 hover:border-orange-500 hover:text-orange-400">
+                            Manus
+                        </button>
+                        <button onclick="showAgent('openclaw')" id="tab-openclaw"
+                            class="agent-tab px-3 py-1 rounded-full text-xs font-semibold border border-gray-600 text-gray-400 hover:border-orange-500 hover:text-orange-400">
+                            OpenClaw
+                        </button>
+                        <button onclick="showAgent('custom')" id="tab-custom"
+                            class="agent-tab px-3 py-1 rounded-full text-xs font-semibold border border-gray-600 text-gray-400 hover:border-orange-500 hover:text-orange-400">
+                            ✚ Custom
+                        </button>
                         <button onclick="showAgent('other')" id="tab-other"
                             class="agent-tab px-3 py-1 rounded-full text-xs font-semibold border border-gray-600 text-gray-400 hover:border-orange-500 hover:text-orange-400">
                             Other
@@ -848,6 +860,85 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                             <code class="text-orange-400 text-sm break-all">{{mcp_url}}</code>
                         </div>
                         <p class="text-xs text-gray-500 mt-2">Poke also supports real-time workout notifications — see the Poke Notifications section below.</p>
+                    </div>
+
+                    <!-- Manus -->
+                    <div id="agent-manus" class="agent-panel hidden">
+                        <p class="text-xs text-gray-400 mb-2">In <strong>Manus</strong>, go to <strong>Settings → Tools → Add MCP Server</strong> and paste your MCP URL:</p>
+                        <div class="bg-gray-900 rounded-lg p-4 mb-3">
+                            <code class="text-orange-400 text-sm break-all">{{mcp_url}}</code>
+                        </div>
+                        <p class="text-xs text-gray-400 mb-2">Or use the JSON config format if Manus requests it:</p>
+                        <div class="relative">
+                            <pre class="bg-gray-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto"><code id="manus-config">{
+  "mcpServers": {
+    "sportsmcp": {
+      "url": "{{mcp_url}}"
+    }
+  }
+}</code></pre>
+                            <button onclick="copyConfig('manus-config')"
+                                class="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-xs text-gray-300">
+                                <i class="fas fa-copy mr-1"></i>Copy
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">Manus supports the Streamable HTTP transport. Your Strava data will be available as tools in any Manus agent.</p>
+                    </div>
+
+                    <!-- OpenClaw -->
+                    <div id="agent-openclaw" class="agent-panel hidden">
+                        <p class="text-xs text-gray-400 mb-2">In <strong>OpenClaw</strong>, go to <strong>Settings → MCP Servers → Add Server</strong> and paste your MCP URL:</p>
+                        <div class="bg-gray-900 rounded-lg p-4 mb-3">
+                            <code class="text-orange-400 text-sm break-all">{{mcp_url}}</code>
+                        </div>
+                        <p class="text-xs text-gray-400 mb-2">Or use the JSON config format:</p>
+                        <div class="relative">
+                            <pre class="bg-gray-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto"><code id="openclaw-config">{
+  "mcpServers": {
+    "sportsmcp": {
+      "url": "{{mcp_url}}"
+    }
+  }
+}</code></pre>
+                            <button onclick="copyConfig('openclaw-config')"
+                                class="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-xs text-gray-300">
+                                <i class="fas fa-copy mr-1"></i>Copy
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">Both Streamable HTTP and SSE transports are supported. Use <code class="text-orange-300">{{mcp_sse_url}}</code> for SSE.</p>
+                    </div>
+
+                    <!-- Custom Agent -->
+                    <div id="agent-custom" class="agent-panel hidden">
+                        <p class="text-xs text-gray-400 mb-3">Add SportsMCP to any MCP-compatible agent. Your personal URL and both config formats are below:</p>
+                        <div class="bg-gray-900 rounded-lg p-3 mb-3 flex items-center justify-between gap-2">
+                            <code class="text-orange-400 text-xs break-all flex-1">{{mcp_url}}</code>
+                            <button onclick="copyText('{{mcp_url}}')" class="bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-xs text-gray-300 whitespace-nowrap flex-shrink-0">
+                                <i class="fas fa-copy mr-1"></i>Copy URL
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-400 mb-2 font-semibold">Standard JSON config (most agents):</p>
+                        <div class="relative mb-3">
+                            <pre class="bg-gray-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto"><code id="custom-config">{
+  "mcpServers": {
+    "sportsmcp": {
+      "url": "{{mcp_url}}"
+    }
+  }
+}</code></pre>
+                            <button onclick="copyConfig('custom-config')"
+                                class="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-xs text-gray-300">
+                                <i class="fas fa-copy mr-1"></i>Copy
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-400 mb-2 font-semibold">SSE transport (legacy clients):</p>
+                        <div class="bg-gray-900 rounded-lg p-3 flex items-center justify-between gap-2">
+                            <code class="text-green-300 text-xs break-all flex-1">{{mcp_sse_url}}</code>
+                            <button onclick="copyText('{{mcp_sse_url}}')" class="bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-xs text-gray-300 whitespace-nowrap flex-shrink-0">
+                                <i class="fas fa-copy mr-1"></i>Copy
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-3">If your agent isn't listed above, open a <a href="https://github.com/gabeperez/strava-mcp/issues" class="text-orange-400 hover:underline">GitHub issue</a> and we'll add instructions for it!</p>
                     </div>
 
                     <!-- Other -->
@@ -1330,6 +1421,19 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                 const successMsg = document.getElementById('copy-success');
                 successMsg.querySelector('span') && (successMsg.querySelector('span').textContent = 'Config copied!');
                 successMsg.textContent = '✅ Config copied to clipboard!';
+                successMsg.classList.remove('hidden');
+                successMsg.classList.add('copy-success');
+                setTimeout(() => {
+                    successMsg.classList.add('hidden');
+                    successMsg.classList.remove('copy-success');
+                }, 2000);
+            });
+        }
+
+        window.copyText = function copyText(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const successMsg = document.getElementById('copy-success');
+                successMsg.textContent = '✅ Copied to clipboard!';
                 successMsg.classList.remove('hidden');
                 successMsg.classList.add('copy-success');
                 setTimeout(() => {
