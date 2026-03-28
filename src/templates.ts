@@ -1242,15 +1242,12 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                             <span class="font-medium text-sm">Claude Desktop</span>
                         </div>
                         <div class="flex items-center gap-3">
-                            {{#if agent_claude}}
-                            <span class="inline-flex items-center gap-1 text-xs font-medium text-green-400 bg-green-400/10 border border-green-400/20 rounded-full px-2.5 py-0.5">
+                            <span class="{{agent_claude_on}} inline-flex items-center gap-1 text-xs font-medium text-green-400 bg-green-400/10 border border-green-400/20 rounded-full px-2.5 py-0.5">
                                 <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span> Connected
                             </span>
-                            {{else}}
-                            <span class="inline-flex items-center gap-1 text-xs font-medium text-gray-400 bg-gray-700/40 border border-gray-600/30 rounded-full px-2.5 py-0.5">
+                            <span class="{{agent_claude_off}} inline-flex items-center gap-1 text-xs font-medium text-gray-400 bg-gray-700/40 border border-gray-600/30 rounded-full px-2.5 py-0.5">
                                 Set up
                             </span>
-                            {{/if}}
                             <i class="fas fa-chevron-down text-gray-500 text-xs transition-transform" id="chevron-claude"></i>
                         </div>
                     </button>
@@ -1266,11 +1263,8 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
 }</code></pre>
                         <div class="flex gap-2">
                             <button onclick="copyConfig('claude-conn-config')" class="flex-1 text-xs bg-gray-700 hover:bg-gray-600 text-gray-200 py-1.5 rounded-lg transition-colors">Copy Config</button>
-                            {{#if agent_claude}}
-                            <button onclick="setAgentConnection('claude', false)" class="text-xs text-red-400 hover:text-red-300 border border-red-400/20 hover:border-red-400/40 px-3 py-1.5 rounded-lg transition-colors">Disconnect</button>
-                            {{else}}
-                            <button onclick="setAgentConnection('claude', true)" class="text-xs bg-orange-500 hover:bg-orange-600 text-white font-medium px-3 py-1.5 rounded-lg transition-colors">Mark as Connected</button>
-                            {{/if}}
+                            <button onclick="setAgentConnection('claude', false)" class="{{agent_claude_on}} text-xs text-red-400 hover:text-red-300 border border-red-400/20 hover:border-red-400/40 px-3 py-1.5 rounded-lg transition-colors">Disconnect</button>
+                            <button onclick="setAgentConnection('claude', true)" class="{{agent_claude_off}} text-xs bg-orange-500 hover:bg-orange-600 text-white font-medium px-3 py-1.5 rounded-lg transition-colors">Mark as Connected</button>
                         </div>
                     </div>
                 </div>
@@ -1283,15 +1277,12 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                             <span class="font-medium text-sm">Cursor</span>
                         </div>
                         <div class="flex items-center gap-3">
-                            {{#if agent_cursor}}
-                            <span class="inline-flex items-center gap-1 text-xs font-medium text-green-400 bg-green-400/10 border border-green-400/20 rounded-full px-2.5 py-0.5">
+                            <span class="{{agent_cursor_on}} inline-flex items-center gap-1 text-xs font-medium text-green-400 bg-green-400/10 border border-green-400/20 rounded-full px-2.5 py-0.5">
                                 <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span> Connected
                             </span>
-                            {{else}}
-                            <span class="inline-flex items-center gap-1 text-xs font-medium text-gray-400 bg-gray-700/40 border border-gray-600/30 rounded-full px-2.5 py-0.5">
+                            <span class="{{agent_cursor_off}} inline-flex items-center gap-1 text-xs font-medium text-gray-400 bg-gray-700/40 border border-gray-600/30 rounded-full px-2.5 py-0.5">
                                 Set up
                             </span>
-                            {{/if}}
                             <i class="fas fa-chevron-down text-gray-500 text-xs transition-transform" id="chevron-cursor"></i>
                         </div>
                     </button>
@@ -1306,11 +1297,8 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
 }</code></pre>
                         <div class="flex gap-2">
                             <button onclick="copyConfig('cursor-conn-config')" class="flex-1 text-xs bg-gray-700 hover:bg-gray-600 text-gray-200 py-1.5 rounded-lg transition-colors">Copy Config</button>
-                            {{#if agent_cursor}}
-                            <button onclick="setAgentConnection('cursor', false)" class="text-xs text-red-400 hover:text-red-300 border border-red-400/20 hover:border-red-400/40 px-3 py-1.5 rounded-lg transition-colors">Disconnect</button>
-                            {{else}}
-                            <button onclick="setAgentConnection('cursor', true)" class="text-xs bg-orange-500 hover:bg-orange-600 text-white font-medium px-3 py-1.5 rounded-lg transition-colors">Mark as Connected</button>
-                            {{/if}}
+                            <button onclick="setAgentConnection('cursor', false)" class="{{agent_cursor_on}} text-xs text-red-400 hover:text-red-300 border border-red-400/20 hover:border-red-400/40 px-3 py-1.5 rounded-lg transition-colors">Disconnect</button>
+                            <button onclick="setAgentConnection('cursor', true)" class="{{agent_cursor_off}} text-xs bg-orange-500 hover:bg-orange-600 text-white font-medium px-3 py-1.5 rounded-lg transition-colors">Mark as Connected</button>
                         </div>
                     </div>
                 </div>
@@ -1323,15 +1311,12 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                             <span class="font-medium text-sm">Windsurf</span>
                         </div>
                         <div class="flex items-center gap-3">
-                            {{#if agent_windsurf}}
-                            <span class="inline-flex items-center gap-1 text-xs font-medium text-green-400 bg-green-400/10 border border-green-400/20 rounded-full px-2.5 py-0.5">
+                            <span class="{{agent_windsurf_on}} inline-flex items-center gap-1 text-xs font-medium text-green-400 bg-green-400/10 border border-green-400/20 rounded-full px-2.5 py-0.5">
                                 <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span> Connected
                             </span>
-                            {{else}}
-                            <span class="inline-flex items-center gap-1 text-xs font-medium text-gray-400 bg-gray-700/40 border border-gray-600/30 rounded-full px-2.5 py-0.5">
+                            <span class="{{agent_windsurf_off}} inline-flex items-center gap-1 text-xs font-medium text-gray-400 bg-gray-700/40 border border-gray-600/30 rounded-full px-2.5 py-0.5">
                                 Set up
                             </span>
-                            {{/if}}
                             <i class="fas fa-chevron-down text-gray-500 text-xs transition-transform" id="chevron-windsurf"></i>
                         </div>
                     </button>
@@ -1347,11 +1332,8 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
 }</code></pre>
                         <div class="flex gap-2">
                             <button onclick="copyConfig('windsurf-conn-config')" class="flex-1 text-xs bg-gray-700 hover:bg-gray-600 text-gray-200 py-1.5 rounded-lg transition-colors">Copy Config</button>
-                            {{#if agent_windsurf}}
-                            <button onclick="setAgentConnection('windsurf', false)" class="text-xs text-red-400 hover:text-red-300 border border-red-400/20 hover:border-red-400/40 px-3 py-1.5 rounded-lg transition-colors">Disconnect</button>
-                            {{else}}
-                            <button onclick="setAgentConnection('windsurf', true)" class="text-xs bg-orange-500 hover:bg-orange-600 text-white font-medium px-3 py-1.5 rounded-lg transition-colors">Mark as Connected</button>
-                            {{/if}}
+                            <button onclick="setAgentConnection('windsurf', false)" class="{{agent_windsurf_on}} text-xs text-red-400 hover:text-red-300 border border-red-400/20 hover:border-red-400/40 px-3 py-1.5 rounded-lg transition-colors">Disconnect</button>
+                            <button onclick="setAgentConnection('windsurf', true)" class="{{agent_windsurf_off}} text-xs bg-orange-500 hover:bg-orange-600 text-white font-medium px-3 py-1.5 rounded-lg transition-colors">Mark as Connected</button>
                         </div>
                     </div>
                 </div>
@@ -1364,15 +1346,12 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                             <span class="font-medium text-sm">Cline</span>
                         </div>
                         <div class="flex items-center gap-3">
-                            {{#if agent_cline}}
-                            <span class="inline-flex items-center gap-1 text-xs font-medium text-green-400 bg-green-400/10 border border-green-400/20 rounded-full px-2.5 py-0.5">
+                            <span class="{{agent_cline_on}} inline-flex items-center gap-1 text-xs font-medium text-green-400 bg-green-400/10 border border-green-400/20 rounded-full px-2.5 py-0.5">
                                 <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span> Connected
                             </span>
-                            {{else}}
-                            <span class="inline-flex items-center gap-1 text-xs font-medium text-gray-400 bg-gray-700/40 border border-gray-600/30 rounded-full px-2.5 py-0.5">
+                            <span class="{{agent_cline_off}} inline-flex items-center gap-1 text-xs font-medium text-gray-400 bg-gray-700/40 border border-gray-600/30 rounded-full px-2.5 py-0.5">
                                 Set up
                             </span>
-                            {{/if}}
                             <i class="fas fa-chevron-down text-gray-500 text-xs transition-transform" id="chevron-cline"></i>
                         </div>
                     </button>
@@ -1388,11 +1367,8 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
 }</code></pre>
                         <div class="flex gap-2">
                             <button onclick="copyConfig('cline-conn-config')" class="flex-1 text-xs bg-gray-700 hover:bg-gray-600 text-gray-200 py-1.5 rounded-lg transition-colors">Copy Config</button>
-                            {{#if agent_cline}}
-                            <button onclick="setAgentConnection('cline', false)" class="text-xs text-red-400 hover:text-red-300 border border-red-400/20 hover:border-red-400/40 px-3 py-1.5 rounded-lg transition-colors">Disconnect</button>
-                            {{else}}
-                            <button onclick="setAgentConnection('cline', true)" class="text-xs bg-orange-500 hover:bg-orange-600 text-white font-medium px-3 py-1.5 rounded-lg transition-colors">Mark as Connected</button>
-                            {{/if}}
+                            <button onclick="setAgentConnection('cline', false)" class="{{agent_cline_on}} text-xs text-red-400 hover:text-red-300 border border-red-400/20 hover:border-red-400/40 px-3 py-1.5 rounded-lg transition-colors">Disconnect</button>
+                            <button onclick="setAgentConnection('cline', true)" class="{{agent_cline_off}} text-xs bg-orange-500 hover:bg-orange-600 text-white font-medium px-3 py-1.5 rounded-lg transition-colors">Mark as Connected</button>
                         </div>
                     </div>
                 </div>
@@ -1405,15 +1381,12 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                             <span class="font-medium text-sm">Continue.dev</span>
                         </div>
                         <div class="flex items-center gap-3">
-                            {{#if agent_continue}}
-                            <span class="inline-flex items-center gap-1 text-xs font-medium text-green-400 bg-green-400/10 border border-green-400/20 rounded-full px-2.5 py-0.5">
+                            <span class="{{agent_continue_on}} inline-flex items-center gap-1 text-xs font-medium text-green-400 bg-green-400/10 border border-green-400/20 rounded-full px-2.5 py-0.5">
                                 <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span> Connected
                             </span>
-                            {{else}}
-                            <span class="inline-flex items-center gap-1 text-xs font-medium text-gray-400 bg-gray-700/40 border border-gray-600/30 rounded-full px-2.5 py-0.5">
+                            <span class="{{agent_continue_off}} inline-flex items-center gap-1 text-xs font-medium text-gray-400 bg-gray-700/40 border border-gray-600/30 rounded-full px-2.5 py-0.5">
                                 Set up
                             </span>
-                            {{/if}}
                             <i class="fas fa-chevron-down text-gray-500 text-xs transition-transform" id="chevron-continue"></i>
                         </div>
                     </button>
@@ -1431,11 +1404,8 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
 }</code></pre>
                         <div class="flex gap-2">
                             <button onclick="copyConfig('continue-conn-config')" class="flex-1 text-xs bg-gray-700 hover:bg-gray-600 text-gray-200 py-1.5 rounded-lg transition-colors">Copy Config</button>
-                            {{#if agent_continue}}
-                            <button onclick="setAgentConnection('continue', false)" class="text-xs text-red-400 hover:text-red-300 border border-red-400/20 hover:border-red-400/40 px-3 py-1.5 rounded-lg transition-colors">Disconnect</button>
-                            {{else}}
-                            <button onclick="setAgentConnection('continue', true)" class="text-xs bg-orange-500 hover:bg-orange-600 text-white font-medium px-3 py-1.5 rounded-lg transition-colors">Mark as Connected</button>
-                            {{/if}}
+                            <button onclick="setAgentConnection('continue', false)" class="{{agent_continue_on}} text-xs text-red-400 hover:text-red-300 border border-red-400/20 hover:border-red-400/40 px-3 py-1.5 rounded-lg transition-colors">Disconnect</button>
+                            <button onclick="setAgentConnection('continue', true)" class="{{agent_continue_off}} text-xs bg-orange-500 hover:bg-orange-600 text-white font-medium px-3 py-1.5 rounded-lg transition-colors">Mark as Connected</button>
                         </div>
                     </div>
                 </div>
@@ -1448,15 +1418,12 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                             <span class="font-medium text-sm">Manus</span>
                         </div>
                         <div class="flex items-center gap-3">
-                            {{#if agent_manus}}
-                            <span class="inline-flex items-center gap-1 text-xs font-medium text-green-400 bg-green-400/10 border border-green-400/20 rounded-full px-2.5 py-0.5">
+                            <span class="{{agent_manus_on}} inline-flex items-center gap-1 text-xs font-medium text-green-400 bg-green-400/10 border border-green-400/20 rounded-full px-2.5 py-0.5">
                                 <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span> Connected
                             </span>
-                            {{else}}
-                            <span class="inline-flex items-center gap-1 text-xs font-medium text-gray-400 bg-gray-700/40 border border-gray-600/30 rounded-full px-2.5 py-0.5">
+                            <span class="{{agent_manus_off}} inline-flex items-center gap-1 text-xs font-medium text-gray-400 bg-gray-700/40 border border-gray-600/30 rounded-full px-2.5 py-0.5">
                                 Set up
                             </span>
-                            {{/if}}
                             <i class="fas fa-chevron-down text-gray-500 text-xs transition-transform" id="chevron-manus"></i>
                         </div>
                     </button>
@@ -1467,11 +1434,8 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                             <button onclick="copyText('{{mcp_url}}')" class="shrink-0 text-xs bg-gray-700 hover:bg-gray-600 text-gray-200 px-3 py-2 rounded-lg transition-colors">Copy</button>
                         </div>
                         <div class="flex gap-2">
-                            {{#if agent_manus}}
-                            <button onclick="setAgentConnection('manus', false)" class="text-xs text-red-400 hover:text-red-300 border border-red-400/20 hover:border-red-400/40 px-3 py-1.5 rounded-lg transition-colors">Disconnect</button>
-                            {{else}}
-                            <button onclick="setAgentConnection('manus', true)" class="text-xs bg-orange-500 hover:bg-orange-600 text-white font-medium px-3 py-1.5 rounded-lg transition-colors">Mark as Connected</button>
-                            {{/if}}
+                            <button onclick="setAgentConnection('manus', false)" class="{{agent_manus_on}} text-xs text-red-400 hover:text-red-300 border border-red-400/20 hover:border-red-400/40 px-3 py-1.5 rounded-lg transition-colors">Disconnect</button>
+                            <button onclick="setAgentConnection('manus', true)" class="{{agent_manus_off}} text-xs bg-orange-500 hover:bg-orange-600 text-white font-medium px-3 py-1.5 rounded-lg transition-colors">Mark as Connected</button>
                         </div>
                     </div>
                 </div>
@@ -1484,15 +1448,12 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                             <span class="font-medium text-sm">OpenClaw</span>
                         </div>
                         <div class="flex items-center gap-3">
-                            {{#if agent_openclaw}}
-                            <span class="inline-flex items-center gap-1 text-xs font-medium text-green-400 bg-green-400/10 border border-green-400/20 rounded-full px-2.5 py-0.5">
+                            <span class="{{agent_openclaw_on}} inline-flex items-center gap-1 text-xs font-medium text-green-400 bg-green-400/10 border border-green-400/20 rounded-full px-2.5 py-0.5">
                                 <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span> Connected
                             </span>
-                            {{else}}
-                            <span class="inline-flex items-center gap-1 text-xs font-medium text-gray-400 bg-gray-700/40 border border-gray-600/30 rounded-full px-2.5 py-0.5">
+                            <span class="{{agent_openclaw_off}} inline-flex items-center gap-1 text-xs font-medium text-gray-400 bg-gray-700/40 border border-gray-600/30 rounded-full px-2.5 py-0.5">
                                 Set up
                             </span>
-                            {{/if}}
                             <i class="fas fa-chevron-down text-gray-500 text-xs transition-transform" id="chevron-openclaw"></i>
                         </div>
                     </button>
@@ -1503,11 +1464,8 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                             <button onclick="copyText('{{mcp_url}}')" class="shrink-0 text-xs bg-gray-700 hover:bg-gray-600 text-gray-200 px-3 py-2 rounded-lg transition-colors">Copy</button>
                         </div>
                         <div class="flex gap-2">
-                            {{#if agent_openclaw}}
-                            <button onclick="setAgentConnection('openclaw', false)" class="text-xs text-red-400 hover:text-red-300 border border-red-400/20 hover:border-red-400/40 px-3 py-1.5 rounded-lg transition-colors">Disconnect</button>
-                            {{else}}
-                            <button onclick="setAgentConnection('openclaw', true)" class="text-xs bg-orange-500 hover:bg-orange-600 text-white font-medium px-3 py-1.5 rounded-lg transition-colors">Mark as Connected</button>
-                            {{/if}}
+                            <button onclick="setAgentConnection('openclaw', false)" class="{{agent_openclaw_on}} text-xs text-red-400 hover:text-red-300 border border-red-400/20 hover:border-red-400/40 px-3 py-1.5 rounded-lg transition-colors">Disconnect</button>
+                            <button onclick="setAgentConnection('openclaw', true)" class="{{agent_openclaw_off}} text-xs bg-orange-500 hover:bg-orange-600 text-white font-medium px-3 py-1.5 rounded-lg transition-colors">Mark as Connected</button>
                         </div>
                     </div>
                 </div>
@@ -1520,25 +1478,19 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                             <span class="font-medium text-sm">Poke</span>
                         </div>
                         <div class="flex items-center gap-3">
-                            {{#if agent_poke}}
-                            <span class="inline-flex items-center gap-1 text-xs font-medium text-green-400 bg-green-400/10 border border-green-400/20 rounded-full px-2.5 py-0.5">
+                            <span class="{{agent_poke_on}} inline-flex items-center gap-1 text-xs font-medium text-green-400 bg-green-400/10 border border-green-400/20 rounded-full px-2.5 py-0.5">
                                 <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span> Active
                             </span>
-                            {{else}}
-                            <span class="inline-flex items-center gap-1 text-xs font-medium text-gray-400 bg-gray-700/40 border border-gray-600/30 rounded-full px-2.5 py-0.5">
+                            <span class="{{agent_poke_off}} inline-flex items-center gap-1 text-xs font-medium text-gray-400 bg-gray-700/40 border border-gray-600/30 rounded-full px-2.5 py-0.5">
                                 Set up
                             </span>
-                            {{/if}}
                             <i class="fas fa-chevron-down text-gray-500 text-xs transition-transform" id="chevron-poke-agent"></i>
                         </div>
                     </button>
                     <div class="hidden px-4 pb-4 pt-1 bg-gray-800/30" id="panel-poke-agent">
                         <p class="text-xs text-gray-400 mb-2">Get notified on <a href="https://poke.com" target="_blank" rel="noopener noreferrer" class="text-orange-400 hover:underline">Poke.com</a> after every workout. Configure your API key in the <strong>Poke Notifications</strong> card above.</p>
-                        {{#if agent_poke}}
-                        <p class="text-xs text-green-400">✓ Your Poke API key is saved and active.</p>
-                        {{else}}
-                        <p class="text-xs text-gray-500">Scroll up to the Poke Notifications card to add your key.</p>
-                        {{/if}}
+                        <p class="{{agent_poke_on}} text-xs text-green-400">✓ Your Poke API key is saved and active.</p>
+                        <p class="{{agent_poke_off}} text-xs text-gray-500">Scroll up to the Poke Notifications card to add your key.</p>
                     </div>
                 </div>
 

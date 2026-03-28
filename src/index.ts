@@ -503,15 +503,27 @@ app.get('/dashboard', async (c) => {
         : '',
       poke_saved_class: pokeKey ? '' : 'hidden',
       poke_form_class: pokeKey ? 'hidden' : '',
-      agent_claude: !!agentConnections.claude,
-      agent_cursor: !!agentConnections.cursor,
-      agent_windsurf: !!agentConnections.windsurf,
-      agent_cline: !!agentConnections.cline,
-      agent_continue: !!agentConnections.continue,
-      agent_manus: !!agentConnections.manus,
-      agent_openclaw: !!agentConnections.openclaw,
       agent_poke: !!pokeKey,
-      mcp_token: token
+      mcp_token: token,
+      // Per-agent CSS class helpers ('' = visible, 'hidden' = hidden)
+      // _on  classes apply when agent IS connected
+      // _off classes apply when agent is NOT connected
+      agent_claude_on:    agentConnections.claude    ? '' : 'hidden',
+      agent_claude_off:   agentConnections.claude    ? 'hidden' : '',
+      agent_cursor_on:    agentConnections.cursor    ? '' : 'hidden',
+      agent_cursor_off:   agentConnections.cursor    ? 'hidden' : '',
+      agent_windsurf_on:  agentConnections.windsurf  ? '' : 'hidden',
+      agent_windsurf_off: agentConnections.windsurf  ? 'hidden' : '',
+      agent_cline_on:     agentConnections.cline     ? '' : 'hidden',
+      agent_cline_off:    agentConnections.cline     ? 'hidden' : '',
+      agent_continue_on:  agentConnections.continue  ? '' : 'hidden',
+      agent_continue_off: agentConnections.continue  ? 'hidden' : '',
+      agent_manus_on:     agentConnections.manus     ? '' : 'hidden',
+      agent_manus_off:    agentConnections.manus     ? 'hidden' : '',
+      agent_openclaw_on:  agentConnections.openclaw  ? '' : 'hidden',
+      agent_openclaw_off: agentConnections.openclaw  ? 'hidden' : '',
+      agent_poke_on:      !!pokeKey                  ? '' : 'hidden',
+      agent_poke_off:     !!pokeKey                  ? 'hidden' : ''
     };
     
     // Render the beautiful dashboard HTML
