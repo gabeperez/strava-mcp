@@ -6,3 +6,6 @@ build/
 coverage/
 *.tsbuildinfo
 *.log
+node_modules/
+scratch/
+agent/

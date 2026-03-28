@@ -43,10 +43,16 @@ export class AuthHandler {
       };
       await this.env.STRAVA_SESSIONS.put(`state:${state}`, JSON.stringify(stateData), { expirationTtl: 600 }); // 10 min expiry
 
+      // Always use the registered Strava callback URI — Strava rejects any URI
+      // that doesn't exactly match what's registered in the app settings.
+      // The origin is stored in state so we can redirect back to the correct
+      // tenant domain (stravamcp.com, mainichi.fit, etc.) after the callback.
+      const registeredRedirectUri = this.env.STRAVA_REDIRECT_URI || `${currentDomain}/callback`;
+
       const authUrl = new URL('https://www.strava.com/oauth/authorize');
       authUrl.searchParams.set('client_id', this.env.STRAVA_CLIENT_ID);
       authUrl.searchParams.set('response_type', 'code');
-      authUrl.searchParams.set('redirect_uri', `${currentDomain}/callback`);
+      authUrl.searchParams.set('redirect_uri', registeredRedirectUri);
       authUrl.searchParams.set('approval_prompt', 'auto');
       authUrl.searchParams.set('scope', REQUIRED_SCOPES);
       authUrl.searchParams.set('state', state);

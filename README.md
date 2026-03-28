@@ -5,6 +5,7 @@
 [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/gabeperez/strava-mcp)
 
 [![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-F38020?logo=cloudflare)](https://workers.cloudflare.com/)
+[![GitHub](https://img.shields.io/badge/GitHub-gabeperez%2Fstrava--mcp-black?logo=github)](https://github.com/gabeperez/strava-mcp)
 [![MCP Protocol](https://img.shields.io/badge/MCP-2024--11--05-blue)](https://modelcontextprotocol.io/)
 [![Compatible with Strava](https://img.shields.io/badge/Compatible%20with-Strava-FC4C02)](https://www.strava.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -17,7 +18,7 @@ A complete **[Model Context Protocol](https://modelcontextprotocol.io/) server**
 
 - 🤖 **Works with any MCP client** — Claude Desktop, Cursor, Windsurf, Cline, Continue.dev, Poke, and more
 - 🔐 **Secure OAuth** — Standard Strava OAuth 2.0, per-user token isolation
-- 🏃 **10 MCP Tools** — Activities, streams, segments, routes, athlete stats, and more
+- 🏃 **21 MCP Tools** — Activities, laps, kudos, comments, segments, segment efforts, routes, gear, clubs, athlete zones, and more
 - 🔔 **Optional Webhooks** — Real-time Poke notifications when workouts complete (per-user keys)
 - 🔄 **Auto Token Refresh** — Tokens renew automatically before expiry
 - 🎨 **Dashboard** — Web UI with one-click config snippets for every major AI agent
@@ -40,7 +41,7 @@ Best for users who prefer clicking buttons over typing commands.
 
 **Step 1: Click Deploy to Cloudflare**
 
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/gabeperez/sportsmcp)
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/gabeperez/strava-mcp)
 
 This will:
 1. Deploy it to your Cloudflare account
@@ -55,8 +56,8 @@ After deployment, you need to configure secrets and webhooks:
 2. **Clone YOUR fork and run setup:**
    ```bash
    # Replace YOUR-USERNAME with your GitHub username
-   git clone https://github.com/YOUR-USERNAME/sportsmcp.git
-   cd sportsmcp
+   git clone https://github.com/YOUR-USERNAME/strava-mcp.git
+   cd strava-mcp
    npm install
    node scripts/setup.js
    ```
@@ -89,10 +90,10 @@ Paste these commands **one at a time** (press Enter after each):
 
 ```bash
 # Download the project
-git clone https://github.com/gabeperez/sportsmcp.git
+git clone https://github.com/gabeperez/strava-mcp.git
 
 # Go into the folder
-cd sportsmcp
+cd strava-mcp
 
 # Install dependencies (takes ~30 seconds)
 npm install
@@ -222,8 +223,8 @@ If you prefer to configure everything manually instead of using the automated sc
 
 ```bash
 # 1. Download and install
-git clone https://github.com/gabeperez/sportsmcp.git
-cd sportsmcp
+git clone https://github.com/gabeperez/strava-mcp.git
+cd strava-mcp
 npm install
 
 # 2. Login to Cloudflare (opens browser)
@@ -308,21 +309,46 @@ wrangler tail
 
 **See [WEBHOOK_SETUP.md](WEBHOOK_SETUP.md) for complete instructions**
 
-## 📚 Available MCP Tools
+## 📚 Available MCP Tools (21 Total)
 
 Ask your AI assistant natural language questions, and these tools will be called automatically:
 
+**Activities**
 | Tool | Example Query |
 |------|---------------|
 | `get-recent-activities` | "Show me my last 5 workouts" |
+| `get-activity-details` | "Get details for my last ride" |
+| `get-activity-streams` | "Show me heart rate data from my last run" |
+| `get-activity-laps` | "What were my lap splits?" |
+| `get-activity-kudos` | "Who gave me kudos on my run?" |
+| `get-activity-comments` | "What comments did I get?" |
+
+**Athlete**
+| Tool | Example Query |
+|------|---------------|
 | `get-athlete-profile` | "What's my Strava profile info?" |
 | `get-athlete-stats` | "What are my cycling stats this year?" |
-| `get-activity-details` | "Get details for activity 123456" |
-| `get-activity-streams` | "Show me heart rate data from my last run" |
+| `get-athlete-zones` | "What are my heart rate training zones?" |
+| `get-athlete-clubs` | "What Strava clubs am I in?" |
+| `get-athlete-routes` | "List my saved routes" |
+
+**Segments**
+| Tool | Example Query |
+|------|---------------|
 | `get-starred-segments` | "What segments have I starred?" |
 | `explore-segments` | "Find climbing segments near San Francisco" |
-| `get-athlete-routes` | "List my saved routes" |
+| `get-segment` | "Tell me about segment 1234" |
+| `get-segment-efforts` | "What are my best efforts on this segment?" |
+| `get-segment-effort` | "Get details for segment effort 5678" |
+
+**Gear & Social**
+| Tool | Example Query |
+|------|---------------|
+| `get-gear` | "How many miles are on my running shoes?" |
+| `get-club` | "Tell me about my cycling club" |
+| `get-route` | "Get details for my weekend route" |
 | `authenticate-strava` | "How do I connect my Strava account?" |
+| `welcome-strava-mcp` | "How do I get started?" |
 
 ## 🌐 Endpoints
 
@@ -504,7 +530,7 @@ See [.env.example](.env.example) for all configuration options.
 - [ ] **Custom Webhook Filters** - Choose which activities trigger notifications
 - [ ] **Web Dashboard Enhancements** - More stats, charts, and visualizations
 
-Interested in contributing to any of these? [Open a discussion](https://github.com/gabeperez/sportsmcp/discussions)!
+Interested in contributing to any of these? [Open a discussion](https://github.com/gabeperez/strava-mcp/discussions)!
 
 ## 🤝 Contributing
 
@@ -536,4 +562,4 @@ If this project helped you, consider giving it a star!
 
 **Made with ❤️ for athletes who love data**
 
-[Report Bug](https://github.com/gabeperez/sportsmcp/issues) · [Request Feature](https://github.com/gabeperez/sportsmcp/issues) · [Discussions](https://github.com/gabeperez/sportsmcp/discussions)
+[Report Bug](https://github.com/gabeperez/strava-mcp/issues) · [Request Feature](https://github.com/gabeperez/strava-mcp/issues) · [Discussions](https://github.com/gabeperez/strava-mcp/discussions)

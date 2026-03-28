@@ -46,7 +46,12 @@ function getCurrentDomain(c: any): string {
   try {
     return new URL(c.req.url).origin;
   } catch {
-    return 'https://strava-mcp-oauth.perez-jg22.workers.dev';
+    // Fallback: derive from the registered redirect URI env var
+    const redirectUri: string = (c.env as any)?.STRAVA_REDIRECT_URI || '';
+    if (redirectUri) {
+      return redirectUri.replace(/\/callback$/, '');
+    }
+    return 'https://your-worker.workers.dev';
   }
 }
 
