@@ -1,7 +1,7 @@
 import { Context } from 'hono';
 import { Env, StravaWebhookEvent, StravaActivity } from './types';
 import { KVSessionManager } from './session';
-import { sendNotification, NotificationConfig } from './notifications';
+import { sendNotification, sendNotificationToAll, NotificationConfig } from './notifications';
 
 /**
  * Strava Webhook Handler
@@ -148,10 +148,11 @@ export class StravaWebhookHandler {
         console.error(`⚠️  Failed to clean up device_auth keys for ${owner_id}:`, err.message);
       }
 
-      // 4. Delete per-user notification config and legacy Poke key if stored
+      // 4. Delete per-user notification configs and legacy Poke key if stored
       try {
         await this.env.STRAVA_SESSIONS.delete(`poke_key:${owner_id}`);
         await this.env.STRAVA_SESSIONS.delete(`notification_config:${owner_id}`);
+        await this.env.STRAVA_SESSIONS.delete(`notification_configs:${owner_id}`);
       } catch (_) {}
 
       console.log(`✅ Full data cleanup complete for athlete ${owner_id}`);
@@ -194,39 +195,59 @@ export class StravaWebhookHandler {
       // Format and send notification
       const message = this.formatActivityMessage(activity);
 
-      // Resolve notification config: check for multi-provider config first,
-      // then fall back to legacy poke_key, then global env POKE_API_KEY
-      let notificationConfig: NotificationConfig | null = null;
+      // Resolve notification configs: supports multiple providers simultaneously.
+      // KV stores an array at notification_configs:{athlete_id}.
+      // Falls back to single-config notification_config:{id}, legacy poke_key, and global env.
+      const notificationConfigs: NotificationConfig[] = [];
       try {
-        const configJson = await this.env.STRAVA_SESSIONS.get(`notification_config:${ownerId}`);
-        if (configJson) {
-          notificationConfig = JSON.parse(configJson) as NotificationConfig;
-          console.log(`🔑 Using ${notificationConfig.provider} notification config for athlete ${ownerId}`);
-        } else {
-          // Legacy fallback: check per-user Poke key
+        // New multi-provider array format
+        const multiJson = await this.env.STRAVA_SESSIONS.get(`notification_configs:${ownerId}`);
+        if (multiJson) {
+          const parsed = JSON.parse(multiJson);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            notificationConfigs.push(...parsed);
+            console.log(`🔑 Using ${parsed.length} notification provider(s) for athlete ${ownerId}: ${parsed.map((c: NotificationConfig) => c.provider).join(', ')}`);
+          }
+        }
+
+        // Fallback: single-config format
+        if (notificationConfigs.length === 0) {
+          const singleJson = await this.env.STRAVA_SESSIONS.get(`notification_config:${ownerId}`);
+          if (singleJson) {
+            notificationConfigs.push(JSON.parse(singleJson) as NotificationConfig);
+          }
+        }
+
+        // Fallback: legacy per-user Poke key
+        if (notificationConfigs.length === 0) {
           const userPokeKey = await this.env.STRAVA_SESSIONS.get(`poke_key:${ownerId}`);
           if (userPokeKey) {
-            notificationConfig = { provider: 'poke', api_key: userPokeKey };
+            notificationConfigs.push({ provider: 'poke', api_key: userPokeKey });
             console.log(`🔑 Using legacy per-user Poke API key for athlete ${ownerId}`);
-          } else if (this.env.POKE_API_KEY) {
-            notificationConfig = { provider: 'poke', api_key: this.env.POKE_API_KEY };
-            console.log(`🔑 Using global Poke API key (no per-user config found for athlete ${ownerId})`);
           }
+        }
+
+        // Fallback: global Poke env key
+        if (notificationConfigs.length === 0 && this.env.POKE_API_KEY) {
+          notificationConfigs.push({ provider: 'poke', api_key: this.env.POKE_API_KEY });
+          console.log(`🔑 Using global Poke API key (no per-user config found for athlete ${ownerId})`);
         }
       } catch (err: any) {
         console.error(`⚠️  Failed to look up notification config:`, err.message);
         if (this.env.POKE_API_KEY) {
-          notificationConfig = { provider: 'poke', api_key: this.env.POKE_API_KEY };
+          notificationConfigs.push({ provider: 'poke', api_key: this.env.POKE_API_KEY });
         }
       }
 
-      // Send notification if a config is available
-      if (notificationConfig) {
-        const result = await sendNotification(message, notificationConfig);
-        if (result.success) {
-          console.log(`✅ Successfully sent activity ${activityId} via ${notificationConfig.provider}`);
-        } else {
-          console.error(`❌ ${notificationConfig.provider} notification failed: ${result.error}`);
+      // Send to ALL configured providers in parallel
+      if (notificationConfigs.length > 0) {
+        const results = await sendNotificationToAll(message, notificationConfigs);
+        for (const { provider, result } of results) {
+          if (result.success) {
+            console.log(`✅ Successfully sent activity ${activityId} via ${provider}`);
+          } else {
+            console.error(`❌ ${provider} notification failed: ${result.error}`);
+          }
         }
       } else {
         console.log(`ℹ️ No notification provider configured for athlete ${ownerId}, skipping notification`);

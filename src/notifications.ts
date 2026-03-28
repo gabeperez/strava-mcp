@@ -159,6 +159,23 @@ async function sendToManus(message: string, apiKey: string): Promise<Notificatio
   return { success: true, data };
 }
 
+/**
+ * Send a notification to ALL configured providers in parallel.
+ * Returns per-provider results.
+ */
+export async function sendNotificationToAll(
+  message: string,
+  configs: NotificationConfig[]
+): Promise<{ provider: NotificationProvider; result: NotificationResult }[]> {
+  const results = await Promise.all(
+    configs.map(async (config) => ({
+      provider: config.provider,
+      result: await sendNotification(message, config),
+    }))
+  );
+  return results;
+}
+
 /** Mask an API key for display: first 5 chars + dots + last 4 chars */
 export function maskKey(key: string): string {
   if (key.length > 9) {

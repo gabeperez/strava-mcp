@@ -7,7 +7,7 @@ import { SportsMCPServer, handleMCPOverSSE } from './mcp-server';
 import { TemplateEngine, LANDING_TEMPLATE, DASHBOARD_TEMPLATE } from './templates';
 import { ABOUT_TEMPLATE, SUPPORT_TEMPLATE, PRIVACY_TEMPLATE, TERMS_TEMPLATE } from './legal-templates';
 import { StravaWebhookHandler } from './webhook';
-import { sendNotification, NotificationConfig, NotificationProvider, PROVIDER_INFO, maskKey } from './notifications';
+import { sendNotification, sendNotificationToAll, NotificationConfig, NotificationProvider, PROVIDER_INFO, maskKey } from './notifications';
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -181,9 +181,47 @@ app.post('/webhook', async (c) => {
 
 // Test endpoint for notifications (supports all providers)
 // Kept as /test-poke for backward compat, also available at /test-notification
+// ---- Helpers to load / persist the notification configs array ----
+async function loadNotificationConfigs(env: Env, athleteId: number): Promise<NotificationConfig[]> {
+  // 1. New multi-provider array
+  const multiJson = await env.STRAVA_SESSIONS.get(`notification_configs:${athleteId}`);
+  if (multiJson) {
+    const parsed = JSON.parse(multiJson);
+    if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+  }
+  // 2. Single-config fallback
+  const singleJson = await env.STRAVA_SESSIONS.get(`notification_config:${athleteId}`);
+  if (singleJson) {
+    const cfg = JSON.parse(singleJson) as NotificationConfig;
+    return [cfg];
+  }
+  // 3. Legacy poke_key
+  const pokeKey = await env.STRAVA_SESSIONS.get(`poke_key:${athleteId}`);
+  if (pokeKey) return [{ provider: 'poke' as NotificationProvider, api_key: pokeKey }];
+  return [];
+}
+
+async function saveNotificationConfigs(env: Env, athleteId: number, configs: NotificationConfig[]): Promise<void> {
+  await env.STRAVA_SESSIONS.put(`notification_configs:${athleteId}`, JSON.stringify(configs));
+  // Keep legacy keys in sync for backward compat
+  const pokeConfig = configs.find(c => c.provider === 'poke');
+  if (pokeConfig) {
+    await env.STRAVA_SESSIONS.put(`poke_key:${athleteId}`, pokeConfig.api_key);
+  } else {
+    await env.STRAVA_SESSIONS.delete(`poke_key:${athleteId}`);
+  }
+  // Keep single-config in sync (first entry) for backward compat
+  if (configs.length > 0) {
+    await env.STRAVA_SESSIONS.put(`notification_config:${athleteId}`, JSON.stringify(configs[0]));
+  } else {
+    await env.STRAVA_SESSIONS.delete(`notification_config:${athleteId}`);
+  }
+}
+
+// ---- Test notification endpoint ----
 async function handleTestNotification(c: any) {
   try {
-    let notificationConfig: NotificationConfig | null = null;
+    const notificationConfigs: NotificationConfig[] = [];
     let accessToken: string | null = null;
     let athleteFirstName = 'athlete';
 
@@ -192,19 +230,8 @@ async function handleTestNotification(c: any) {
       const personalData = await c.env.STRAVA_SESSIONS.get(`personal_mcp:${token}`);
       if (personalData) {
         const { athlete_id } = JSON.parse(personalData);
+        notificationConfigs.push(...await loadNotificationConfigs(c.env, athlete_id));
 
-        // Check for multi-provider config first, then legacy poke_key
-        const configJson = await c.env.STRAVA_SESSIONS.get(`notification_config:${athlete_id}`);
-        if (configJson) {
-          notificationConfig = JSON.parse(configJson) as NotificationConfig;
-        } else {
-          const userKey = await c.env.STRAVA_SESSIONS.get(`poke_key:${athlete_id}`);
-          if (userKey) {
-            notificationConfig = { provider: 'poke', api_key: userKey };
-          }
-        }
-
-        // Fetch session to get Strava access token
         const sessionData = await c.env.STRAVA_SESSIONS.get(`user:${athlete_id}`);
         if (sessionData) {
           const session = JSON.parse(sessionData);
@@ -213,11 +240,11 @@ async function handleTestNotification(c: any) {
         }
       }
     }
-    if (!notificationConfig && c.env.POKE_API_KEY) {
-      notificationConfig = { provider: 'poke', api_key: c.env.POKE_API_KEY };
+    if (notificationConfigs.length === 0 && c.env.POKE_API_KEY) {
+      notificationConfigs.push({ provider: 'poke', api_key: c.env.POKE_API_KEY });
     }
 
-    if (!notificationConfig) {
+    if (notificationConfigs.length === 0) {
       return c.json({ error: 'No notification provider configured. Add your key first.' }, 400);
     }
 
@@ -280,22 +307,33 @@ async function handleTestNotification(c: any) {
       }
     }
 
-    const providerName = PROVIDER_INFO[notificationConfig.provider]?.name || notificationConfig.provider;
+    const providerNames = notificationConfigs.map(c => PROVIDER_INFO[c.provider]?.name || c.provider);
     const fallback = `\n\nSportsMCP gives your AI access to your full Strava history: recent activities, lap splits, heart rate zones, segment efforts, gear mileage, clubs, and more.\n\nPlease reply to confirm you received this and that the SportsMCP + Strava connection is active on your end.`;
     const testMessage = `👋 Test ping from SportsMCP — your Strava data is now connected to your AI assistant.${recentActivityBlock || fallback}
 
 — Sent ${now}`;
 
-    const result = await sendNotification(testMessage, notificationConfig);
+    const results = await sendNotificationToAll(testMessage, notificationConfigs);
+    const successes = results.filter(r => r.result.success);
+    const failures = results.filter(r => !r.result.success);
 
-    if (!result.success) {
+    if (successes.length === 0) {
       return c.json({
         success: false,
-        error: `${providerName} error — ${result.error}`,
+        error: failures.map(f => `${f.provider}: ${f.result.error}`).join('; '),
       }, 502);
     }
 
-    return c.json({ success: true, message: `Test ping sent via ${providerName}! Check your messages 📱`, provider: notificationConfig.provider, response: result.data });
+    const successNames = successes.map(s => PROVIDER_INFO[s.provider]?.name || s.provider).join(', ');
+    const msg = failures.length > 0
+      ? `Test ping sent via ${successNames}! (${failures.length} failed) 📱`
+      : `Test ping sent via ${successNames}! Check your messages 📱`;
+
+    return c.json({
+      success: true,
+      message: msg,
+      providers: results.map(r => ({ provider: r.provider, success: r.result.success, error: r.result.error })),
+    });
   } catch (error: any) {
     return c.json({ success: false, error: error.message }, 500);
   }
@@ -304,8 +342,7 @@ async function handleTestNotification(c: any) {
 app.post('/test-poke', handleTestNotification);
 app.post('/test-notification', handleTestNotification);
 
-// Get notification config status for dashboard display
-// Also responds at legacy /settings/poke-key for backward compat
+// ---- GET notification config ----
 async function handleGetNotificationConfig(c: any) {
   try {
     const token = c.req.query('token');
@@ -315,33 +352,23 @@ async function handleGetNotificationConfig(c: any) {
     if (!personalData) return c.json({ error: 'Invalid token' }, 401);
 
     const { athlete_id } = JSON.parse(personalData);
+    const configs = await loadNotificationConfigs(c.env, athlete_id);
 
-    // Check for multi-provider config first
-    const configJson = await c.env.STRAVA_SESSIONS.get(`notification_config:${athlete_id}`);
-    if (configJson) {
-      const config = JSON.parse(configJson) as NotificationConfig;
-      return c.json({
-        hasKey: true,
-        provider: config.provider,
-        maskedKey: maskKey(config.api_key),
-        hasEndpoint: !!config.endpoint,
-        providerName: PROVIDER_INFO[config.provider]?.name || config.provider,
-      });
-    }
+    if (configs.length === 0) return c.json({ hasKey: false, providers: [] });
 
-    // Legacy fallback: check poke_key
-    const key = await c.env.STRAVA_SESSIONS.get(`poke_key:${athlete_id}`);
-    if (key) {
-      return c.json({
-        hasKey: true,
-        provider: 'poke',
-        maskedKey: maskKey(key),
-        hasEndpoint: false,
-        providerName: 'Poke',
-      });
-    }
-
-    return c.json({ hasKey: false });
+    return c.json({
+      hasKey: true,
+      providers: configs.map(cfg => ({
+        provider: cfg.provider,
+        maskedKey: maskKey(cfg.api_key),
+        hasEndpoint: !!cfg.endpoint,
+        providerName: PROVIDER_INFO[cfg.provider]?.name || cfg.provider,
+      })),
+      // Backward compat: first provider
+      provider: configs[0].provider,
+      maskedKey: maskKey(configs[0].api_key),
+      providerName: PROVIDER_INFO[configs[0].provider]?.name || configs[0].provider,
+    });
   } catch (err: any) {
     return c.json({ error: err.message }, 500);
   }
@@ -350,20 +377,31 @@ async function handleGetNotificationConfig(c: any) {
 app.get('/settings/poke-key', handleGetNotificationConfig);
 app.get('/settings/notification-config', handleGetNotificationConfig);
 
-// Delete saved notification config
+// ---- DELETE notification config ----
+// Body: { token, provider? } — if provider given, remove just that one; otherwise remove all
 async function handleDeleteNotificationConfig(c: any) {
   try {
-    const { token } = await c.req.json() as { token: string };
-    if (!token) return c.json({ error: 'token required' }, 400);
+    const body = await c.req.json() as { token: string; provider?: NotificationProvider };
+    if (!body.token) return c.json({ error: 'token required' }, 400);
 
-    const personalData = await c.env.STRAVA_SESSIONS.get(`personal_mcp:${token}`);
+    const personalData = await c.env.STRAVA_SESSIONS.get(`personal_mcp:${body.token}`);
     if (!personalData) return c.json({ error: 'Invalid token' }, 401);
 
     const { athlete_id } = JSON.parse(personalData);
-    // Delete both new config and legacy key
-    await c.env.STRAVA_SESSIONS.delete(`notification_config:${athlete_id}`);
-    await c.env.STRAVA_SESSIONS.delete(`poke_key:${athlete_id}`);
-    return c.json({ success: true });
+
+    if (body.provider) {
+      // Remove just this provider from the array
+      const configs = await loadNotificationConfigs(c.env, athlete_id);
+      const filtered = configs.filter(cfg => cfg.provider !== body.provider);
+      await saveNotificationConfigs(c.env, athlete_id, filtered);
+      return c.json({ success: true, remaining: filtered.length });
+    } else {
+      // Remove everything
+      await c.env.STRAVA_SESSIONS.delete(`notification_configs:${athlete_id}`);
+      await c.env.STRAVA_SESSIONS.delete(`notification_config:${athlete_id}`);
+      await c.env.STRAVA_SESSIONS.delete(`poke_key:${athlete_id}`);
+      return c.json({ success: true, remaining: 0 });
+    }
   } catch (err: any) {
     return c.json({ error: err.message }, 500);
   }
@@ -393,9 +431,9 @@ app.get('/terms', (c) => {
   return c.html(html);
 });
 
-// Save notification config (supports all providers)
+// ---- POST: Add / update a provider in the configs array ----
 // POST body: { token, provider?, poke_api_key OR api_key, endpoint? }
-// Backward compat: if poke_api_key is sent without provider, defaults to 'poke'
+// Adds to the array; if the same provider already exists, it's updated.
 async function handleSaveNotificationConfig(c: any) {
   try {
     const body = await c.req.json() as {
@@ -413,38 +451,39 @@ async function handleSaveNotificationConfig(c: any) {
     if (!token || !apiKey) {
       return c.json({ error: 'token and api_key are required' }, 400);
     }
-
-    // Validate provider
     if (!PROVIDER_INFO[provider]) {
       return c.json({ error: `Unknown provider: ${provider}. Supported: ${Object.keys(PROVIDER_INFO).join(', ')}` }, 400);
     }
-
-    // OpenClaw requires an endpoint
     if (provider === 'openclaw' && !endpoint) {
       return c.json({ error: 'OpenClaw requires a gateway endpoint URL' }, 400);
     }
 
-    // Validate the MCP token and resolve athlete ID
     const personalData = await c.env.STRAVA_SESSIONS.get(`personal_mcp:${token}`);
     if (!personalData) {
       return c.json({ error: 'Invalid or expired token' }, 401);
     }
     const { athlete_id } = JSON.parse(personalData);
 
-    // Store as notification config (new format)
-    const config: NotificationConfig = { provider, api_key: apiKey };
-    if (endpoint) config.endpoint = endpoint;
-    await c.env.STRAVA_SESSIONS.put(`notification_config:${athlete_id}`, JSON.stringify(config));
+    // Load existing configs, upsert this provider
+    const configs = await loadNotificationConfigs(c.env, athlete_id);
+    const newConfig: NotificationConfig = { provider, api_key: apiKey };
+    if (endpoint) newConfig.endpoint = endpoint;
 
-    // Also write legacy poke_key for backward compat if provider is poke
-    if (provider === 'poke') {
-      await c.env.STRAVA_SESSIONS.put(`poke_key:${athlete_id}`, apiKey);
+    const idx = configs.findIndex(cfg => cfg.provider === provider);
+    if (idx >= 0) {
+      configs[idx] = newConfig; // update existing
     } else {
-      // Clean up legacy poke_key if switching away from poke
-      await c.env.STRAVA_SESSIONS.delete(`poke_key:${athlete_id}`);
+      configs.push(newConfig); // add new
     }
 
-    return c.json({ success: true, provider });
+    await saveNotificationConfigs(c.env, athlete_id, configs);
+
+    return c.json({
+      success: true,
+      provider,
+      totalProviders: configs.length,
+      providers: configs.map(cfg => cfg.provider),
+    });
   } catch (err: any) {
     return c.json({ error: err.message }, 500);
   }
@@ -476,7 +515,7 @@ app.get('/dashboard', async (c) => {
     }
     
     // Fetch user's Strava data + notification config in parallel
-    const [profileResponse, statsResponse, activitiesResponse, notifConfigJson, legacyPokeKey] = await Promise.all([
+    const [profileResponse, statsResponse, activitiesResponse] = await Promise.all([
       fetch('https://www.strava.com/api/v3/athlete', {
         headers: { 'Authorization': `Bearer ${session.access_token}` }
       }),
@@ -486,21 +525,10 @@ app.get('/dashboard', async (c) => {
       fetch('https://www.strava.com/api/v3/athlete/activities?per_page=7', {
         headers: { 'Authorization': `Bearer ${session.access_token}` }
       }),
-      c.env.STRAVA_SESSIONS.get(`notification_config:${athlete_id}`),
-      c.env.STRAVA_SESSIONS.get(`poke_key:${athlete_id}`)
     ]);
 
-    // Resolve notification config: new format first, then legacy
-    let activeProvider: NotificationProvider | null = null;
-    let activeApiKey: string | null = null;
-    if (notifConfigJson) {
-      const cfg = JSON.parse(notifConfigJson) as NotificationConfig;
-      activeProvider = cfg.provider;
-      activeApiKey = cfg.api_key;
-    } else if (legacyPokeKey) {
-      activeProvider = 'poke';
-      activeApiKey = legacyPokeKey;
-    }
+    // Load all configured notification providers
+    const activeConfigs = await loadNotificationConfigs(c.env, athlete_id);
     
     const profile = await profileResponse.json();
     const stats = await statsResponse.json();
@@ -570,12 +598,15 @@ app.get('/dashboard', async (c) => {
         weekly_average: Math.round(totalActivities / 4 * 10) / 10,
         longest_activity: activitiesArray.length > 0 ? Math.round(Math.max(...activitiesArray.map((a: any) => a.distance)) / 1000 * 10) / 10 : 0
       },
-      poke_key_saved: !!activeProvider,
-      poke_masked_key: activeApiKey ? maskKey(activeApiKey) : '',
-      poke_saved_class: activeProvider ? '' : 'hidden',
-      poke_form_class: activeProvider ? 'hidden' : '',
-      notification_provider: activeProvider || '',
-      notification_provider_name: activeProvider ? (PROVIDER_INFO[activeProvider]?.name || activeProvider) : '',
+      poke_key_saved: activeConfigs.length > 0,
+      poke_masked_key: activeConfigs.length > 0 ? maskKey(activeConfigs[0].api_key) : '',
+      poke_saved_class: activeConfigs.length > 0 ? '' : 'hidden',
+      poke_form_class: activeConfigs.length > 0 ? 'hidden' : '',
+      notification_provider: activeConfigs.length > 0 ? activeConfigs[0].provider : '',
+      notification_provider_name: activeConfigs.length > 0
+        ? activeConfigs.map(c => PROVIDER_INFO[c.provider]?.name || c.provider).join(', ')
+        : '',
+      active_providers_json: JSON.stringify(activeConfigs.map(c => c.provider)),
       providers_json: JSON.stringify(PROVIDER_INFO)
     };
     
