@@ -12,7 +12,7 @@
 		}
 	],
 	"vars": {
-		"STRAVA_REDIRECT_URI": "https://stravamcp.com/callback"
+		"STRAVA_REDIRECT_URI": "https://your-worker-name.your-subdomain.workers.dev/callback"
 	},
 	"observability": {
 		"enabled": true

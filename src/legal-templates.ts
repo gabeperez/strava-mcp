@@ -253,7 +253,7 @@ export const ABOUT_TEMPLATE = `<!DOCTYPE html>
                         </div>
                         <div class="flex items-center">
                             <i class="fas fa-globe text-orange-400 mr-3"></i>
-                            <a href="https://stravamcp.com" class="hover:text-orange-400 transition-colors">stravamcp.com</a>
+                            <a href="{{base_url}}" class="hover:text-orange-400 transition-colors">{{base_url}}</a>
                         </div>
                         <div class="flex items-center">
                             <i class="fas fa-code text-orange-400 mr-3"></i>
@@ -377,7 +377,7 @@ export const SUPPORT_TEMPLATE = `<!DOCTYPE html>
                         <h3 class="text-xl font-semibold text-orange-400 mb-2">Connect Your Strava Account</h3>
                         <p class="text-gray-300 mb-3">Visit our homepage and click "Connect with Strava" to authorize secure access to your fitness data.</p>
                         <div class="bg-gray-900 rounded-lg p-4">
-                            <code class="text-orange-300">https://stravamcp.com</code> → <strong>Connect with Strava</strong> → Authorize
+                            <code class="text-orange-300">{{base_url}}</code> → <strong>Connect with Strava</strong> → Authorize
                         </div>
                     </div>
                 </div>
@@ -390,7 +390,7 @@ export const SUPPORT_TEMPLATE = `<!DOCTYPE html>
                         <h3 class="text-xl font-semibold text-orange-400 mb-2">Get Your Personal MCP URL</h3>
                         <p class="text-gray-300 mb-3">After authentication, you'll receive your unique MCP server URL on the dashboard.</p>
                         <div class="bg-gray-900 rounded-lg p-4">
-                            <code class="text-green-300">https://stravamcp.com/mcp?token=YOUR_UNIQUE_TOKEN</code>
+                            <code class="text-green-300">{{base_url}}/mcp?token=YOUR_UNIQUE_TOKEN</code>
                         </div>
                     </div>
                 </div>
@@ -773,7 +773,7 @@ export const PRIVACY_TEMPLATE = `<!DOCTYPE html>
                     <p>
                         <strong>Contact Information:</strong><br>
                         Email: <a href="mailto:help@stravamcp.com" class="text-orange-400 hover:text-orange-300">help@stravamcp.com</a><br>
-                        Website: <a href="https://stravamcp.com" class="text-orange-400 hover:text-orange-300">https://stravamcp.com</a>
+                        Website: <a href="{{base_url}}" class="text-orange-400 hover:text-orange-300">{{base_url}}</a>
                     </p>
                 </div>
             </div>
@@ -1483,7 +1483,7 @@ export const TERMS_TEMPLATE = `<!DOCTYPE html>
                         <div class="space-y-2 text-gray-300">
                             <p><strong>Email:</strong> <a href="mailto:help@stravamcp.com" class="text-orange-400 hover:text-orange-300">help@stravamcp.com</a></p>
                             <p><strong>Subject:</strong> Terms of Service Question</p>
-                            <p><strong>Website:</strong> <a href="https://stravamcp.com" class="text-orange-400 hover:text-orange-300">stravamcp.com</a></p>
+                            <p><strong>Website:</strong> <a href="{{base_url}}" class="text-orange-400 hover:text-orange-300">{{base_url}}</a></p>
                         </div>
                     </div>
                     <div>

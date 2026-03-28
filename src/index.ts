@@ -41,13 +41,13 @@ app.use('*', async (c, next) => {
   c.res.headers.set('Access-Control-Allow-Credentials', 'true');
 });
 
-// Helper function to get current domain
+// Helper function to get current origin
 function getCurrentDomain(c: any): string {
-  const host = c.req.header('host');
-  if (!host) return 'https://strava-mcp-oauth.perez-jg22.workers.dev';
-  // Always use the actual request host — works for workers.dev or any custom domain
-  const protocol = host.includes('localhost') ? 'http' : 'https';
-  return `${protocol}://${host}`;
+  try {
+    return new URL(c.req.url).origin;
+  } catch {
+    return 'https://strava-mcp-oauth.perez-jg22.workers.dev';
+  }
 }
 
 
@@ -341,22 +341,22 @@ app.delete('/settings/poke-key', async (c) => {
 
 // Legal and informational pages  
 app.get('/about', (c) => {
-  const html = templates.render('about');
+  const html = templates.render('about', { base_url: getCurrentDomain(c) });
   return c.html(html);
 });
 
 app.get('/support', (c) => {
-  const html = templates.render('support');
+  const html = templates.render('support', { base_url: getCurrentDomain(c) });
   return c.html(html);
 });
 
 app.get('/privacy', (c) => {
-  const html = templates.render('privacy');
+  const html = templates.render('privacy', { base_url: getCurrentDomain(c) });
   return c.html(html);
 });
 
 app.get('/terms', (c) => {
-  const html = templates.render('terms');
+  const html = templates.render('terms', { base_url: getCurrentDomain(c) });
   return c.html(html);
 });
 

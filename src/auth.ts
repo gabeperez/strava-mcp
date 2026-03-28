@@ -18,12 +18,13 @@ export class AuthHandler {
     return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
   }
 
-  // Get current domain for dynamic URL generation
+  // Get current origin for dynamic URL generation
   private getCurrentDomain(c: Context): string {
-    const host = c.req.header('host');
-    if (!host) return 'https://strava-mcp-oauth.perez-jg22.workers.dev';
-    const protocol = host.includes('localhost') ? 'http' : 'https';
-    return `${protocol}://${host}`;
+    try {
+      return new URL(c.req.url).origin;
+    } catch {
+      return this.env.STRAVA_REDIRECT_URI.replace(/\/callback$/, '');
+    }
   }
 
   // GET /auth - Initiate OAuth flow
@@ -44,7 +45,7 @@ export class AuthHandler {
       const authUrl = new URL('https://www.strava.com/oauth/authorize');
       authUrl.searchParams.set('client_id', this.env.STRAVA_CLIENT_ID);
       authUrl.searchParams.set('response_type', 'code');
-      authUrl.searchParams.set('redirect_uri', this.env.STRAVA_REDIRECT_URI);
+      authUrl.searchParams.set('redirect_uri', `${currentDomain}/callback`);
       authUrl.searchParams.set('approval_prompt', 'auto');
       authUrl.searchParams.set('scope', REQUIRED_SCOPES);
       authUrl.searchParams.set('state', state);
@@ -59,6 +60,7 @@ export class AuthHandler {
   // GET /callback - Handle OAuth callback
   async handleCallback(c: Context) {
     try {
+      const currentDomain = this.getCurrentDomain(c);
       const code = c.req.query('code');
       const state = c.req.query('state');
       const error = c.req.query('error');
@@ -192,9 +194,8 @@ export class AuthHandler {
         expires_at: Math.floor(Date.now() / 1000) + (365 * 24 * 60 * 60) // 1 year
       }), { expirationTtl: 365 * 24 * 60 * 60 }); // 1 year
 
-      // Always redirect to stravamcp.com for better UX, fallback to workers.dev
-      const dashboardDomain = 'https://stravamcp.com';
-      return c.redirect(`${dashboardDomain}/dashboard?token=${personalMcpToken}`);
+      // Redirect back to the same domain that handled authentication
+      return c.redirect(`${currentDomain}/dashboard?token=${personalMcpToken}`);
     } catch (error: any) {
       console.error('OAuth callback error:', error);
       return c.html(`

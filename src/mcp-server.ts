@@ -652,9 +652,11 @@ export async function handleMCPOverSSE(c: Context) {
   return streamSSE(c, async (stream) => {
     let context: any = {
       baseUrl: (() => {
-        const host = c.req.header('host');
-        if (host?.includes('stravamcp.com')) return 'https://stravamcp.com';
-        return `https://${host || 'your-worker.workers.dev'}`;
+        try {
+          return new URL(c.req.url).origin;
+        } catch {
+          return 'https://strava-mcp-oauth.perez-jg22.workers.dev';
+        }
       })()
     };
 
