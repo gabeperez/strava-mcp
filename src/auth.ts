@@ -105,13 +105,25 @@ export class AuthHandler {
       }
 
       // Parse the state data
-      let stateInfo;
+      let stateInfo: {
+        pending: boolean;
+        sessionId: string | null;
+        created_at?: number;
+        origin?: string;
+      };
       try {
-        stateInfo = JSON.parse(storedStateData);
+        stateInfo = JSON.parse(storedStateData) as {
+          pending: boolean;
+          sessionId: string | null;
+          created_at?: number;
+          origin?: string;
+        };
       } catch (e) {
         // Handle legacy string states
         stateInfo = { pending: true, sessionId: null };
       }
+
+      const flowOrigin = stateInfo.origin || currentDomain;
       
       // Clean up the state
       await this.env.STRAVA_SESSIONS.delete(`state:${state}`);
