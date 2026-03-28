@@ -11,9 +11,13 @@
 			"id": "25472761404c4f98a37a8ece07550458"
 		}
 	],
-	"vars": {
-		"STRAVA_REDIRECT_URI": "https://your-worker-name.your-subdomain.workers.dev/callback"
-	},
+	// ⚠️  Set your secrets via: wrangler secret put STRAVA_CLIENT_ID
+	//                             wrangler secret put STRAVA_CLIENT_SECRET
+	//                             wrangler secret put STRAVA_REDIRECT_URI
+	//                             wrangler secret put STRAVA_WEBHOOK_VERIFY_TOKEN
+	//                             wrangler secret put POKE_API_KEY
+	// STRAVA_REDIRECT_URI should be: https://your-worker.workers.dev/callback
+	// (must match exactly what you registered on strava.com/settings/api)
 	"observability": {
 		"enabled": true
 	}
