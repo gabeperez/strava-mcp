@@ -412,7 +412,7 @@ app.get('/dashboard', async (c) => {
     }
     
     // Fetch user's Strava data + poke key status in parallel
-    const [profileResponse, statsResponse, activitiesResponse, pokeKey] = await Promise.all([
+    const [profileResponse, statsResponse, activitiesResponse, pokeKey, agentConnectionsRaw] = await Promise.all([
       fetch('https://www.strava.com/api/v3/athlete', {
         headers: { 'Authorization': `Bearer ${session.access_token}` }
       }),
@@ -422,8 +422,12 @@ app.get('/dashboard', async (c) => {
       fetch('https://www.strava.com/api/v3/athlete/activities?per_page=7', {
         headers: { 'Authorization': `Bearer ${session.access_token}` }
       }),
-      c.env.STRAVA_SESSIONS.get(`poke_key:${athlete_id}`)
+      c.env.STRAVA_SESSIONS.get(`poke_key:${athlete_id}`),
+      c.env.STRAVA_SESSIONS.get(`agent_connections:${athlete_id}`)
     ]);
+
+    const agentConnections: Record<string, boolean> = agentConnectionsRaw
+      ? JSON.parse(agentConnectionsRaw) : {};
     
     const profile = await profileResponse.json();
     const stats = await statsResponse.json();
@@ -498,7 +502,16 @@ app.get('/dashboard', async (c) => {
         ? (pokeKey.length > 9 ? pokeKey.slice(0, 5) + '••••••••' + pokeKey.slice(-4) : '••••••••••••')
         : '',
       poke_saved_class: pokeKey ? '' : 'hidden',
-      poke_form_class: pokeKey ? 'hidden' : ''
+      poke_form_class: pokeKey ? 'hidden' : '',
+      agent_claude: !!agentConnections.claude,
+      agent_cursor: !!agentConnections.cursor,
+      agent_windsurf: !!agentConnections.windsurf,
+      agent_cline: !!agentConnections.cline,
+      agent_continue: !!agentConnections.continue,
+      agent_manus: !!agentConnections.manus,
+      agent_openclaw: !!agentConnections.openclaw,
+      agent_poke: !!pokeKey,
+      mcp_token: token
     };
     
     // Render the beautiful dashboard HTML
@@ -703,6 +716,30 @@ app.get('/api/routes/:id/export/tcx', StravaApiHandlers.exportRouteTcx);
 
 // Clubs endpoints
 app.get('/api/clubs', StravaApiHandlers.getAthleteClubs);
+
+// Agent connections - save which agents a user has connected
+app.post('/settings/agent-connections', async (c) => {
+  try {
+    const { token, agent, connected } = await c.req.json();
+    if (!token || !agent) {
+      return c.json({ error: 'Missing token or agent' }, 400);
+    }
+    const personalData = await c.env.STRAVA_SESSIONS.get(`personal_mcp:${token}`);
+    if (!personalData) {
+      return c.json({ error: 'Invalid token' }, 401);
+    }
+    const { athlete_id } = JSON.parse(personalData);
+    const key = `agent_connections:${athlete_id}`;
+    const existing = await c.env.STRAVA_SESSIONS.get(key);
+    const connections: Record<string, boolean> = existing ? JSON.parse(existing) : {};
+    connections[agent] = !!connected;
+    await c.env.STRAVA_SESSIONS.put(key, JSON.stringify(connections));
+    return c.json({ success: true, connections });
+  } catch (err) {
+    console.error('agent-connections error:', err);
+    return c.json({ error: 'Internal error' }, 500);
+  }
+});
 
 // Error handling
 app.notFound((c) => {
