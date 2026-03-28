@@ -87,34 +87,22 @@ async function main() {
   fs.writeFileSync(wranglerPath, wranglerConfig);
   console.log('✅ wrangler.jsonc updated\n');
 
-  // Step 3: Get worker URL and update redirect URI
-  const workerName = 'strava-mcp-oauth';
-  const whoami = exec('wrangler whoami', true);
-  const accountMatch = whoami.match(/Account ID:\s+([a-f0-9]+)/i);
-  
-  let workerUrl;
-  if (accountMatch) {
-    // Try to get subdomain from account
-    workerUrl = `https://${workerName}.YOUR-SUBDOMAIN.workers.dev`;
-    console.log('⚠️  Please update STRAVA_REDIRECT_URI in wrangler.jsonc manually');
-    console.log(`   Replace YOUR-SUBDOMAIN with your actual Cloudflare subdomain\n`);
-  } else {
-    workerUrl = await question('Enter your worker URL (e.g., https://strava-mcp-oauth.myname.workers.dev): ');
-  }
+  // Step 3: Deploy first to get the worker URL, then set redirect URI as secret
+  console.log('\n🚀 Step 3: Deploying worker (first pass to get your URL)...');
+  const deployOutput = exec('npm run deploy');
 
-  // Update redirect URI if user provided URL
-  if (workerUrl && !workerUrl.includes('YOUR-SUBDOMAIN')) {
-    wranglerConfig = fs.readFileSync(wranglerPath, 'utf8');
-    wranglerConfig = wranglerConfig.replace(
-      /"STRAVA_REDIRECT_URI": "[^"]+"/,
-      `"STRAVA_REDIRECT_URI": "${workerUrl}/callback"`
-    );
-    fs.writeFileSync(wranglerPath, wranglerConfig);
-    console.log('✅ Redirect URI updated\n');
+  // Extract worker URL from deploy output
+  const urlMatch = deployOutput.match(/https:\/\/[a-z0-9-]+\.[a-z0-9-]+\.workers\.dev/);
+  let workerUrl = urlMatch ? urlMatch[0] : null;
+
+  if (!workerUrl) {
+    workerUrl = await question('\nEnter your worker URL (e.g., https://strava-mcp-oauth.myname.workers.dev): ');
+  } else {
+    console.log(`\n✅ Worker deployed at: ${workerUrl}\n`);
   }
 
   // Step 4: Set secrets
-  console.log('🔐 Step 3: Setting secrets...\n');
+  console.log('🔐 Step 4: Setting secrets...\n');
   
   const stravaClientId = await question('Enter your Strava Client ID: ');
   exec(`echo "${stravaClientId}" | wrangler secret put STRAVA_CLIENT_ID`, true);
@@ -122,7 +110,14 @@ async function main() {
   
   const stravaClientSecret = await question('Enter your Strava Client Secret: ');
   exec(`echo "${stravaClientSecret}" | wrangler secret put STRAVA_CLIENT_SECRET`, true);
-  console.log('✅ STRAVA_CLIENT_SECRET set\n');
+  console.log('✅ STRAVA_CLIENT_SECRET set');
+
+  // Set redirect URI — must match what's registered on strava.com/settings/api
+  const redirectUri = `${workerUrl}/callback`;
+  exec(`echo "${redirectUri}" | wrangler secret put STRAVA_REDIRECT_URI`, true);
+  console.log(`✅ STRAVA_REDIRECT_URI set to ${redirectUri}\n`);
+  console.log('⚠️  Make sure to register this exact callback URL in your Strava app settings:');
+  console.log(`   https://www.strava.com/settings/api  →  Authorization Callback Domain: ${new URL(workerUrl).hostname}\n`);
 
   // Optional: Webhook secrets
   const setupWebhooks = await question('Set up webhooks? (y/N): ');
@@ -138,8 +133,8 @@ async function main() {
     }
   }
 
-  // Step 5: Deploy
-  console.log('\n🚀 Step 4: Deploying worker...');
+  // Step 5: Re-deploy so secrets are live
+  console.log('\n🚀 Step 5: Redeploying with all secrets set...');
   exec('npm run deploy');
   
   console.log('\n✨ Setup complete! Your Strava MCP server is live!\n');

@@ -8,7 +8,9 @@
 	"kv_namespaces": [
 		{
 			"binding": "STRAVA_SESSIONS",
-			"id": "25472761404c4f98a37a8ece07550458"
+			// Run: wrangler kv:namespace create STRAVA_SESSIONS
+			// Then paste the id you get here (or run: node scripts/setup.js)
+			"id": "YOUR_KV_NAMESPACE_ID"
 		}
 	],
 	// ⚠️  Set your secrets via: wrangler secret put STRAVA_CLIENT_ID
