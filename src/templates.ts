@@ -1223,15 +1223,30 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
     <!-- AI Agent Connections -->
     <div class="max-w-6xl mx-auto px-4 mb-8">
         <div class="card rounded-2xl p-6">
-            <div class="flex items-center justify-between mb-5">
+            <div class="flex items-center justify-between mb-4">
                 <div>
                     <h3 class="font-bold text-base flex items-center">
                         <i class="fas fa-plug text-orange-400 mr-2"></i>
                         AI Agent Connections
                     </h3>
-                    <p class="text-xs text-gray-500 mt-0.5">Track which agents you've connected to your SportsMCP server.</p>
+                    <p class="text-xs text-gray-500 mt-0.5">Test or track which agents have connected to your SportsMCP server.</p>
                 </div>
             </div>
+
+            <!-- Last-seen banner (Option 2: real connection data) -->
+            <div class="{{last_conn_has_data}} flex items-center gap-3 bg-green-500/8 border border-green-500/20 rounded-xl px-4 py-2.5 mb-4">
+                <span class="w-2 h-2 bg-green-400 rounded-full flex-shrink-0 animate-pulse"></span>
+                <div class="flex-1 min-w-0">
+                    <span class="text-xs text-green-400 font-medium">Last connection: {{last_conn_display}}</span>
+                    <span class="text-xs text-gray-500 ml-2">via {{last_conn_agent}}</span>
+                    <span class="text-xs text-gray-600 ml-2">· {{last_conn_count}} total call(s)</span>
+                </div>
+            </div>
+            <div class="{{last_conn_no_data}} flex items-center gap-2 bg-gray-800/50 border border-gray-700/40 rounded-xl px-4 py-2.5 mb-4">
+                <i class="fas fa-circle-info text-gray-500 text-xs"></i>
+                <span class="text-xs text-gray-500">No connections recorded yet. Add your MCP URL to an agent and use it — it will appear here automatically.</span>
+            </div>
+
             <div class="space-y-2" id="agent-connections-list">
 
                 <!-- Claude Desktop -->
@@ -1261,10 +1276,12 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
     }
   }
 }</code></pre>
+                        <div id="conn-status-claude" class="hidden mb-2"></div>
                         <div class="flex gap-2">
                             <button onclick="copyConfig('claude-conn-config')" class="flex-1 text-xs bg-gray-700 hover:bg-gray-600 text-gray-200 py-1.5 rounded-lg transition-colors">Copy Config</button>
+                            <button onclick="testConnection('claude')" class="text-xs bg-blue-600 hover:bg-blue-500 text-white font-medium px-3 py-1.5 rounded-lg transition-colors" id="test-btn-claude">Test Connection</button>
                             <button onclick="setAgentConnection('claude', false)" class="{{agent_claude_on}} text-xs text-red-400 hover:text-red-300 border border-red-400/20 hover:border-red-400/40 px-3 py-1.5 rounded-lg transition-colors">Disconnect</button>
-                            <button onclick="setAgentConnection('claude', true)" class="{{agent_claude_off}} text-xs bg-orange-500 hover:bg-orange-600 text-white font-medium px-3 py-1.5 rounded-lg transition-colors">Mark as Connected</button>
+                            <button onclick="setAgentConnection('claude', true)" class="{{agent_claude_off}} text-xs border border-gray-600 hover:border-gray-400 text-gray-400 hover:text-gray-200 font-medium px-3 py-1.5 rounded-lg transition-colors">Mark Connected</button>
                         </div>
                     </div>
                 </div>
@@ -1295,10 +1312,12 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
     }
   }
 }</code></pre>
+                        <div id="conn-status-cursor" class="hidden mb-2"></div>
                         <div class="flex gap-2">
                             <button onclick="copyConfig('cursor-conn-config')" class="flex-1 text-xs bg-gray-700 hover:bg-gray-600 text-gray-200 py-1.5 rounded-lg transition-colors">Copy Config</button>
+                            <button onclick="testConnection('cursor')" class="text-xs bg-blue-600 hover:bg-blue-500 text-white font-medium px-3 py-1.5 rounded-lg transition-colors" id="test-btn-cursor">Test Connection</button>
                             <button onclick="setAgentConnection('cursor', false)" class="{{agent_cursor_on}} text-xs text-red-400 hover:text-red-300 border border-red-400/20 hover:border-red-400/40 px-3 py-1.5 rounded-lg transition-colors">Disconnect</button>
-                            <button onclick="setAgentConnection('cursor', true)" class="{{agent_cursor_off}} text-xs bg-orange-500 hover:bg-orange-600 text-white font-medium px-3 py-1.5 rounded-lg transition-colors">Mark as Connected</button>
+                            <button onclick="setAgentConnection('cursor', true)" class="{{agent_cursor_off}} text-xs border border-gray-600 hover:border-gray-400 text-gray-400 hover:text-gray-200 font-medium px-3 py-1.5 rounded-lg transition-colors">Mark Connected</button>
                         </div>
                     </div>
                 </div>
@@ -1330,10 +1349,12 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
     }
   }
 }</code></pre>
+                        <div id="conn-status-windsurf" class="hidden mb-2"></div>
                         <div class="flex gap-2">
                             <button onclick="copyConfig('windsurf-conn-config')" class="flex-1 text-xs bg-gray-700 hover:bg-gray-600 text-gray-200 py-1.5 rounded-lg transition-colors">Copy Config</button>
+                            <button onclick="testConnection('windsurf')" class="text-xs bg-blue-600 hover:bg-blue-500 text-white font-medium px-3 py-1.5 rounded-lg transition-colors" id="test-btn-windsurf">Test Connection</button>
                             <button onclick="setAgentConnection('windsurf', false)" class="{{agent_windsurf_on}} text-xs text-red-400 hover:text-red-300 border border-red-400/20 hover:border-red-400/40 px-3 py-1.5 rounded-lg transition-colors">Disconnect</button>
-                            <button onclick="setAgentConnection('windsurf', true)" class="{{agent_windsurf_off}} text-xs bg-orange-500 hover:bg-orange-600 text-white font-medium px-3 py-1.5 rounded-lg transition-colors">Mark as Connected</button>
+                            <button onclick="setAgentConnection('windsurf', true)" class="{{agent_windsurf_off}} text-xs border border-gray-600 hover:border-gray-400 text-gray-400 hover:text-gray-200 font-medium px-3 py-1.5 rounded-lg transition-colors">Mark Connected</button>
                         </div>
                     </div>
                 </div>
@@ -1365,10 +1386,12 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
     }
   }
 }</code></pre>
+                        <div id="conn-status-cline" class="hidden mb-2"></div>
                         <div class="flex gap-2">
                             <button onclick="copyConfig('cline-conn-config')" class="flex-1 text-xs bg-gray-700 hover:bg-gray-600 text-gray-200 py-1.5 rounded-lg transition-colors">Copy Config</button>
+                            <button onclick="testConnection('cline')" class="text-xs bg-blue-600 hover:bg-blue-500 text-white font-medium px-3 py-1.5 rounded-lg transition-colors" id="test-btn-cline">Test Connection</button>
                             <button onclick="setAgentConnection('cline', false)" class="{{agent_cline_on}} text-xs text-red-400 hover:text-red-300 border border-red-400/20 hover:border-red-400/40 px-3 py-1.5 rounded-lg transition-colors">Disconnect</button>
-                            <button onclick="setAgentConnection('cline', true)" class="{{agent_cline_off}} text-xs bg-orange-500 hover:bg-orange-600 text-white font-medium px-3 py-1.5 rounded-lg transition-colors">Mark as Connected</button>
+                            <button onclick="setAgentConnection('cline', true)" class="{{agent_cline_off}} text-xs border border-gray-600 hover:border-gray-400 text-gray-400 hover:text-gray-200 font-medium px-3 py-1.5 rounded-lg transition-colors">Mark Connected</button>
                         </div>
                     </div>
                 </div>
@@ -1402,10 +1425,12 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
     }]
   }
 }</code></pre>
+                        <div id="conn-status-continue" class="hidden mb-2"></div>
                         <div class="flex gap-2">
                             <button onclick="copyConfig('continue-conn-config')" class="flex-1 text-xs bg-gray-700 hover:bg-gray-600 text-gray-200 py-1.5 rounded-lg transition-colors">Copy Config</button>
+                            <button onclick="testConnection('continue')" class="text-xs bg-blue-600 hover:bg-blue-500 text-white font-medium px-3 py-1.5 rounded-lg transition-colors" id="test-btn-continue">Test Connection</button>
                             <button onclick="setAgentConnection('continue', false)" class="{{agent_continue_on}} text-xs text-red-400 hover:text-red-300 border border-red-400/20 hover:border-red-400/40 px-3 py-1.5 rounded-lg transition-colors">Disconnect</button>
-                            <button onclick="setAgentConnection('continue', true)" class="{{agent_continue_off}} text-xs bg-orange-500 hover:bg-orange-600 text-white font-medium px-3 py-1.5 rounded-lg transition-colors">Mark as Connected</button>
+                            <button onclick="setAgentConnection('continue', true)" class="{{agent_continue_off}} text-xs border border-gray-600 hover:border-gray-400 text-gray-400 hover:text-gray-200 font-medium px-3 py-1.5 rounded-lg transition-colors">Mark Connected</button>
                         </div>
                     </div>
                 </div>
@@ -1433,9 +1458,11 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                             <code class="flex-1 bg-gray-900 rounded-lg px-3 py-2 text-xs text-green-300 break-all" id="manus-url">{{mcp_url}}</code>
                             <button onclick="copyText('{{mcp_url}}')" class="shrink-0 text-xs bg-gray-700 hover:bg-gray-600 text-gray-200 px-3 py-2 rounded-lg transition-colors">Copy</button>
                         </div>
+                        <div id="conn-status-manus" class="hidden mb-2"></div>
                         <div class="flex gap-2">
+                            <button onclick="testConnection('manus')" class="flex-1 text-xs bg-blue-600 hover:bg-blue-500 text-white font-medium px-3 py-1.5 rounded-lg transition-colors" id="test-btn-manus">Test Connection</button>
                             <button onclick="setAgentConnection('manus', false)" class="{{agent_manus_on}} text-xs text-red-400 hover:text-red-300 border border-red-400/20 hover:border-red-400/40 px-3 py-1.5 rounded-lg transition-colors">Disconnect</button>
-                            <button onclick="setAgentConnection('manus', true)" class="{{agent_manus_off}} text-xs bg-orange-500 hover:bg-orange-600 text-white font-medium px-3 py-1.5 rounded-lg transition-colors">Mark as Connected</button>
+                            <button onclick="setAgentConnection('manus', true)" class="{{agent_manus_off}} text-xs border border-gray-600 hover:border-gray-400 text-gray-400 hover:text-gray-200 font-medium px-3 py-1.5 rounded-lg transition-colors">Mark Connected</button>
                         </div>
                     </div>
                 </div>
@@ -1463,9 +1490,11 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                             <code class="flex-1 bg-gray-900 rounded-lg px-3 py-2 text-xs text-green-300 break-all" id="openclaw-url">{{mcp_url}}</code>
                             <button onclick="copyText('{{mcp_url}}')" class="shrink-0 text-xs bg-gray-700 hover:bg-gray-600 text-gray-200 px-3 py-2 rounded-lg transition-colors">Copy</button>
                         </div>
+                        <div id="conn-status-openclaw" class="hidden mb-2"></div>
                         <div class="flex gap-2">
+                            <button onclick="testConnection('openclaw')" class="flex-1 text-xs bg-blue-600 hover:bg-blue-500 text-white font-medium px-3 py-1.5 rounded-lg transition-colors" id="test-btn-openclaw">Test Connection</button>
                             <button onclick="setAgentConnection('openclaw', false)" class="{{agent_openclaw_on}} text-xs text-red-400 hover:text-red-300 border border-red-400/20 hover:border-red-400/40 px-3 py-1.5 rounded-lg transition-colors">Disconnect</button>
-                            <button onclick="setAgentConnection('openclaw', true)" class="{{agent_openclaw_off}} text-xs bg-orange-500 hover:bg-orange-600 text-white font-medium px-3 py-1.5 rounded-lg transition-colors">Mark as Connected</button>
+                            <button onclick="setAgentConnection('openclaw', true)" class="{{agent_openclaw_off}} text-xs border border-gray-600 hover:border-gray-400 text-gray-400 hover:text-gray-200 font-medium px-3 py-1.5 rounded-lg transition-colors">Mark Connected</button>
                         </div>
                     </div>
                 </div>
@@ -1857,6 +1886,43 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
         window.cancelPokeEdit = function cancelPokeEdit() {
             _showPokeView('saved');
             document.getElementById('poke-status-bar').classList.add('hidden');
+        };
+
+        // Test the MCP endpoint from the browser (Option 1)
+        window.testConnection = async function testConnection(agent) {
+            const btn = document.getElementById('test-btn-' + agent);
+            const statusEl = document.getElementById('conn-status-' + agent);
+            if (!btn || !statusEl) return;
+
+            const mcpUrl = '{{mcp_url}}';
+            btn.textContent = 'Testing…';
+            btn.disabled = true;
+
+            function showStatus(ok, msg) {
+                statusEl.className = 'mb-2 text-xs rounded-lg px-3 py-2 ' +
+                    (ok ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400');
+                statusEl.textContent = msg;
+                statusEl.classList.remove('hidden');
+                btn.textContent = 'Test Connection';
+                btn.disabled = false;
+            }
+
+            try {
+                const res = await fetch(mcpUrl, { method: 'GET' });
+                if (!res.ok) { showStatus(false, '✗ Server returned ' + res.status); return; }
+                const data = await res.json();
+                if (data && data.result && data.result.authenticated === true) {
+                    showStatus(true, '✓ Server is responding and your token is valid!');
+                    // Auto-mark as connected after a successful test
+                    await window.setAgentConnection(agent, true);
+                } else if (data && data.result && data.result.authenticated === false) {
+                    showStatus(false, '✗ Server responded but token was not recognized.');
+                } else {
+                    showStatus(false, '✗ Unexpected response from server.');
+                }
+            } catch (e) {
+                showStatus(false, '✗ Could not reach the server. Check your network.');
+            }
         };
 
         // AI Agent Connections card — expand/collapse rows

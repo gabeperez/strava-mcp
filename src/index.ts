@@ -412,7 +412,7 @@ app.get('/dashboard', async (c) => {
     }
     
     // Fetch user's Strava data + poke key status in parallel
-    const [profileResponse, statsResponse, activitiesResponse, pokeKey, agentConnectionsRaw] = await Promise.all([
+    const [profileResponse, statsResponse, activitiesResponse, pokeKey, agentConnectionsRaw, lastConnRaw] = await Promise.all([
       fetch('https://www.strava.com/api/v3/athlete', {
         headers: { 'Authorization': `Bearer ${session.access_token}` }
       }),
@@ -423,8 +423,41 @@ app.get('/dashboard', async (c) => {
         headers: { 'Authorization': `Bearer ${session.access_token}` }
       }),
       c.env.STRAVA_SESSIONS.get(`poke_key:${athlete_id}`),
-      c.env.STRAVA_SESSIONS.get(`agent_connections:${athlete_id}`)
+      c.env.STRAVA_SESSIONS.get(`agent_connections:${athlete_id}`),
+      c.env.STRAVA_SESSIONS.get(`agent_lastconn:${athlete_id}`)
     ]);
+
+    // Parse last-connection info for "last seen" display
+    let lastConnDisplay = '';
+    let lastConnAgent = '';
+    let lastConnCount = 0;
+    if (lastConnRaw) {
+      try {
+        const lc = JSON.parse(lastConnRaw);
+        lastConnCount = lc.count || 0;
+        // Parse User-Agent into a friendly name
+        const ua: string = lc.ua || '';
+        if (/claude/i.test(ua)) lastConnAgent = 'Claude Desktop';
+        else if (/cursor/i.test(ua)) lastConnAgent = 'Cursor';
+        else if (/windsurf/i.test(ua)) lastConnAgent = 'Windsurf';
+        else if (/cline/i.test(ua)) lastConnAgent = 'Cline';
+        else if (/continue/i.test(ua)) lastConnAgent = 'Continue.dev';
+        else if (/manus/i.test(ua)) lastConnAgent = 'Manus';
+        else if (/openclaw/i.test(ua)) lastConnAgent = 'OpenClaw';
+        else if (/mcp-remote/i.test(ua)) lastConnAgent = 'Claude Desktop';
+        else if (/node/i.test(ua)) lastConnAgent = 'Node.js client';
+        else lastConnAgent = ua.split('/')[0] || 'Unknown client';
+        // Format time-ago
+        const diffMs = Date.now() - (lc.ts || 0);
+        const diffMin = Math.floor(diffMs / 60000);
+        const diffHr = Math.floor(diffMin / 60);
+        const diffDay = Math.floor(diffHr / 24);
+        if (diffMin < 2) lastConnDisplay = 'just now';
+        else if (diffMin < 60) lastConnDisplay = `${diffMin} min ago`;
+        else if (diffHr < 24) lastConnDisplay = `${diffHr}h ago`;
+        else lastConnDisplay = `${diffDay}d ago`;
+      } catch (_) {}
+    }
 
     const agentConnections: Record<string, boolean> = agentConnectionsRaw
       ? JSON.parse(agentConnectionsRaw) : {};
@@ -505,6 +538,11 @@ app.get('/dashboard', async (c) => {
       poke_form_class: pokeKey ? 'hidden' : '',
       agent_poke: !!pokeKey,
       mcp_token: token,
+      last_conn_display: lastConnDisplay,
+      last_conn_agent: lastConnAgent,
+      last_conn_count: lastConnCount,
+      last_conn_has_data: lastConnDisplay ? '' : 'hidden',
+      last_conn_no_data: lastConnDisplay ? 'hidden' : '',
       // Per-agent CSS class helpers ('' = visible, 'hidden' = hidden)
       // _on  classes apply when agent IS connected
       // _off classes apply when agent is NOT connected
@@ -601,6 +639,19 @@ app.post('/mcp', async (c) => {
         if (personalData) {
           const tokenInfo = JSON.parse(personalData);
           authenticatedAthleteId = tokenInfo.athlete_id;
+
+          // Option 2: log this connection for "last seen" dashboard display
+          try {
+            const ua = c.req.header('User-Agent') || 'Unknown';
+            const connKey = `agent_lastconn:${authenticatedAthleteId}`;
+            const existing = await env.STRAVA_SESSIONS.get(connKey);
+            const prev = existing ? JSON.parse(existing) : { count: 0 };
+            await env.STRAVA_SESSIONS.put(connKey, JSON.stringify({
+              ts: Date.now(),
+              ua,
+              count: (prev.count || 0) + 1
+            }), { expirationTtl: 60 * 60 * 24 * 30 }); // 30-day TTL
+          } catch (_) { /* non-blocking — ignore errors */ }
         }
       } catch (error) {
         console.error('Personal token validation error:', error);
