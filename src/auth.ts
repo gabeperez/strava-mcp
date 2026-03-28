@@ -38,6 +38,7 @@ export class AuthHandler {
       const stateData = { 
         pending: true,
         sessionId: sessionId || null,
+        origin: currentDomain,
         created_at: Math.floor(Date.now() / 1000)
       };
       await this.env.STRAVA_SESSIONS.put(`state:${state}`, JSON.stringify(stateData), { expirationTtl: 600 }); // 10 min expiry
@@ -206,8 +207,8 @@ export class AuthHandler {
         expires_at: Math.floor(Date.now() / 1000) + (365 * 24 * 60 * 60) // 1 year
       }), { expirationTtl: 365 * 24 * 60 * 60 }); // 1 year
 
-      // Redirect back to the same domain that handled authentication
-      return c.redirect(`${currentDomain}/dashboard?token=${personalMcpToken}`);
+      // Redirect back to the original tenant domain that started the flow
+      return c.redirect(`${flowOrigin}/dashboard?token=${personalMcpToken}`);
     } catch (error: any) {
       console.error('OAuth callback error:', error);
       return c.html(`
