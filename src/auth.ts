@@ -32,11 +32,13 @@ export class AuthHandler {
       const sessionId = c.req.query('session'); // Get session ID if provided
       const state = generateState();
       const currentDomain = this.getCurrentDomain(c);
-      
+
       // Store state in a temporary KV entry for CSRF protection
-      const stateData = { 
+      // Include the origin domain so the callback can redirect back here
+      const stateData = {
         pending: true,
         sessionId: sessionId || null,
+        originDomain: currentDomain,
         created_at: Math.floor(Date.now() / 1000)
       };
       await this.env.STRAVA_SESSIONS.put(`state:${state}`, JSON.stringify(stateData), { expirationTtl: 600 }); // 10 min expiry
@@ -44,6 +46,7 @@ export class AuthHandler {
       const authUrl = new URL('https://www.strava.com/oauth/authorize');
       authUrl.searchParams.set('client_id', this.env.STRAVA_CLIENT_ID);
       authUrl.searchParams.set('response_type', 'code');
+      // Always use the registered callback URI so it matches the Strava app config
       authUrl.searchParams.set('redirect_uri', this.env.STRAVA_REDIRECT_URI);
       authUrl.searchParams.set('approval_prompt', 'auto');
       authUrl.searchParams.set('scope', REQUIRED_SCOPES);
@@ -192,8 +195,9 @@ export class AuthHandler {
         expires_at: Math.floor(Date.now() / 1000) + (365 * 24 * 60 * 60) // 1 year
       }), { expirationTtl: 365 * 24 * 60 * 60 }); // 1 year
 
-      // Always redirect to stravamcp.com for better UX, fallback to workers.dev
-      const dashboardDomain = 'https://stravamcp.com';
+      // Redirect back to whichever domain the user started from (stored in state)
+      // This lets both stravamcp.com and sportmcp.mainichi.fit work seamlessly
+      const dashboardDomain = stateInfo.originDomain || this.getCurrentDomain(c);
       return c.redirect(`${dashboardDomain}/dashboard?token=${personalMcpToken}`);
     } catch (error: any) {
       console.error('OAuth callback error:', error);

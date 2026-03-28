@@ -12,7 +12,7 @@
 		}
 	],
 	"vars": {
-		"STRAVA_REDIRECT_URI": "https://stravamcp.com/callback"
+		"STRAVA_REDIRECT_URI": "https://sportmcp.mainichi.fit/callback"
 	},
 	"observability": {
 		"enabled": true
