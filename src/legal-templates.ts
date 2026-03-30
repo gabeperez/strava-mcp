@@ -249,7 +249,7 @@ export const ABOUT_TEMPLATE = `<!DOCTYPE html>
                     <div class="space-y-3 text-gray-300">
                         <div class="flex items-center">
                             <i class="fas fa-envelope text-orange-400 mr-3"></i>
-                            <a href="mailto:help@stravamcp.com" class="hover:text-orange-400 transition-colors">help@stravamcp.com</a>
+                            <a href="mailto:hello@mainichi.fit" class="hover:text-orange-400 transition-colors">hello@mainichi.fit</a>
                         </div>
                         <div class="flex items-center">
                             <i class="fas fa-globe text-orange-400 mr-3"></i>
@@ -634,7 +634,7 @@ export const SUPPORT_TEMPLATE = `<!DOCTYPE html>
                             </div>
                             <div>
                                 <h4 class="font-semibold">Email Support</h4>
-                                <p class="text-gray-400">help@stravamcp.com</p>
+                                <p class="text-gray-400">hello@mainichi.fit</p>
                                 <p class="text-sm text-gray-500">Response within 24 hours</p>
                             </div>
                         </div>
@@ -680,7 +680,7 @@ export const SUPPORT_TEMPLATE = `<!DOCTYPE html>
                     </div>
                     
                     <div class="mt-6">
-                        <a href="mailto:help@stravamcp.com" class="inline-flex items-center bg-purple-500 hover:bg-purple-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
+                        <a href="mailto:hello@mainichi.fit" class="inline-flex items-center bg-purple-500 hover:bg-purple-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
                             <i class="fas fa-paper-plane mr-2"></i>
                             Send Support Email
                         </a>
@@ -772,7 +772,7 @@ export const PRIVACY_TEMPLATE = `<!DOCTYPE html>
                     </p>
                     <p>
                         <strong>Contact Information:</strong><br>
-                        Email: <a href="mailto:help@stravamcp.com" class="text-orange-400 hover:text-orange-300">help@stravamcp.com</a><br>
+                        Email: <a href="mailto:hello@mainichi.fit" class="text-orange-400 hover:text-orange-300">hello@mainichi.fit</a><br>
                         Website: <a href="https://stravamcp.com" class="text-orange-400 hover:text-orange-300">https://stravamcp.com</a>
                     </p>
                 </div>
@@ -991,7 +991,7 @@ export const PRIVACY_TEMPLATE = `<!DOCTYPE html>
                 </div>
                 <div class="mt-6 p-4 bg-blue-900/30 border border-blue-400 rounded-lg">
                     <p class="text-blue-300">
-                        <strong>To exercise your rights:</strong> Email us at <a href="mailto:help@stravamcp.com" class="text-blue-400 hover:text-blue-300">help@stravamcp.com</a> with your request. We'll respond within 30 days.
+                        <strong>To exercise your rights:</strong> Email us at <a href="mailto:hello@mainichi.fit" class="text-blue-400 hover:text-blue-300">hello@mainichi.fit</a> with your request. We'll respond within 30 days.
                     </p>
                 </div>
             </div>
@@ -1054,7 +1054,7 @@ export const PRIVACY_TEMPLATE = `<!DOCTYPE html>
                             If you have questions about this Privacy Policy or how we handle your data, please contact us:
                         </p>
                         <div class="space-y-2 text-gray-300">
-                            <p><strong>Email:</strong> <a href="mailto:help@stravamcp.com" class="text-orange-400 hover:text-orange-300">help@stravamcp.com</a></p>
+                            <p><strong>Email:</strong> <a href="mailto:hello@mainichi.fit" class="text-orange-400 hover:text-orange-300">hello@mainichi.fit</a></p>
                             <p><strong>Subject:</strong> Privacy Policy Question</p>
                             <p><strong>Response Time:</strong> Within 48 hours</p>
                         </div>
@@ -1065,7 +1065,7 @@ export const PRIVACY_TEMPLATE = `<!DOCTYPE html>
                             To exercise your privacy rights or request data deletion:
                         </p>
                         <div class="space-y-2 text-gray-300">
-                            <p><strong>Email:</strong> <a href="mailto:help@stravamcp.com" class="text-orange-400 hover:text-orange-300">help@stravamcp.com</a></p>
+                            <p><strong>Email:</strong> <a href="mailto:hello@mainichi.fit" class="text-orange-400 hover:text-orange-300">hello@mainichi.fit</a></p>
                             <p><strong>Subject:</strong> Data Request - [Your Request Type]</p>
                             <p><strong>Response Time:</strong> Within 30 days</p>
                         </div>
@@ -1161,7 +1161,7 @@ export const TERMS_TEMPLATE = `<!DOCTYPE html>
                     <div class="bg-blue-900/30 border border-blue-400 rounded-lg p-4">
                         <p class="text-blue-300">
                             <strong>Service Provider:</strong> SportsMCP<br>
-                            <strong>Contact:</strong> <a href="mailto:help@stravamcp.com" class="text-blue-400 hover:text-blue-300">help@stravamcp.com</a>
+                            <strong>Contact:</strong> <a href="mailto:hello@mainichi.fit" class="text-blue-400 hover:text-blue-300">hello@mainichi.fit</a>
                         </p>
                     </div>
                 </div>
@@ -1453,7 +1453,7 @@ export const TERMS_TEMPLATE = `<!DOCTYPE html>
                             Before pursuing legal action, we encourage you to contact us to resolve any disputes amicably. For formal disputes:
                         </p>
                         <ul class="space-y-2">
-                            <li>• First contact our support team at <a href="mailto:help@stravamcp.com" class="text-orange-400 hover:text-orange-300">help@stravamcp.com</a></li>
+                            <li>• First contact our support team at <a href="mailto:hello@mainichi.fit" class="text-orange-400 hover:text-orange-300">hello@mainichi.fit</a></li>
                             <li>• We'll work in good faith to resolve the issue within 60 days</li>
                             <li>• If unresolved, disputes may be subject to binding arbitration</li>
                         </ul>
@@ -1481,7 +1481,7 @@ export const TERMS_TEMPLATE = `<!DOCTYPE html>
                             For questions about these Terms of Service:
                         </p>
                         <div class="space-y-2 text-gray-300">
-                            <p><strong>Email:</strong> <a href="mailto:help@stravamcp.com" class="text-orange-400 hover:text-orange-300">help@stravamcp.com</a></p>
+                            <p><strong>Email:</strong> <a href="mailto:hello@mainichi.fit" class="text-orange-400 hover:text-orange-300">hello@mainichi.fit</a></p>
                             <p><strong>Subject:</strong> Terms of Service Question</p>
                             <p><strong>Website:</strong> <a href="https://stravamcp.com" class="text-orange-400 hover:text-orange-300">stravamcp.com</a></p>
                         </div>
@@ -1493,7 +1493,7 @@ export const TERMS_TEMPLATE = `<!DOCTYPE html>
                         </p>
                         <div class="space-y-2 text-gray-300">
                             <p><strong>Support Center:</strong> <a href="/support" class="text-orange-400 hover:text-orange-300">/support</a></p>
-                            <p><strong>Email:</strong> <a href="mailto:help@stravamcp.com" class="text-orange-400 hover:text-orange-300">help@stravamcp.com</a></p>
+                            <p><strong>Email:</strong> <a href="mailto:hello@mainichi.fit" class="text-orange-400 hover:text-orange-300">hello@mainichi.fit</a></p>
                             <p><strong>Response Time:</strong> Within 24 hours</p>
                         </div>
                     </div>
