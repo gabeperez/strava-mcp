@@ -7,6 +7,7 @@ import { SportsMCPServer, handleMCPOverSSE } from './mcp-server';
 import { TemplateEngine, LANDING_TEMPLATE, DASHBOARD_TEMPLATE } from './templates';
 import { ABOUT_TEMPLATE, SUPPORT_TEMPLATE, PRIVACY_TEMPLATE, TERMS_TEMPLATE } from './legal-templates';
 import { StravaWebhookHandler } from './webhook';
+import { sendNotification, sendNotificationToAll, NotificationConfig, NotificationProvider, PROVIDER_INFO, maskKey } from './notifications';
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -183,10 +184,49 @@ app.post('/webhook', async (c) => {
   return webhookHandler.handleEvent(c, c.executionCtx);
 });
 
-// Test endpoint for Poke notifications
-app.post('/test-poke', async (c) => {
+// Test endpoint for notifications (supports all providers)
+// Kept as /test-poke for backward compat, also available at /test-notification
+// ---- Helpers to load / persist the notification configs array ----
+async function loadNotificationConfigs(env: Env, athleteId: number): Promise<NotificationConfig[]> {
+  // 1. New multi-provider array
+  const multiJson = await env.STRAVA_SESSIONS.get(`notification_configs:${athleteId}`);
+  if (multiJson) {
+    const parsed = JSON.parse(multiJson);
+    if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+  }
+  // 2. Single-config fallback
+  const singleJson = await env.STRAVA_SESSIONS.get(`notification_config:${athleteId}`);
+  if (singleJson) {
+    const cfg = JSON.parse(singleJson) as NotificationConfig;
+    return [cfg];
+  }
+  // 3. Legacy poke_key
+  const pokeKey = await env.STRAVA_SESSIONS.get(`poke_key:${athleteId}`);
+  if (pokeKey) return [{ provider: 'poke' as NotificationProvider, api_key: pokeKey }];
+  return [];
+}
+
+async function saveNotificationConfigs(env: Env, athleteId: number, configs: NotificationConfig[]): Promise<void> {
+  await env.STRAVA_SESSIONS.put(`notification_configs:${athleteId}`, JSON.stringify(configs));
+  // Keep legacy keys in sync for backward compat
+  const pokeConfig = configs.find(c => c.provider === 'poke');
+  if (pokeConfig) {
+    await env.STRAVA_SESSIONS.put(`poke_key:${athleteId}`, pokeConfig.api_key);
+  } else {
+    await env.STRAVA_SESSIONS.delete(`poke_key:${athleteId}`);
+  }
+  // Keep single-config in sync (first entry) for backward compat
+  if (configs.length > 0) {
+    await env.STRAVA_SESSIONS.put(`notification_config:${athleteId}`, JSON.stringify(configs[0]));
+  } else {
+    await env.STRAVA_SESSIONS.delete(`notification_config:${athleteId}`);
+  }
+}
+
+// ---- Test notification endpoint ----
+async function handleTestNotification(c: any) {
   try {
-    let pokeApiKey: string | null = null;
+    const notificationConfigs: NotificationConfig[] = [];
     let accessToken: string | null = null;
     let athleteFirstName = 'athlete';
 
@@ -195,10 +235,8 @@ app.post('/test-poke', async (c) => {
       const personalData = await c.env.STRAVA_SESSIONS.get(`personal_mcp:${token}`);
       if (personalData) {
         const { athlete_id } = JSON.parse(personalData);
-        const userKey = await c.env.STRAVA_SESSIONS.get(`poke_key:${athlete_id}`);
-        if (userKey) pokeApiKey = userKey;
+        notificationConfigs.push(...await loadNotificationConfigs(c.env, athlete_id));
 
-        // Fetch session to get Strava access token
         const sessionData = await c.env.STRAVA_SESSIONS.get(`user:${athlete_id}`);
         if (sessionData) {
           const session = JSON.parse(sessionData);
@@ -207,10 +245,12 @@ app.post('/test-poke', async (c) => {
         }
       }
     }
-    if (!pokeApiKey) pokeApiKey = c.env.POKE_API_KEY || null;
+    if (notificationConfigs.length === 0 && c.env.POKE_API_KEY) {
+      notificationConfigs.push({ provider: 'poke', api_key: c.env.POKE_API_KEY });
+    }
 
-    if (!pokeApiKey) {
-      return c.json({ error: 'No Poke API key saved. Add your key first.' }, 400);
+    if (notificationConfigs.length === 0) {
+      return c.json({ error: 'No notification provider configured. Add your key first.' }, 400);
     }
 
     const now = new Date().toLocaleString('en-US', {
@@ -272,38 +312,43 @@ app.post('/test-poke', async (c) => {
       }
     }
 
+    const providerNames = notificationConfigs.map(c => PROVIDER_INFO[c.provider]?.name || c.provider);
     const fallback = `\n\nSportsMCP gives your AI access to your full Strava history: recent activities, lap splits, heart rate zones, segment efforts, gear mileage, clubs, and more.\n\nPlease reply to confirm you received this and that the SportsMCP + Strava connection is active on your end.`;
     const testMessage = `👋 Test ping from SportsMCP — your Strava data is now connected to your AI assistant.${recentActivityBlock || fallback}
 
 — Sent ${now}`;
 
-    const response = await fetch('https://poke.com/api/v1/inbound/api-message', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${pokeApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ message: testMessage }),
-    });
+    const results = await sendNotificationToAll(testMessage, notificationConfigs);
+    const successes = results.filter(r => r.result.success);
+    const failures = results.filter(r => !r.result.success);
 
-    if (!response.ok) {
-      const errorText = await response.text();
+    if (successes.length === 0) {
       return c.json({
         success: false,
-        error: `Poke returned ${response.status} — double-check your API key.`,
-        details: errorText
-      }, response.status);
+        error: failures.map(f => `${f.provider}: ${f.result.error}`).join('; '),
+      }, 502);
     }
 
-    const data = await response.json();
-    return c.json({ success: true, message: 'Test ping sent! Check your messages 📱', poke_response: data });
+    const successNames = successes.map(s => PROVIDER_INFO[s.provider]?.name || s.provider).join(', ');
+    const msg = failures.length > 0
+      ? `Test ping sent via ${successNames}! (${failures.length} failed) 📱`
+      : `Test ping sent via ${successNames}! Check your messages 📱`;
+
+    return c.json({
+      success: true,
+      message: msg,
+      providers: results.map(r => ({ provider: r.provider, success: r.result.success, error: r.result.error })),
+    });
   } catch (error: any) {
     return c.json({ success: false, error: error.message }, 500);
   }
-});
+}
 
-// Get Poke key status for dashboard display
-app.get('/settings/poke-key', async (c) => {
+app.post('/test-poke', handleTestNotification);
+app.post('/test-notification', handleTestNotification);
+
+// ---- GET notification config ----
+async function handleGetNotificationConfig(c: any) {
   try {
     const token = c.req.query('token');
     if (!token) return c.json({ error: 'token required' }, 400);
@@ -312,37 +357,63 @@ app.get('/settings/poke-key', async (c) => {
     if (!personalData) return c.json({ error: 'Invalid token' }, 401);
 
     const { athlete_id } = JSON.parse(personalData);
-    const key = await c.env.STRAVA_SESSIONS.get(`poke_key:${athlete_id}`);
+    const configs = await loadNotificationConfigs(c.env, athlete_id);
 
-    if (!key) return c.json({ hasKey: false });
+    if (configs.length === 0) return c.json({ hasKey: false, providers: [] });
 
-    // Return a masked version — show first 5 chars + last 4 chars
-    const masked = key.length > 9
-      ? key.slice(0, 5) + '••••••••' + key.slice(-4)
-      : '••••••••••••';
-
-    return c.json({ hasKey: true, maskedKey: masked });
+    return c.json({
+      hasKey: true,
+      providers: configs.map(cfg => ({
+        provider: cfg.provider,
+        maskedKey: maskKey(cfg.api_key),
+        hasEndpoint: !!cfg.endpoint,
+        providerName: PROVIDER_INFO[cfg.provider]?.name || cfg.provider,
+      })),
+      // Backward compat: first provider
+      provider: configs[0].provider,
+      maskedKey: maskKey(configs[0].api_key),
+      providerName: PROVIDER_INFO[configs[0].provider]?.name || configs[0].provider,
+    });
   } catch (err: any) {
     return c.json({ error: err.message }, 500);
   }
-});
+}
 
-// Delete saved Poke key
-app.delete('/settings/poke-key', async (c) => {
+app.get('/settings/poke-key', handleGetNotificationConfig);
+app.get('/settings/notification-config', handleGetNotificationConfig);
+
+// ---- DELETE notification config ----
+// Body: { token, provider? } — if provider given, remove just that one; otherwise remove all
+async function handleDeleteNotificationConfig(c: any) {
   try {
-    const { token } = await c.req.json() as { token: string };
-    if (!token) return c.json({ error: 'token required' }, 400);
+    const body = await c.req.json() as { token: string; provider?: NotificationProvider };
+    if (!body.token) return c.json({ error: 'token required' }, 400);
 
-    const personalData = await c.env.STRAVA_SESSIONS.get(`personal_mcp:${token}`);
+    const personalData = await c.env.STRAVA_SESSIONS.get(`personal_mcp:${body.token}`);
     if (!personalData) return c.json({ error: 'Invalid token' }, 401);
 
     const { athlete_id } = JSON.parse(personalData);
-    await c.env.STRAVA_SESSIONS.delete(`poke_key:${athlete_id}`);
-    return c.json({ success: true });
+
+    if (body.provider) {
+      // Remove just this provider from the array
+      const configs = await loadNotificationConfigs(c.env, athlete_id);
+      const filtered = configs.filter(cfg => cfg.provider !== body.provider);
+      await saveNotificationConfigs(c.env, athlete_id, filtered);
+      return c.json({ success: true, remaining: filtered.length });
+    } else {
+      // Remove everything
+      await c.env.STRAVA_SESSIONS.delete(`notification_configs:${athlete_id}`);
+      await c.env.STRAVA_SESSIONS.delete(`notification_config:${athlete_id}`);
+      await c.env.STRAVA_SESSIONS.delete(`poke_key:${athlete_id}`);
+      return c.json({ success: true, remaining: 0 });
+    }
   } catch (err: any) {
     return c.json({ error: err.message }, 500);
   }
-});
+}
+
+app.delete('/settings/poke-key', handleDeleteNotificationConfig);
+app.delete('/settings/notification-config', handleDeleteNotificationConfig);
 
 // Legal and informational pages  
 app.get('/about', (c) => {
@@ -365,29 +436,66 @@ app.get('/terms', (c) => {
   return c.html(html);
 });
 
-// Per-user Poke API key endpoint
-app.post('/settings/poke-key', async (c) => {
+// ---- POST: Add / update a provider in the configs array ----
+// POST body: { token, provider?, poke_api_key OR api_key, endpoint? }
+// Adds to the array; if the same provider already exists, it's updated.
+async function handleSaveNotificationConfig(c: any) {
   try {
-    const { token, poke_api_key } = await c.req.json() as { token: string; poke_api_key: string };
-    if (!token || !poke_api_key) {
-      return c.json({ error: 'token and poke_api_key are required' }, 400);
+    const body = await c.req.json() as {
+      token: string;
+      provider?: NotificationProvider;
+      api_key?: string;
+      poke_api_key?: string;
+      endpoint?: string;
+    };
+    const token = body.token;
+    const provider: NotificationProvider = body.provider || 'poke';
+    const apiKey = (body.api_key || body.poke_api_key || '').trim();
+    const endpoint = body.endpoint?.trim();
+
+    if (!token || !apiKey) {
+      return c.json({ error: 'token and api_key are required' }, 400);
+    }
+    if (!PROVIDER_INFO[provider]) {
+      return c.json({ error: `Unknown provider: ${provider}. Supported: ${Object.keys(PROVIDER_INFO).join(', ')}` }, 400);
+    }
+    if (provider === 'openclaw' && !endpoint) {
+      return c.json({ error: 'OpenClaw requires a gateway endpoint URL' }, 400);
     }
 
-    // Validate the MCP token and resolve athlete ID
     const personalData = await c.env.STRAVA_SESSIONS.get(`personal_mcp:${token}`);
     if (!personalData) {
       return c.json({ error: 'Invalid or expired token' }, 401);
     }
     const { athlete_id } = JSON.parse(personalData);
 
-    // Store per-user Poke key (no expiry — persists until deauth)
-    await c.env.STRAVA_SESSIONS.put(`poke_key:${athlete_id}`, poke_api_key.trim());
+    // Load existing configs, upsert this provider
+    const configs = await loadNotificationConfigs(c.env, athlete_id);
+    const newConfig: NotificationConfig = { provider, api_key: apiKey };
+    if (endpoint) newConfig.endpoint = endpoint;
 
-    return c.json({ success: true });
+    const idx = configs.findIndex(cfg => cfg.provider === provider);
+    if (idx >= 0) {
+      configs[idx] = newConfig; // update existing
+    } else {
+      configs.push(newConfig); // add new
+    }
+
+    await saveNotificationConfigs(c.env, athlete_id, configs);
+
+    return c.json({
+      success: true,
+      provider,
+      totalProviders: configs.length,
+      providers: configs.map(cfg => cfg.provider),
+    });
   } catch (err: any) {
     return c.json({ error: err.message }, 500);
   }
-});
+}
+
+app.post('/settings/poke-key', handleSaveNotificationConfig);
+app.post('/settings/notification-config', handleSaveNotificationConfig);
 
 // Dashboard endpoint
 app.get('/dashboard', async (c) => {
@@ -411,8 +519,8 @@ app.get('/dashboard', async (c) => {
       return c.redirect('/auth');
     }
     
-    // Fetch user's Strava data + poke key status in parallel
-    const [profileResponse, statsResponse, activitiesResponse, pokeKey, agentConnectionsRaw, lastConnRaw] = await Promise.all([
+    // Fetch user's Strava data + agent connection info in parallel
+    const [profileResponse, statsResponse, activitiesResponse, agentConnectionsRaw, lastConnRaw] = await Promise.all([
       fetch('https://www.strava.com/api/v3/athlete', {
         headers: { 'Authorization': `Bearer ${session.access_token}` }
       }),
@@ -422,10 +530,12 @@ app.get('/dashboard', async (c) => {
       fetch('https://www.strava.com/api/v3/athlete/activities?per_page=7', {
         headers: { 'Authorization': `Bearer ${session.access_token}` }
       }),
-      c.env.STRAVA_SESSIONS.get(`poke_key:${athlete_id}`),
       c.env.STRAVA_SESSIONS.get(`agent_connections:${athlete_id}`),
       c.env.STRAVA_SESSIONS.get(`agent_lastconn:${athlete_id}`)
     ]);
+
+    // Load all configured notification providers
+    const activeConfigs = await loadNotificationConfigs(c.env, athlete_id);
 
     // Parse last-connection info for "last seen" display
     let lastConnDisplay = '';
@@ -530,22 +640,23 @@ app.get('/dashboard', async (c) => {
         weekly_average: Math.round(totalActivities / 4 * 10) / 10,
         longest_activity: activitiesArray.length > 0 ? Math.round(Math.max(...activitiesArray.map((a: any) => a.distance)) / 1000 * 10) / 10 : 0
       },
-      poke_key_saved: !!pokeKey,
-      poke_masked_key: pokeKey
-        ? (pokeKey.length > 9 ? pokeKey.slice(0, 5) + '••••••••' + pokeKey.slice(-4) : '••••••••••••')
+      poke_key_saved: activeConfigs.length > 0,
+      poke_masked_key: activeConfigs.length > 0 ? maskKey(activeConfigs[0].api_key) : '',
+      poke_saved_class: activeConfigs.length > 0 ? '' : 'hidden',
+      poke_form_class: activeConfigs.length > 0 ? 'hidden' : '',
+      notification_provider: activeConfigs.length > 0 ? activeConfigs[0].provider : '',
+      notification_provider_name: activeConfigs.length > 0
+        ? activeConfigs.map(c => PROVIDER_INFO[c.provider]?.name || c.provider).join(', ')
         : '',
-      poke_saved_class: pokeKey ? '' : 'hidden',
-      poke_form_class: pokeKey ? 'hidden' : '',
-      agent_poke: !!pokeKey,
+      active_providers_json: JSON.stringify(activeConfigs.map(c => c.provider)),
+      providers_json: JSON.stringify(PROVIDER_INFO),
+      agent_poke: activeConfigs.some(c => c.provider === 'poke'),
       mcp_token: token,
       last_conn_display: lastConnDisplay,
       last_conn_agent: lastConnAgent,
       last_conn_count: lastConnCount,
       last_conn_has_data: lastConnDisplay ? '' : 'hidden',
       last_conn_no_data: lastConnDisplay ? 'hidden' : '',
-      // Per-agent CSS class helpers ('' = visible, 'hidden' = hidden)
-      // _on  classes apply when agent IS connected
-      // _off classes apply when agent is NOT connected
       agent_claude_on:    agentConnections.claude    ? '' : 'hidden',
       agent_claude_off:   agentConnections.claude    ? 'hidden' : '',
       agent_cursor_on:    agentConnections.cursor    ? '' : 'hidden',
@@ -560,8 +671,8 @@ app.get('/dashboard', async (c) => {
       agent_manus_off:    agentConnections.manus     ? 'hidden' : '',
       agent_openclaw_on:  agentConnections.openclaw  ? '' : 'hidden',
       agent_openclaw_off: agentConnections.openclaw  ? 'hidden' : '',
-      agent_poke_on:      !!pokeKey                  ? '' : 'hidden',
-      agent_poke_off:     !!pokeKey                  ? 'hidden' : ''
+      agent_poke_on:      activeConfigs.some(c => c.provider === 'poke') ? '' : 'hidden',
+      agent_poke_off:     activeConfigs.some(c => c.provider === 'poke') ? 'hidden' : ''
     };
     
     // Render the beautiful dashboard HTML

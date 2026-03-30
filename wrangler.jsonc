@@ -15,11 +15,12 @@
 	],
 	// ⚠️  Set your secrets via: wrangler secret put STRAVA_CLIENT_ID
 	//                             wrangler secret put STRAVA_CLIENT_SECRET
-	//                             wrangler secret put STRAVA_REDIRECT_URI
 	//                             wrangler secret put STRAVA_WEBHOOK_VERIFY_TOKEN
 	//                             wrangler secret put POKE_API_KEY
-	// STRAVA_REDIRECT_URI should be: https://your-worker.workers.dev/callback
-	// (must match exactly what you registered on strava.com/settings/api)
+	// STRAVA_REDIRECT_URI must match exactly what you registered on strava.com/settings/api
+	"vars": {
+		"STRAVA_REDIRECT_URI": "https://sportmcp.mainichi.fit/callback"
+	},
 	"observability": {
 		"enabled": true
 	}

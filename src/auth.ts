@@ -33,9 +33,10 @@ export class AuthHandler {
       const sessionId = c.req.query('session'); // Get session ID if provided
       const state = generateState();
       const currentDomain = this.getCurrentDomain(c);
-      
+
       // Store state in a temporary KV entry for CSRF protection
-      const stateData = { 
+      // Include the origin domain so the callback can redirect back here
+      const stateData = {
         pending: true,
         sessionId: sessionId || null,
         origin: currentDomain,
