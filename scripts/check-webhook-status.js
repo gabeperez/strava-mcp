@@ -4,7 +4,7 @@
  * Check webhook subscription status by calling the worker's internal API
  */
 
-const WORKER_URL = 'https://stravamcp.com';
+const WORKER_URL = process.env.WORKER_URL || 'https://your-worker-name.your-subdomain.workers.dev';
 
 async function checkWebhookStatus() {
   try {

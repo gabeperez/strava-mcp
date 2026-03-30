@@ -42,13 +42,18 @@ app.use('*', async (c, next) => {
   c.res.headers.set('Access-Control-Allow-Credentials', 'true');
 });
 
-// Helper function to get current domain
+// Helper function to get current origin
 function getCurrentDomain(c: any): string {
-  const host = c.req.header('host');
-  if (!host) return 'https://strava-mcp-oauth.perez-jg22.workers.dev';
-  // Always use the actual request host — works for workers.dev or any custom domain
-  const protocol = host.includes('localhost') ? 'http' : 'https';
-  return `${protocol}://${host}`;
+  try {
+    return new URL(c.req.url).origin;
+  } catch {
+    // Fallback: derive from the registered redirect URI env var
+    const redirectUri: string = (c.env as any)?.STRAVA_REDIRECT_URI || '';
+    if (redirectUri) {
+      return redirectUri.replace(/\/callback$/, '');
+    }
+    return 'https://your-worker.workers.dev';
+  }
 }
 
 
@@ -412,22 +417,22 @@ app.delete('/settings/notification-config', handleDeleteNotificationConfig);
 
 // Legal and informational pages  
 app.get('/about', (c) => {
-  const html = templates.render('about');
+  const html = templates.render('about', { base_url: getCurrentDomain(c) });
   return c.html(html);
 });
 
 app.get('/support', (c) => {
-  const html = templates.render('support');
+  const html = templates.render('support', { base_url: getCurrentDomain(c) });
   return c.html(html);
 });
 
 app.get('/privacy', (c) => {
-  const html = templates.render('privacy');
+  const html = templates.render('privacy', { base_url: getCurrentDomain(c) });
   return c.html(html);
 });
 
 app.get('/terms', (c) => {
-  const html = templates.render('terms');
+  const html = templates.render('terms', { base_url: getCurrentDomain(c) });
   return c.html(html);
 });
 
@@ -514,8 +519,8 @@ app.get('/dashboard', async (c) => {
       return c.redirect('/auth');
     }
     
-    // Fetch user's Strava data + notification config in parallel
-    const [profileResponse, statsResponse, activitiesResponse] = await Promise.all([
+    // Fetch user's Strava data + agent connection info in parallel
+    const [profileResponse, statsResponse, activitiesResponse, agentConnectionsRaw, lastConnRaw] = await Promise.all([
       fetch('https://www.strava.com/api/v3/athlete', {
         headers: { 'Authorization': `Bearer ${session.access_token}` }
       }),
@@ -525,10 +530,47 @@ app.get('/dashboard', async (c) => {
       fetch('https://www.strava.com/api/v3/athlete/activities?per_page=7', {
         headers: { 'Authorization': `Bearer ${session.access_token}` }
       }),
+      c.env.STRAVA_SESSIONS.get(`agent_connections:${athlete_id}`),
+      c.env.STRAVA_SESSIONS.get(`agent_lastconn:${athlete_id}`)
     ]);
 
     // Load all configured notification providers
     const activeConfigs = await loadNotificationConfigs(c.env, athlete_id);
+
+    // Parse last-connection info for "last seen" display
+    let lastConnDisplay = '';
+    let lastConnAgent = '';
+    let lastConnCount = 0;
+    if (lastConnRaw) {
+      try {
+        const lc = JSON.parse(lastConnRaw);
+        lastConnCount = lc.count || 0;
+        // Parse User-Agent into a friendly name
+        const ua: string = lc.ua || '';
+        if (/claude/i.test(ua)) lastConnAgent = 'Claude Desktop';
+        else if (/cursor/i.test(ua)) lastConnAgent = 'Cursor';
+        else if (/windsurf/i.test(ua)) lastConnAgent = 'Windsurf';
+        else if (/cline/i.test(ua)) lastConnAgent = 'Cline';
+        else if (/continue/i.test(ua)) lastConnAgent = 'Continue.dev';
+        else if (/manus/i.test(ua)) lastConnAgent = 'Manus';
+        else if (/openclaw/i.test(ua)) lastConnAgent = 'OpenClaw';
+        else if (/mcp-remote/i.test(ua)) lastConnAgent = 'Claude Desktop';
+        else if (/node/i.test(ua)) lastConnAgent = 'Node.js client';
+        else lastConnAgent = ua.split('/')[0] || 'Unknown client';
+        // Format time-ago
+        const diffMs = Date.now() - (lc.ts || 0);
+        const diffMin = Math.floor(diffMs / 60000);
+        const diffHr = Math.floor(diffMin / 60);
+        const diffDay = Math.floor(diffHr / 24);
+        if (diffMin < 2) lastConnDisplay = 'just now';
+        else if (diffMin < 60) lastConnDisplay = `${diffMin} min ago`;
+        else if (diffHr < 24) lastConnDisplay = `${diffHr}h ago`;
+        else lastConnDisplay = `${diffDay}d ago`;
+      } catch (_) {}
+    }
+
+    const agentConnections: Record<string, boolean> = agentConnectionsRaw
+      ? JSON.parse(agentConnectionsRaw) : {};
     
     const profile = await profileResponse.json();
     const stats = await statsResponse.json();
@@ -607,7 +649,30 @@ app.get('/dashboard', async (c) => {
         ? activeConfigs.map(c => PROVIDER_INFO[c.provider]?.name || c.provider).join(', ')
         : '',
       active_providers_json: JSON.stringify(activeConfigs.map(c => c.provider)),
-      providers_json: JSON.stringify(PROVIDER_INFO)
+      providers_json: JSON.stringify(PROVIDER_INFO),
+      agent_poke: activeConfigs.some(c => c.provider === 'poke'),
+      mcp_token: token,
+      last_conn_display: lastConnDisplay,
+      last_conn_agent: lastConnAgent,
+      last_conn_count: lastConnCount,
+      last_conn_has_data: lastConnDisplay ? '' : 'hidden',
+      last_conn_no_data: lastConnDisplay ? 'hidden' : '',
+      agent_claude_on:    agentConnections.claude    ? '' : 'hidden',
+      agent_claude_off:   agentConnections.claude    ? 'hidden' : '',
+      agent_cursor_on:    agentConnections.cursor    ? '' : 'hidden',
+      agent_cursor_off:   agentConnections.cursor    ? 'hidden' : '',
+      agent_windsurf_on:  agentConnections.windsurf  ? '' : 'hidden',
+      agent_windsurf_off: agentConnections.windsurf  ? 'hidden' : '',
+      agent_cline_on:     agentConnections.cline     ? '' : 'hidden',
+      agent_cline_off:    agentConnections.cline     ? 'hidden' : '',
+      agent_continue_on:  agentConnections.continue  ? '' : 'hidden',
+      agent_continue_off: agentConnections.continue  ? 'hidden' : '',
+      agent_manus_on:     agentConnections.manus     ? '' : 'hidden',
+      agent_manus_off:    agentConnections.manus     ? 'hidden' : '',
+      agent_openclaw_on:  agentConnections.openclaw  ? '' : 'hidden',
+      agent_openclaw_off: agentConnections.openclaw  ? 'hidden' : '',
+      agent_poke_on:      activeConfigs.some(c => c.provider === 'poke') ? '' : 'hidden',
+      agent_poke_off:     activeConfigs.some(c => c.provider === 'poke') ? 'hidden' : ''
     };
     
     // Render the beautiful dashboard HTML
@@ -685,6 +750,19 @@ app.post('/mcp', async (c) => {
         if (personalData) {
           const tokenInfo = JSON.parse(personalData);
           authenticatedAthleteId = tokenInfo.athlete_id;
+
+          // Option 2: log this connection for "last seen" dashboard display
+          try {
+            const ua = c.req.header('User-Agent') || 'Unknown';
+            const connKey = `agent_lastconn:${authenticatedAthleteId}`;
+            const existing = await env.STRAVA_SESSIONS.get(connKey);
+            const prev = existing ? JSON.parse(existing) : { count: 0 };
+            await env.STRAVA_SESSIONS.put(connKey, JSON.stringify({
+              ts: Date.now(),
+              ua,
+              count: (prev.count || 0) + 1
+            }), { expirationTtl: 60 * 60 * 24 * 30 }); // 30-day TTL
+          } catch (_) { /* non-blocking — ignore errors */ }
         }
       } catch (error) {
         console.error('Personal token validation error:', error);
@@ -812,6 +890,30 @@ app.get('/api/routes/:id/export/tcx', StravaApiHandlers.exportRouteTcx);
 
 // Clubs endpoints
 app.get('/api/clubs', StravaApiHandlers.getAthleteClubs);
+
+// Agent connections - save which agents a user has connected
+app.post('/settings/agent-connections', async (c) => {
+  try {
+    const { token, agent, connected } = await c.req.json();
+    if (!token || !agent) {
+      return c.json({ error: 'Missing token or agent' }, 400);
+    }
+    const personalData = await c.env.STRAVA_SESSIONS.get(`personal_mcp:${token}`);
+    if (!personalData) {
+      return c.json({ error: 'Invalid token' }, 401);
+    }
+    const { athlete_id } = JSON.parse(personalData);
+    const key = `agent_connections:${athlete_id}`;
+    const existing = await c.env.STRAVA_SESSIONS.get(key);
+    const connections: Record<string, boolean> = existing ? JSON.parse(existing) : {};
+    connections[agent] = !!connected;
+    await c.env.STRAVA_SESSIONS.put(key, JSON.stringify(connections));
+    return c.json({ success: true, connections });
+  } catch (err) {
+    console.error('agent-connections error:', err);
+    return c.json({ error: 'Internal error' }, 500);
+  }
+});
 
 // Error handling
 app.notFound((c) => {

@@ -735,6 +735,18 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                             class="agent-tab px-3 py-1 rounded-full text-xs font-semibold border border-gray-600 text-gray-400 hover:border-orange-500 hover:text-orange-400">
                             Poke
                         </button>
+                        <button onclick="showAgent('manus')" id="tab-manus"
+                            class="agent-tab px-3 py-1 rounded-full text-xs font-semibold border border-gray-600 text-gray-400 hover:border-orange-500 hover:text-orange-400">
+                            Manus
+                        </button>
+                        <button onclick="showAgent('openclaw')" id="tab-openclaw"
+                            class="agent-tab px-3 py-1 rounded-full text-xs font-semibold border border-gray-600 text-gray-400 hover:border-orange-500 hover:text-orange-400">
+                            OpenClaw
+                        </button>
+                        <button onclick="showAgent('custom')" id="tab-custom"
+                            class="agent-tab px-3 py-1 rounded-full text-xs font-semibold border border-gray-600 text-gray-400 hover:border-orange-500 hover:text-orange-400">
+                            ✚ Custom
+                        </button>
                         <button onclick="showAgent('other')" id="tab-other"
                             class="agent-tab px-3 py-1 rounded-full text-xs font-semibold border border-gray-600 text-gray-400 hover:border-orange-500 hover:text-orange-400">
                             Other
@@ -844,6 +856,85 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                             <code class="text-orange-400 text-sm break-all">{{mcp_url}}</code>
                         </div>
                         <p class="text-xs text-gray-500 mt-2">Poke also supports real-time workout notifications — see the Poke Notifications section below.</p>
+                    </div>
+
+                    <!-- Manus -->
+                    <div id="agent-manus" class="agent-panel hidden">
+                        <p class="text-xs text-gray-400 mb-2">In <strong>Manus</strong>, go to <strong>Settings → Tools → Add MCP Server</strong> and paste your MCP URL:</p>
+                        <div class="bg-gray-900 rounded-lg p-4 mb-3">
+                            <code class="text-orange-400 text-sm break-all">{{mcp_url}}</code>
+                        </div>
+                        <p class="text-xs text-gray-400 mb-2">Or use the JSON config format if Manus requests it:</p>
+                        <div class="relative">
+                            <pre class="bg-gray-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto"><code id="manus-config">{
+  "mcpServers": {
+    "sportsmcp": {
+      "url": "{{mcp_url}}"
+    }
+  }
+}</code></pre>
+                            <button onclick="copyConfig('manus-config')"
+                                class="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-xs text-gray-300">
+                                <i class="fas fa-copy mr-1"></i>Copy
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">Manus supports the Streamable HTTP transport. Your Strava data will be available as tools in any Manus agent.</p>
+                    </div>
+
+                    <!-- OpenClaw -->
+                    <div id="agent-openclaw" class="agent-panel hidden">
+                        <p class="text-xs text-gray-400 mb-2">In <strong>OpenClaw</strong>, go to <strong>Settings → MCP Servers → Add Server</strong> and paste your MCP URL:</p>
+                        <div class="bg-gray-900 rounded-lg p-4 mb-3">
+                            <code class="text-orange-400 text-sm break-all">{{mcp_url}}</code>
+                        </div>
+                        <p class="text-xs text-gray-400 mb-2">Or use the JSON config format:</p>
+                        <div class="relative">
+                            <pre class="bg-gray-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto"><code id="openclaw-config">{
+  "mcpServers": {
+    "sportsmcp": {
+      "url": "{{mcp_url}}"
+    }
+  }
+}</code></pre>
+                            <button onclick="copyConfig('openclaw-config')"
+                                class="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-xs text-gray-300">
+                                <i class="fas fa-copy mr-1"></i>Copy
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">Both Streamable HTTP and SSE transports are supported. Use <code class="text-orange-300">{{mcp_sse_url}}</code> for SSE.</p>
+                    </div>
+
+                    <!-- Custom Agent -->
+                    <div id="agent-custom" class="agent-panel hidden">
+                        <p class="text-xs text-gray-400 mb-3">Add SportsMCP to any MCP-compatible agent. Your personal URL and both config formats are below:</p>
+                        <div class="bg-gray-900 rounded-lg p-3 mb-3 flex items-center justify-between gap-2">
+                            <code class="text-orange-400 text-xs break-all flex-1">{{mcp_url}}</code>
+                            <button onclick="copyText('{{mcp_url}}')" class="bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-xs text-gray-300 whitespace-nowrap flex-shrink-0">
+                                <i class="fas fa-copy mr-1"></i>Copy URL
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-400 mb-2 font-semibold">Standard JSON config (most agents):</p>
+                        <div class="relative mb-3">
+                            <pre class="bg-gray-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto"><code id="custom-config">{
+  "mcpServers": {
+    "sportsmcp": {
+      "url": "{{mcp_url}}"
+    }
+  }
+}</code></pre>
+                            <button onclick="copyConfig('custom-config')"
+                                class="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-xs text-gray-300">
+                                <i class="fas fa-copy mr-1"></i>Copy
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-400 mb-2 font-semibold">SSE transport (legacy clients):</p>
+                        <div class="bg-gray-900 rounded-lg p-3 flex items-center justify-between gap-2">
+                            <code class="text-green-300 text-xs break-all flex-1">{{mcp_sse_url}}</code>
+                            <button onclick="copyText('{{mcp_sse_url}}')" class="bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-xs text-gray-300 whitespace-nowrap flex-shrink-0">
+                                <i class="fas fa-copy mr-1"></i>Copy
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-3">If your agent isn't listed above, open a <a href="https://github.com/gabeperez/strava-mcp/issues" class="text-orange-400 hover:underline">GitHub issue</a> and we'll add instructions for it!</p>
                     </div>
 
                     <!-- Other -->
@@ -1148,6 +1239,313 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
         </div>
     </div>
 
+    <!-- AI Agent Connections -->
+    <div class="max-w-6xl mx-auto px-4 mb-8">
+        <div class="card rounded-2xl p-6">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h3 class="font-bold text-base flex items-center">
+                        <i class="fas fa-plug text-orange-400 mr-2"></i>
+                        AI Agent Connections
+                    </h3>
+                    <p class="text-xs text-gray-500 mt-0.5">Test or track which agents have connected to your SportsMCP server.</p>
+                </div>
+            </div>
+
+            <!-- Last-seen banner (Option 2: real connection data) -->
+            <div class="{{last_conn_has_data}} flex items-center gap-3 bg-green-500/8 border border-green-500/20 rounded-xl px-4 py-2.5 mb-4">
+                <span class="w-2 h-2 bg-green-400 rounded-full flex-shrink-0 animate-pulse"></span>
+                <div class="flex-1 min-w-0">
+                    <span class="text-xs text-green-400 font-medium">Last connection: {{last_conn_display}}</span>
+                    <span class="text-xs text-gray-500 ml-2">via {{last_conn_agent}}</span>
+                    <span class="text-xs text-gray-600 ml-2">· {{last_conn_count}} total call(s)</span>
+                </div>
+            </div>
+            <div class="{{last_conn_no_data}} flex items-center gap-2 bg-gray-800/50 border border-gray-700/40 rounded-xl px-4 py-2.5 mb-4">
+                <i class="fas fa-circle-info text-gray-500 text-xs"></i>
+                <span class="text-xs text-gray-500">No connections recorded yet. Add your MCP URL to an agent and use it — it will appear here automatically.</span>
+            </div>
+
+            <div class="space-y-2" id="agent-connections-list">
+
+                <!-- Claude Desktop -->
+                <div class="agent-row rounded-xl border border-gray-700/50 overflow-hidden" id="row-claude">
+                    <button onclick="toggleAgentRow('claude')" class="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-800/60 transition-colors text-left">
+                        <div class="flex items-center gap-3">
+                            <span class="text-lg">🤖</span>
+                            <span class="font-medium text-sm">Claude Desktop</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="{{agent_claude_on}} inline-flex items-center gap-1 text-xs font-medium text-green-400 bg-green-400/10 border border-green-400/20 rounded-full px-2.5 py-0.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span> Connected
+                            </span>
+                            <span class="{{agent_claude_off}} inline-flex items-center gap-1 text-xs font-medium text-gray-400 bg-gray-700/40 border border-gray-600/30 rounded-full px-2.5 py-0.5">
+                                Set up
+                            </span>
+                            <i class="fas fa-chevron-down text-gray-500 text-xs transition-transform" id="chevron-claude"></i>
+                        </div>
+                    </button>
+                    <div class="hidden px-4 pb-4 pt-1 bg-gray-800/30" id="panel-claude">
+                        <p class="text-xs text-gray-400 mb-3">Add to your <code class="bg-gray-900 px-1 rounded">claude_desktop_config.json</code>:</p>
+                        <pre class="bg-gray-900 rounded-lg p-3 text-xs text-green-300 overflow-x-auto mb-3"><code id="claude-conn-config">{
+  "mcpServers": {
+    "SportsMCP": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote@latest", "{{mcp_url}}"]
+    }
+  }
+}</code></pre>
+                        <div id="conn-status-claude" class="hidden mb-2"></div>
+                        <div class="flex gap-2">
+                            <button onclick="copyConfig('claude-conn-config')" class="flex-1 text-xs bg-gray-700 hover:bg-gray-600 text-gray-200 py-1.5 rounded-lg transition-colors">Copy Config</button>
+                            <button onclick="testConnection('claude')" class="text-xs bg-blue-600 hover:bg-blue-500 text-white font-medium px-3 py-1.5 rounded-lg transition-colors" id="test-btn-claude">Test Connection</button>
+                            <button onclick="setAgentConnection('claude', false)" class="{{agent_claude_on}} text-xs text-red-400 hover:text-red-300 border border-red-400/20 hover:border-red-400/40 px-3 py-1.5 rounded-lg transition-colors">Disconnect</button>
+                            <button onclick="setAgentConnection('claude', true)" class="{{agent_claude_off}} text-xs border border-gray-600 hover:border-gray-400 text-gray-400 hover:text-gray-200 font-medium px-3 py-1.5 rounded-lg transition-colors">Mark Connected</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cursor -->
+                <div class="agent-row rounded-xl border border-gray-700/50 overflow-hidden" id="row-cursor">
+                    <button onclick="toggleAgentRow('cursor')" class="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-800/60 transition-colors text-left">
+                        <div class="flex items-center gap-3">
+                            <span class="text-lg">⌨️</span>
+                            <span class="font-medium text-sm">Cursor</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="{{agent_cursor_on}} inline-flex items-center gap-1 text-xs font-medium text-green-400 bg-green-400/10 border border-green-400/20 rounded-full px-2.5 py-0.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span> Connected
+                            </span>
+                            <span class="{{agent_cursor_off}} inline-flex items-center gap-1 text-xs font-medium text-gray-400 bg-gray-700/40 border border-gray-600/30 rounded-full px-2.5 py-0.5">
+                                Set up
+                            </span>
+                            <i class="fas fa-chevron-down text-gray-500 text-xs transition-transform" id="chevron-cursor"></i>
+                        </div>
+                    </button>
+                    <div class="hidden px-4 pb-4 pt-1 bg-gray-800/30" id="panel-cursor">
+                        <p class="text-xs text-gray-400 mb-3">Add to your Cursor MCP settings:</p>
+                        <pre class="bg-gray-900 rounded-lg p-3 text-xs text-green-300 overflow-x-auto mb-3"><code id="cursor-conn-config">{
+  "mcpServers": {
+    "SportsMCP": {
+      "url": "{{mcp_url}}"
+    }
+  }
+}</code></pre>
+                        <div id="conn-status-cursor" class="hidden mb-2"></div>
+                        <div class="flex gap-2">
+                            <button onclick="copyConfig('cursor-conn-config')" class="flex-1 text-xs bg-gray-700 hover:bg-gray-600 text-gray-200 py-1.5 rounded-lg transition-colors">Copy Config</button>
+                            <button onclick="testConnection('cursor')" class="text-xs bg-blue-600 hover:bg-blue-500 text-white font-medium px-3 py-1.5 rounded-lg transition-colors" id="test-btn-cursor">Test Connection</button>
+                            <button onclick="setAgentConnection('cursor', false)" class="{{agent_cursor_on}} text-xs text-red-400 hover:text-red-300 border border-red-400/20 hover:border-red-400/40 px-3 py-1.5 rounded-lg transition-colors">Disconnect</button>
+                            <button onclick="setAgentConnection('cursor', true)" class="{{agent_cursor_off}} text-xs border border-gray-600 hover:border-gray-400 text-gray-400 hover:text-gray-200 font-medium px-3 py-1.5 rounded-lg transition-colors">Mark Connected</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Windsurf -->
+                <div class="agent-row rounded-xl border border-gray-700/50 overflow-hidden" id="row-windsurf">
+                    <button onclick="toggleAgentRow('windsurf')" class="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-800/60 transition-colors text-left">
+                        <div class="flex items-center gap-3">
+                            <span class="text-lg">🏄</span>
+                            <span class="font-medium text-sm">Windsurf</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="{{agent_windsurf_on}} inline-flex items-center gap-1 text-xs font-medium text-green-400 bg-green-400/10 border border-green-400/20 rounded-full px-2.5 py-0.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span> Connected
+                            </span>
+                            <span class="{{agent_windsurf_off}} inline-flex items-center gap-1 text-xs font-medium text-gray-400 bg-gray-700/40 border border-gray-600/30 rounded-full px-2.5 py-0.5">
+                                Set up
+                            </span>
+                            <i class="fas fa-chevron-down text-gray-500 text-xs transition-transform" id="chevron-windsurf"></i>
+                        </div>
+                    </button>
+                    <div class="hidden px-4 pb-4 pt-1 bg-gray-800/30" id="panel-windsurf">
+                        <p class="text-xs text-gray-400 mb-3">Add to your Windsurf MCP settings:</p>
+                        <pre class="bg-gray-900 rounded-lg p-3 text-xs text-green-300 overflow-x-auto mb-3"><code id="windsurf-conn-config">{
+  "mcpServers": {
+    "SportsMCP": {
+      "serverUrl": "{{mcp_sse_url}}",
+      "type": "sse"
+    }
+  }
+}</code></pre>
+                        <div id="conn-status-windsurf" class="hidden mb-2"></div>
+                        <div class="flex gap-2">
+                            <button onclick="copyConfig('windsurf-conn-config')" class="flex-1 text-xs bg-gray-700 hover:bg-gray-600 text-gray-200 py-1.5 rounded-lg transition-colors">Copy Config</button>
+                            <button onclick="testConnection('windsurf')" class="text-xs bg-blue-600 hover:bg-blue-500 text-white font-medium px-3 py-1.5 rounded-lg transition-colors" id="test-btn-windsurf">Test Connection</button>
+                            <button onclick="setAgentConnection('windsurf', false)" class="{{agent_windsurf_on}} text-xs text-red-400 hover:text-red-300 border border-red-400/20 hover:border-red-400/40 px-3 py-1.5 rounded-lg transition-colors">Disconnect</button>
+                            <button onclick="setAgentConnection('windsurf', true)" class="{{agent_windsurf_off}} text-xs border border-gray-600 hover:border-gray-400 text-gray-400 hover:text-gray-200 font-medium px-3 py-1.5 rounded-lg transition-colors">Mark Connected</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cline -->
+                <div class="agent-row rounded-xl border border-gray-700/50 overflow-hidden" id="row-cline">
+                    <button onclick="toggleAgentRow('cline')" class="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-800/60 transition-colors text-left">
+                        <div class="flex items-center gap-3">
+                            <span class="text-lg">🧩</span>
+                            <span class="font-medium text-sm">Cline</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="{{agent_cline_on}} inline-flex items-center gap-1 text-xs font-medium text-green-400 bg-green-400/10 border border-green-400/20 rounded-full px-2.5 py-0.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span> Connected
+                            </span>
+                            <span class="{{agent_cline_off}} inline-flex items-center gap-1 text-xs font-medium text-gray-400 bg-gray-700/40 border border-gray-600/30 rounded-full px-2.5 py-0.5">
+                                Set up
+                            </span>
+                            <i class="fas fa-chevron-down text-gray-500 text-xs transition-transform" id="chevron-cline"></i>
+                        </div>
+                    </button>
+                    <div class="hidden px-4 pb-4 pt-1 bg-gray-800/30" id="panel-cline">
+                        <p class="text-xs text-gray-400 mb-3">Add to your Cline MCP config:</p>
+                        <pre class="bg-gray-900 rounded-lg p-3 text-xs text-green-300 overflow-x-auto mb-3"><code id="cline-conn-config">{
+  "mcpServers": {
+    "SportsMCP": {
+      "url": "{{mcp_url}}",
+      "type": "streamable-http"
+    }
+  }
+}</code></pre>
+                        <div id="conn-status-cline" class="hidden mb-2"></div>
+                        <div class="flex gap-2">
+                            <button onclick="copyConfig('cline-conn-config')" class="flex-1 text-xs bg-gray-700 hover:bg-gray-600 text-gray-200 py-1.5 rounded-lg transition-colors">Copy Config</button>
+                            <button onclick="testConnection('cline')" class="text-xs bg-blue-600 hover:bg-blue-500 text-white font-medium px-3 py-1.5 rounded-lg transition-colors" id="test-btn-cline">Test Connection</button>
+                            <button onclick="setAgentConnection('cline', false)" class="{{agent_cline_on}} text-xs text-red-400 hover:text-red-300 border border-red-400/20 hover:border-red-400/40 px-3 py-1.5 rounded-lg transition-colors">Disconnect</button>
+                            <button onclick="setAgentConnection('cline', true)" class="{{agent_cline_off}} text-xs border border-gray-600 hover:border-gray-400 text-gray-400 hover:text-gray-200 font-medium px-3 py-1.5 rounded-lg transition-colors">Mark Connected</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Continue.dev -->
+                <div class="agent-row rounded-xl border border-gray-700/50 overflow-hidden" id="row-continue">
+                    <button onclick="toggleAgentRow('continue')" class="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-800/60 transition-colors text-left">
+                        <div class="flex items-center gap-3">
+                            <span class="text-lg">▶️</span>
+                            <span class="font-medium text-sm">Continue.dev</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="{{agent_continue_on}} inline-flex items-center gap-1 text-xs font-medium text-green-400 bg-green-400/10 border border-green-400/20 rounded-full px-2.5 py-0.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span> Connected
+                            </span>
+                            <span class="{{agent_continue_off}} inline-flex items-center gap-1 text-xs font-medium text-gray-400 bg-gray-700/40 border border-gray-600/30 rounded-full px-2.5 py-0.5">
+                                Set up
+                            </span>
+                            <i class="fas fa-chevron-down text-gray-500 text-xs transition-transform" id="chevron-continue"></i>
+                        </div>
+                    </button>
+                    <div class="hidden px-4 pb-4 pt-1 bg-gray-800/30" id="panel-continue">
+                        <p class="text-xs text-gray-400 mb-3">Add to your Continue config.json:</p>
+                        <pre class="bg-gray-900 rounded-lg p-3 text-xs text-green-300 overflow-x-auto mb-3"><code id="continue-conn-config">{
+  "experimental": {
+    "modelContextProtocolServers": [{
+      "transport": {
+        "type": "streamable-http",
+        "url": "{{mcp_url}}"
+      }
+    }]
+  }
+}</code></pre>
+                        <div id="conn-status-continue" class="hidden mb-2"></div>
+                        <div class="flex gap-2">
+                            <button onclick="copyConfig('continue-conn-config')" class="flex-1 text-xs bg-gray-700 hover:bg-gray-600 text-gray-200 py-1.5 rounded-lg transition-colors">Copy Config</button>
+                            <button onclick="testConnection('continue')" class="text-xs bg-blue-600 hover:bg-blue-500 text-white font-medium px-3 py-1.5 rounded-lg transition-colors" id="test-btn-continue">Test Connection</button>
+                            <button onclick="setAgentConnection('continue', false)" class="{{agent_continue_on}} text-xs text-red-400 hover:text-red-300 border border-red-400/20 hover:border-red-400/40 px-3 py-1.5 rounded-lg transition-colors">Disconnect</button>
+                            <button onclick="setAgentConnection('continue', true)" class="{{agent_continue_off}} text-xs border border-gray-600 hover:border-gray-400 text-gray-400 hover:text-gray-200 font-medium px-3 py-1.5 rounded-lg transition-colors">Mark Connected</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Manus -->
+                <div class="agent-row rounded-xl border border-gray-700/50 overflow-hidden" id="row-manus">
+                    <button onclick="toggleAgentRow('manus')" class="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-800/60 transition-colors text-left">
+                        <div class="flex items-center gap-3">
+                            <span class="text-lg">🦾</span>
+                            <span class="font-medium text-sm">Manus</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="{{agent_manus_on}} inline-flex items-center gap-1 text-xs font-medium text-green-400 bg-green-400/10 border border-green-400/20 rounded-full px-2.5 py-0.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span> Connected
+                            </span>
+                            <span class="{{agent_manus_off}} inline-flex items-center gap-1 text-xs font-medium text-gray-400 bg-gray-700/40 border border-gray-600/30 rounded-full px-2.5 py-0.5">
+                                Set up
+                            </span>
+                            <i class="fas fa-chevron-down text-gray-500 text-xs transition-transform" id="chevron-manus"></i>
+                        </div>
+                    </button>
+                    <div class="hidden px-4 pb-4 pt-1 bg-gray-800/30" id="panel-manus">
+                        <p class="text-xs text-gray-400 mb-3">In Manus, add an MCP server with this URL:</p>
+                        <div class="flex items-center gap-2 mb-3">
+                            <code class="flex-1 bg-gray-900 rounded-lg px-3 py-2 text-xs text-green-300 break-all" id="manus-url">{{mcp_url}}</code>
+                            <button onclick="copyText('{{mcp_url}}')" class="shrink-0 text-xs bg-gray-700 hover:bg-gray-600 text-gray-200 px-3 py-2 rounded-lg transition-colors">Copy</button>
+                        </div>
+                        <div id="conn-status-manus" class="hidden mb-2"></div>
+                        <div class="flex gap-2">
+                            <button onclick="testConnection('manus')" class="flex-1 text-xs bg-blue-600 hover:bg-blue-500 text-white font-medium px-3 py-1.5 rounded-lg transition-colors" id="test-btn-manus">Test Connection</button>
+                            <button onclick="setAgentConnection('manus', false)" class="{{agent_manus_on}} text-xs text-red-400 hover:text-red-300 border border-red-400/20 hover:border-red-400/40 px-3 py-1.5 rounded-lg transition-colors">Disconnect</button>
+                            <button onclick="setAgentConnection('manus', true)" class="{{agent_manus_off}} text-xs border border-gray-600 hover:border-gray-400 text-gray-400 hover:text-gray-200 font-medium px-3 py-1.5 rounded-lg transition-colors">Mark Connected</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- OpenClaw -->
+                <div class="agent-row rounded-xl border border-gray-700/50 overflow-hidden" id="row-openclaw">
+                    <button onclick="toggleAgentRow('openclaw')" class="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-800/60 transition-colors text-left">
+                        <div class="flex items-center gap-3">
+                            <span class="text-lg">🦀</span>
+                            <span class="font-medium text-sm">OpenClaw</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="{{agent_openclaw_on}} inline-flex items-center gap-1 text-xs font-medium text-green-400 bg-green-400/10 border border-green-400/20 rounded-full px-2.5 py-0.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span> Connected
+                            </span>
+                            <span class="{{agent_openclaw_off}} inline-flex items-center gap-1 text-xs font-medium text-gray-400 bg-gray-700/40 border border-gray-600/30 rounded-full px-2.5 py-0.5">
+                                Set up
+                            </span>
+                            <i class="fas fa-chevron-down text-gray-500 text-xs transition-transform" id="chevron-openclaw"></i>
+                        </div>
+                    </button>
+                    <div class="hidden px-4 pb-4 pt-1 bg-gray-800/30" id="panel-openclaw">
+                        <p class="text-xs text-gray-400 mb-3">In OpenClaw, add an MCP server with this URL:</p>
+                        <div class="flex items-center gap-2 mb-3">
+                            <code class="flex-1 bg-gray-900 rounded-lg px-3 py-2 text-xs text-green-300 break-all" id="openclaw-url">{{mcp_url}}</code>
+                            <button onclick="copyText('{{mcp_url}}')" class="shrink-0 text-xs bg-gray-700 hover:bg-gray-600 text-gray-200 px-3 py-2 rounded-lg transition-colors">Copy</button>
+                        </div>
+                        <div id="conn-status-openclaw" class="hidden mb-2"></div>
+                        <div class="flex gap-2">
+                            <button onclick="testConnection('openclaw')" class="flex-1 text-xs bg-blue-600 hover:bg-blue-500 text-white font-medium px-3 py-1.5 rounded-lg transition-colors" id="test-btn-openclaw">Test Connection</button>
+                            <button onclick="setAgentConnection('openclaw', false)" class="{{agent_openclaw_on}} text-xs text-red-400 hover:text-red-300 border border-red-400/20 hover:border-red-400/40 px-3 py-1.5 rounded-lg transition-colors">Disconnect</button>
+                            <button onclick="setAgentConnection('openclaw', true)" class="{{agent_openclaw_off}} text-xs border border-gray-600 hover:border-gray-400 text-gray-400 hover:text-gray-200 font-medium px-3 py-1.5 rounded-lg transition-colors">Mark Connected</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Poke (real state from KV) -->
+                <div class="agent-row rounded-xl border border-gray-700/50 overflow-hidden" id="row-poke-agent">
+                    <button onclick="toggleAgentRow('poke-agent')" class="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-800/60 transition-colors text-left">
+                        <div class="flex items-center gap-3">
+                            <span class="text-lg">📱</span>
+                            <span class="font-medium text-sm">Poke</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="{{agent_poke_on}} inline-flex items-center gap-1 text-xs font-medium text-green-400 bg-green-400/10 border border-green-400/20 rounded-full px-2.5 py-0.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span> Active
+                            </span>
+                            <span class="{{agent_poke_off}} inline-flex items-center gap-1 text-xs font-medium text-gray-400 bg-gray-700/40 border border-gray-600/30 rounded-full px-2.5 py-0.5">
+                                Set up
+                            </span>
+                            <i class="fas fa-chevron-down text-gray-500 text-xs transition-transform" id="chevron-poke-agent"></i>
+                        </div>
+                    </button>
+                    <div class="hidden px-4 pb-4 pt-1 bg-gray-800/30" id="panel-poke-agent">
+                        <p class="text-xs text-gray-400 mb-2">Get notified on <a href="https://poke.com" target="_blank" rel="noopener noreferrer" class="text-orange-400 hover:underline">Poke.com</a> after every workout. Configure your API key in the <strong>Poke Notifications</strong> card above.</p>
+                        <p class="{{agent_poke_on}} text-xs text-green-400">✓ Your Poke API key is saved and active.</p>
+                        <p class="{{agent_poke_off}} text-xs text-gray-500">Scroll up to the Poke Notifications card to add your key.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
     <!-- Footer attribution -->
     <footer class="bg-gray-950 py-6 mt-8">
         <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -1349,6 +1747,19 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                 const successMsg = document.getElementById('copy-success');
                 successMsg.querySelector('span') && (successMsg.querySelector('span').textContent = 'Config copied!');
                 successMsg.textContent = '✅ Config copied to clipboard!';
+                successMsg.classList.remove('hidden');
+                successMsg.classList.add('copy-success');
+                setTimeout(() => {
+                    successMsg.classList.add('hidden');
+                    successMsg.classList.remove('copy-success');
+                }, 2000);
+            });
+        }
+
+        window.copyText = function copyText(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const successMsg = document.getElementById('copy-success');
+                successMsg.textContent = '✅ Copied to clipboard!';
                 successMsg.classList.remove('hidden');
                 successMsg.classList.add('copy-success');
                 setTimeout(() => {
@@ -1593,6 +2004,74 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                 _showPokeView('saved');
             }
             document.getElementById('poke-status-bar').classList.add('hidden');
+        };
+
+        // Test the MCP endpoint from the browser (Option 1)
+        window.testConnection = async function testConnection(agent) {
+            const btn = document.getElementById('test-btn-' + agent);
+            const statusEl = document.getElementById('conn-status-' + agent);
+            if (!btn || !statusEl) return;
+
+            const mcpUrl = '{{mcp_url}}';
+            btn.textContent = 'Testing…';
+            btn.disabled = true;
+
+            function showStatus(ok, msg) {
+                statusEl.className = 'mb-2 text-xs rounded-lg px-3 py-2 ' +
+                    (ok ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400');
+                statusEl.textContent = msg;
+                statusEl.classList.remove('hidden');
+                btn.textContent = 'Test Connection';
+                btn.disabled = false;
+            }
+
+            try {
+                const res = await fetch(mcpUrl, { method: 'GET' });
+                if (!res.ok) { showStatus(false, '✗ Server returned ' + res.status); return; }
+                const data = await res.json();
+                if (data && data.result && data.result.authenticated === true) {
+                    showStatus(true, '✓ Server is responding and your token is valid!');
+                    // Auto-mark as connected after a successful test
+                    await window.setAgentConnection(agent, true);
+                } else if (data && data.result && data.result.authenticated === false) {
+                    showStatus(false, '✗ Server responded but token was not recognized.');
+                } else {
+                    showStatus(false, '✗ Unexpected response from server.');
+                }
+            } catch (e) {
+                showStatus(false, '✗ Could not reach the server. Check your network.');
+            }
+        };
+
+        // AI Agent Connections card — expand/collapse rows
+        window.toggleAgentRow = function toggleAgentRow(agent) {
+            const panel = document.getElementById('panel-' + agent);
+            const chevron = document.getElementById('chevron-' + agent);
+            if (!panel) return;
+            const isHidden = panel.classList.contains('hidden');
+            panel.classList.toggle('hidden', !isHidden);
+            if (chevron) chevron.style.transform = isHidden ? 'rotate(180deg)' : '';
+        };
+
+        // Save / remove agent connection state
+        window.setAgentConnection = async function setAgentConnection(agent, connected) {
+            const token = _pokeToken();
+            if (!token) { alert('Could not find your session token. Please reload.'); return; }
+            try {
+                const res = await fetch('/settings/agent-connections', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token, agent, connected })
+                });
+                if (res.ok) {
+                    // Reload to reflect new state (simple & reliable)
+                    window.location.reload();
+                } else {
+                    alert('Could not save connection state. Please try again.');
+                }
+            } catch (e) {
+                alert('Network error. Please try again.');
+            }
         };
     </script>
 </body>
