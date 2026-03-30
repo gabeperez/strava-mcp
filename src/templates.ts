@@ -2030,9 +2030,7 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                 if (!res.ok) { showStatus(false, '✗ Server returned ' + res.status); return; }
                 const data = await res.json();
                 if (data && data.result && data.result.authenticated === true) {
-                    showStatus(true, '✓ Server is responding and your token is valid!');
-                    // Auto-mark as connected after a successful test
-                    await window.setAgentConnection(agent, true);
+                    showStatus(true, '✓ Server is responding and your token is valid! Click "Mark Connected" to track this agent.');
                 } else if (data && data.result && data.result.authenticated === false) {
                     showStatus(false, '✗ Server responded but token was not recognized.');
                 } else {
