@@ -9,6 +9,39 @@ import { ABOUT_TEMPLATE, SUPPORT_TEMPLATE, PRIVACY_TEMPLATE, TERMS_TEMPLATE } fr
 import { StravaWebhookHandler } from './webhook';
 import { sendNotification, sendNotificationToAll, NotificationConfig, NotificationProvider, PROVIDER_INFO, maskKey } from './notifications';
 
+/** Map of agent slug → { regex to match User-Agent, display name } */
+const AGENT_DEFS: { slug: string; re: RegExp; name: string }[] = [
+  { slug: 'claude',   re: /claude|mcp-remote/i, name: 'Claude Desktop' },
+  { slug: 'cursor',   re: /cursor/i,            name: 'Cursor' },
+  { slug: 'windsurf', re: /windsurf/i,          name: 'Windsurf' },
+  { slug: 'cline',    re: /cline/i,             name: 'Cline' },
+  { slug: 'continue', re: /continue/i,          name: 'Continue.dev' },
+  { slug: 'manus',    re: /manus/i,             name: 'Manus' },
+  { slug: 'openclaw', re: /openclaw/i,          name: 'OpenClaw' },
+];
+
+function detectAgentFromUA(ua: string): string | null {
+  for (const def of AGENT_DEFS) {
+    if (def.re.test(ua)) return def.slug;
+  }
+  return null;
+}
+
+function agentDisplayName(slug: string): string {
+  return AGENT_DEFS.find(d => d.slug === slug)?.name || slug;
+}
+
+function formatTimeAgo(ts: number): string {
+  const diffMs = Date.now() - ts;
+  const diffMin = Math.floor(diffMs / 60000);
+  const diffHr = Math.floor(diffMin / 60);
+  const diffDay = Math.floor(diffHr / 24);
+  if (diffMin < 2) return 'just now';
+  if (diffMin < 60) return `${diffMin} min ago`;
+  if (diffHr < 24) return `${diffHr}h ago`;
+  return `${diffDay}d ago`;
+}
+
 const app = new Hono<{ Bindings: Env }>();
 
 // Initialize template engine
@@ -520,7 +553,8 @@ app.get('/dashboard', async (c) => {
     }
     
     // Fetch user's Strava data + agent connection info in parallel
-    const [profileResponse, statsResponse, activitiesResponse, agentConnectionsRaw, lastConnRaw] = await Promise.all([
+    const agentSlugs = AGENT_DEFS.map(d => d.slug);
+    const [profileResponse, statsResponse, activitiesResponse, lastConnRaw, ...perAgentRaws] = await Promise.all([
       fetch('https://www.strava.com/api/v3/athlete', {
         headers: { 'Authorization': `Bearer ${session.access_token}` }
       }),
@@ -530,47 +564,36 @@ app.get('/dashboard', async (c) => {
       fetch('https://www.strava.com/api/v3/athlete/activities?per_page=7', {
         headers: { 'Authorization': `Bearer ${session.access_token}` }
       }),
-      c.env.STRAVA_SESSIONS.get(`agent_connections:${athlete_id}`),
-      c.env.STRAVA_SESSIONS.get(`agent_lastconn:${athlete_id}`)
+      c.env.STRAVA_SESSIONS.get(`agent_lastconn:${athlete_id}`),
+      ...agentSlugs.map(slug => c.env.STRAVA_SESSIONS.get(`agent_perconn:${athlete_id}:${slug}`))
     ]);
 
     // Load all configured notification providers
     const activeConfigs = await loadNotificationConfigs(c.env, athlete_id);
 
-    // Parse last-connection info for "last seen" display
+    // Parse global last-connection info
     let lastConnDisplay = '';
     let lastConnAgent = '';
     let lastConnCount = 0;
     if (lastConnRaw) {
       try {
-        const lc = JSON.parse(lastConnRaw);
+        const lc = JSON.parse(lastConnRaw as string);
         lastConnCount = lc.count || 0;
-        // Parse User-Agent into a friendly name
         const ua: string = lc.ua || '';
-        if (/claude/i.test(ua)) lastConnAgent = 'Claude Desktop';
-        else if (/cursor/i.test(ua)) lastConnAgent = 'Cursor';
-        else if (/windsurf/i.test(ua)) lastConnAgent = 'Windsurf';
-        else if (/cline/i.test(ua)) lastConnAgent = 'Cline';
-        else if (/continue/i.test(ua)) lastConnAgent = 'Continue.dev';
-        else if (/manus/i.test(ua)) lastConnAgent = 'Manus';
-        else if (/openclaw/i.test(ua)) lastConnAgent = 'OpenClaw';
-        else if (/mcp-remote/i.test(ua)) lastConnAgent = 'Claude Desktop';
-        else if (/node/i.test(ua)) lastConnAgent = 'Node.js client';
-        else lastConnAgent = ua.split('/')[0] || 'Unknown client';
-        // Format time-ago
-        const diffMs = Date.now() - (lc.ts || 0);
-        const diffMin = Math.floor(diffMs / 60000);
-        const diffHr = Math.floor(diffMin / 60);
-        const diffDay = Math.floor(diffHr / 24);
-        if (diffMin < 2) lastConnDisplay = 'just now';
-        else if (diffMin < 60) lastConnDisplay = `${diffMin} min ago`;
-        else if (diffHr < 24) lastConnDisplay = `${diffHr}h ago`;
-        else lastConnDisplay = `${diffDay}d ago`;
+        const slug = detectAgentFromUA(ua);
+        lastConnAgent = slug ? agentDisplayName(slug) : (ua.split('/')[0] || 'Unknown client');
+        lastConnDisplay = formatTimeAgo(lc.ts || 0);
       } catch (_) {}
     }
 
-    const agentConnections: Record<string, boolean> = agentConnectionsRaw
-      ? JSON.parse(agentConnectionsRaw) : {};
+    // Parse per-agent connection data
+    const perAgentData: Record<string, { ts: number; count: number; lastTool: string | null }> = {};
+    agentSlugs.forEach((slug, i) => {
+      const raw = perAgentRaws[i];
+      if (raw) {
+        try { perAgentData[slug] = JSON.parse(raw as string); } catch (_) {}
+      }
+    });
     
     const profile = await profileResponse.json();
     const stats = await statsResponse.json();
@@ -657,20 +680,18 @@ app.get('/dashboard', async (c) => {
       last_conn_count: lastConnCount,
       last_conn_has_data: lastConnDisplay ? '' : 'hidden',
       last_conn_no_data: lastConnDisplay ? 'hidden' : '',
-      agent_claude_on:    agentConnections.claude    ? '' : 'hidden',
-      agent_claude_off:   agentConnections.claude    ? 'hidden' : '',
-      agent_cursor_on:    agentConnections.cursor    ? '' : 'hidden',
-      agent_cursor_off:   agentConnections.cursor    ? 'hidden' : '',
-      agent_windsurf_on:  agentConnections.windsurf  ? '' : 'hidden',
-      agent_windsurf_off: agentConnections.windsurf  ? 'hidden' : '',
-      agent_cline_on:     agentConnections.cline     ? '' : 'hidden',
-      agent_cline_off:    agentConnections.cline     ? 'hidden' : '',
-      agent_continue_on:  agentConnections.continue  ? '' : 'hidden',
-      agent_continue_off: agentConnections.continue  ? 'hidden' : '',
-      agent_manus_on:     agentConnections.manus     ? '' : 'hidden',
-      agent_manus_off:    agentConnections.manus     ? 'hidden' : '',
-      agent_openclaw_on:  agentConnections.openclaw  ? '' : 'hidden',
-      agent_openclaw_off: agentConnections.openclaw  ? 'hidden' : '',
+      // Per-agent connection data (auto-detected from actual MCP tool calls)
+      ...Object.fromEntries(agentSlugs.flatMap(slug => {
+        const data = perAgentData[slug];
+        return [
+          [`agent_${slug}_on`, data ? '' : 'hidden'],
+          [`agent_${slug}_off`, data ? 'hidden' : ''],
+          [`agent_${slug}_lastconn`, data ? formatTimeAgo(data.ts) : ''],
+          [`agent_${slug}_count`, data ? String(data.count) : '0'],
+          [`agent_${slug}_lasttool`, data?.lastTool || ''],
+          [`agent_${slug}_lasttool_visible`, data?.lastTool ? '' : 'hidden'],
+        ];
+      })),
       agent_poke_on:      activeConfigs.some(c => c.provider === 'poke') ? '' : 'hidden',
       agent_poke_off:     activeConfigs.some(c => c.provider === 'poke') ? 'hidden' : ''
     };
@@ -751,9 +772,13 @@ app.post('/mcp', async (c) => {
           const tokenInfo = JSON.parse(personalData);
           authenticatedAthleteId = tokenInfo.athlete_id;
 
-          // Option 2: log this connection for "last seen" dashboard display
+          // Log connection for "last seen" dashboard display (global + per-agent)
           try {
             const ua = c.req.header('User-Agent') || 'Unknown';
+            const agentSlug = detectAgentFromUA(ua);
+            const toolName = (request?.method === 'tools/call' && request?.params?.name) || null;
+
+            // Global last-connection
             const connKey = `agent_lastconn:${authenticatedAthleteId}`;
             const existing = await env.STRAVA_SESSIONS.get(connKey);
             const prev = existing ? JSON.parse(existing) : { count: 0 };
@@ -761,7 +786,19 @@ app.post('/mcp', async (c) => {
               ts: Date.now(),
               ua,
               count: (prev.count || 0) + 1
-            }), { expirationTtl: 60 * 60 * 24 * 30 }); // 30-day TTL
+            }), { expirationTtl: 60 * 60 * 24 * 30 });
+
+            // Per-agent connection tracking
+            if (agentSlug) {
+              const perAgentKey = `agent_perconn:${authenticatedAthleteId}:${agentSlug}`;
+              const perExisting = await env.STRAVA_SESSIONS.get(perAgentKey);
+              const perPrev = perExisting ? JSON.parse(perExisting) : { count: 0 };
+              await env.STRAVA_SESSIONS.put(perAgentKey, JSON.stringify({
+                ts: Date.now(),
+                count: (perPrev.count || 0) + 1,
+                lastTool: toolName || perPrev.lastTool || null,
+              }), { expirationTtl: 60 * 60 * 24 * 30 });
+            }
           } catch (_) { /* non-blocking — ignore errors */ }
         }
       } catch (error) {
@@ -891,29 +928,7 @@ app.get('/api/routes/:id/export/tcx', StravaApiHandlers.exportRouteTcx);
 // Clubs endpoints
 app.get('/api/clubs', StravaApiHandlers.getAthleteClubs);
 
-// Agent connections - save which agents a user has connected
-app.post('/settings/agent-connections', async (c) => {
-  try {
-    const { token, agent, connected } = await c.req.json();
-    if (!token || !agent) {
-      return c.json({ error: 'Missing token or agent' }, 400);
-    }
-    const personalData = await c.env.STRAVA_SESSIONS.get(`personal_mcp:${token}`);
-    if (!personalData) {
-      return c.json({ error: 'Invalid token' }, 401);
-    }
-    const { athlete_id } = JSON.parse(personalData);
-    const key = `agent_connections:${athlete_id}`;
-    const existing = await c.env.STRAVA_SESSIONS.get(key);
-    const connections: Record<string, boolean> = existing ? JSON.parse(existing) : {};
-    connections[agent] = !!connected;
-    await c.env.STRAVA_SESSIONS.put(key, JSON.stringify(connections));
-    return c.json({ success: true, connections });
-  } catch (err) {
-    console.error('agent-connections error:', err);
-    return c.json({ error: 'Internal error' }, 500);
-  }
-});
+// Agent connections are now auto-tracked via User-Agent detection on MCP tool calls
 
 // Error handling
 app.notFound((c) => {
