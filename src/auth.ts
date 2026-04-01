@@ -222,8 +222,12 @@ export class AuthHandler {
       }), { expirationTtl: mcpTokenTtl });
 
       // Redirect to dashboard using athlete ID (cookie-based auth, no token in URL)
-      return c.redirect(`${flowOrigin}/dashboard/${tokenData.athlete.id}`, 302, {
-        'Set-Cookie': cookie,
+      return new Response(null, {
+        status: 302,
+        headers: {
+          'Location': `${flowOrigin}/dashboard/${tokenData.athlete.id}`,
+          'Set-Cookie': cookie,
+        },
       });
     } catch (error: any) {
       console.error('OAuth callback error:', error);
@@ -306,8 +310,12 @@ export class AuthHandler {
       const cookie = deleteCookie('sid');
       
       // Redirect to landing page after successful logout
-      return c.redirect('/', 302, {
-        'Set-Cookie': cookie,
+      return new Response(null, {
+        status: 302,
+        headers: {
+          'Location': '/',
+          'Set-Cookie': cookie,
+        },
       });
     } catch (error) {
       console.error('Error logging out:', error);

@@ -554,8 +554,12 @@ app.get('/dashboard', async (c) => {
     const existingCookie = getCookieValue(c.req.raw, 'sid');
     if (!existingCookie || existingCookie !== String(athlete_id)) {
       const cookie = createCookie('sid', String(athlete_id), 30 * 24 * 60 * 60);
-      return c.redirect(`/dashboard/${athlete_id}`, 302, {
-        'Set-Cookie': cookie,
+      return new Response(null, {
+        status: 302,
+        headers: {
+          'Location': `/dashboard/${athlete_id}`,
+          'Set-Cookie': cookie,
+        },
       });
     }
     return c.redirect(`/dashboard/${athlete_id}`);
