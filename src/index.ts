@@ -203,14 +203,17 @@ app.post('/oauth/register', async (c) => {
       created_at: Math.floor(Date.now() / 1000),
     }), { expirationTtl: 365 * 24 * 60 * 60 }); // 1 year
 
-    return c.json({
+    return new Response(JSON.stringify({
       client_id: clientId,
       client_name: body.client_name || 'MCP Client',
       redirect_uris: body.redirect_uris || [],
       grant_types: ['authorization_code'],
       response_types: ['code'],
       token_endpoint_auth_method: 'none',
-    }, 201);
+    }), {
+      status: 201,
+      headers: { 'Content-Type': 'application/json' },
+    });
   } catch (error: any) {
     return c.json({ error: 'invalid_request', error_description: error.message }, 400);
   }
@@ -996,14 +999,22 @@ app.get('/mcp', async (c) => {
   // If no valid auth, return 401 with OAuth discovery header (triggers MCP OAuth flow)
   if (!isAuthenticated) {
     const resourceMetadata = `${getCurrentDomain(c)}/.well-known/oauth-authorization-server`;
-    return c.json({
+    return new Response(JSON.stringify({
       jsonrpc: '2.0',
       error: {
         code: -32001,
         message: 'Authentication required. Use OAuth to connect your Strava account.',
       }
-    }, 401, {
-      'WWW-Authenticate': `Bearer resource_metadata="${resourceMetadata}"`,
+    }), {
+      status: 401,
+      headers: {
+        'Content-Type': 'application/json',
+        'WWW-Authenticate': `Bearer resource_metadata="${resourceMetadata}"`,
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, Cookie',
+        'Access-Control-Allow-Credentials': 'true',
+      },
     });
   }
 
@@ -1039,14 +1050,22 @@ app.post('/mcp', async (c) => {
     // If no auth credentials at all, return 401 to trigger OAuth discovery
     if (!personalToken) {
       const resourceMetadata = `${getCurrentDomain(c)}/.well-known/oauth-authorization-server`;
-      return c.json({
+      return new Response(JSON.stringify({
         jsonrpc: '2.0',
         error: {
           code: -32001,
           message: 'Authentication required. Use OAuth to connect your Strava account.',
         }
-      }, 401, {
-        'WWW-Authenticate': `Bearer resource_metadata="${resourceMetadata}"`,
+      }), {
+        status: 401,
+        headers: {
+          'Content-Type': 'application/json',
+          'WWW-Authenticate': `Bearer resource_metadata="${resourceMetadata}"`,
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization, Cookie',
+          'Access-Control-Allow-Credentials': 'true',
+        },
       });
     }
 
