@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import { Env } from './types';
 import { AuthHandler } from './auth';
 import { AuthMiddleware } from './middleware';
-import { getCookieValue, createCookie } from './session';
+import { getCookieValue, createCookie, generateState } from './session';
 import { StravaApiHandlers } from './api';
 import { SportsMCPServer, handleMCPOverSSE } from './mcp-server';
 import { TemplateEngine, LANDING_TEMPLATE, DASHBOARD_TEMPLATE } from './templates';
@@ -154,6 +154,215 @@ app.get('/status', async (c) => {
 app.post('/logout', async (c) => {
   const authHandler = new AuthHandler(c.env);
   return authHandler.logout(c);
+});
+
+// ---------------------------------------------------------------------------
+// MCP OAuth 2.1 Discovery endpoints
+// Allows MCP clients to authenticate via Strava without manual token copying
+// ---------------------------------------------------------------------------
+
+// PKCE verification helper
+async function verifyPKCE(codeVerifier: string, codeChallenge: string): Promise<boolean> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(codeVerifier);
+  const digest = await crypto.subtle.digest('SHA-256', data);
+  const base64url = btoa(String.fromCharCode(...new Uint8Array(digest)))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
+  return base64url === codeChallenge;
+}
+
+// OAuth Authorization Server Metadata (RFC 8414 / MCP spec)
+app.get('/.well-known/oauth-authorization-server', (c) => {
+  const issuer = getCurrentDomain(c);
+  return c.json({
+    issuer,
+    authorization_endpoint: `${issuer}/oauth/authorize`,
+    token_endpoint: `${issuer}/oauth/token`,
+    registration_endpoint: `${issuer}/oauth/register`,
+    response_types_supported: ['code'],
+    grant_types_supported: ['authorization_code'],
+    code_challenge_methods_supported: ['S256'],
+    token_endpoint_auth_methods_supported: ['none'],
+    scopes_supported: ['strava'],
+  });
+});
+
+// Dynamic Client Registration (MCP spec requires this for public clients)
+app.post('/oauth/register', async (c) => {
+  try {
+    const body = await c.req.json();
+    // MCP clients register dynamically — we accept any client and return an ID
+    const clientId = crypto.randomUUID();
+    const env = c.env as Env;
+
+    await env.STRAVA_SESSIONS.put(`oauth_client:${clientId}`, JSON.stringify({
+      client_name: body.client_name || 'MCP Client',
+      redirect_uris: body.redirect_uris || [],
+      created_at: Math.floor(Date.now() / 1000),
+    }), { expirationTtl: 365 * 24 * 60 * 60 }); // 1 year
+
+    return c.json({
+      client_id: clientId,
+      client_name: body.client_name || 'MCP Client',
+      redirect_uris: body.redirect_uris || [],
+      grant_types: ['authorization_code'],
+      response_types: ['code'],
+      token_endpoint_auth_method: 'none',
+    }, 201);
+  } catch (error: any) {
+    return c.json({ error: 'invalid_request', error_description: error.message }, 400);
+  }
+});
+
+// OAuth Authorization Endpoint — wraps existing Strava OAuth flow
+app.get('/oauth/authorize', async (c) => {
+  const env = c.env as Env;
+  const responseType = c.req.query('response_type');
+  const clientId = c.req.query('client_id');
+  const redirectUri = c.req.query('redirect_uri');
+  const clientState = c.req.query('state') || '';
+  const codeChallenge = c.req.query('code_challenge');
+  const codeChallengeMethod = c.req.query('code_challenge_method');
+  const scope = c.req.query('scope');
+
+  // Validate required params
+  if (responseType !== 'code') {
+    return c.json({ error: 'unsupported_response_type' }, 400);
+  }
+  if (!redirectUri) {
+    return c.json({ error: 'invalid_request', error_description: 'redirect_uri is required' }, 400);
+  }
+  if (!codeChallenge || codeChallengeMethod !== 'S256') {
+    return c.json({ error: 'invalid_request', error_description: 'PKCE with S256 is required' }, 400);
+  }
+
+  // Generate internal state for the Strava OAuth flow
+  const state = generateState();
+  const currentDomain = getCurrentDomain(c);
+
+  // Store MCP OAuth pending data
+  await env.STRAVA_SESSIONS.put(`oauth_pending:${state}`, JSON.stringify({
+    client_redirect_uri: redirectUri,
+    client_state: clientState,
+    code_challenge: codeChallenge,
+    code_challenge_method: codeChallengeMethod,
+    client_id: clientId,
+    created_at: Math.floor(Date.now() / 1000),
+  }), { expirationTtl: 600 }); // 10 min
+
+  // Store state for the existing callback handler, with mcp_oauth_state marker
+  await env.STRAVA_SESSIONS.put(`state:${state}`, JSON.stringify({
+    pending: true,
+    sessionId: null,
+    origin: currentDomain,
+    created_at: Math.floor(Date.now() / 1000),
+    mcp_oauth_state: state,
+  }), { expirationTtl: 600 });
+
+  // Redirect to Strava OAuth (same as /auth but with our state)
+  const registeredRedirectUri = env.STRAVA_REDIRECT_URI || `${currentDomain}/callback`;
+  const authUrl = new URL('https://www.strava.com/oauth/authorize');
+  authUrl.searchParams.set('client_id', env.STRAVA_CLIENT_ID);
+  authUrl.searchParams.set('response_type', 'code');
+  authUrl.searchParams.set('redirect_uri', registeredRedirectUri);
+  authUrl.searchParams.set('approval_prompt', 'auto');
+  authUrl.searchParams.set('scope', 'profile:read_all,activity:read_all,activity:read');
+  authUrl.searchParams.set('state', state);
+
+  return c.redirect(authUrl.toString());
+});
+
+// OAuth Token Endpoint — exchanges auth code for Bearer token
+app.post('/oauth/token', async (c) => {
+  const env = c.env as Env;
+
+  // Support both form-urlencoded and JSON bodies
+  let grantType: string | undefined;
+  let code: string | undefined;
+  let codeVerifier: string | undefined;
+  let redirectUri: string | undefined;
+
+  const contentType = c.req.header('Content-Type') || '';
+  if (contentType.includes('application/x-www-form-urlencoded')) {
+    const body = await c.req.parseBody();
+    grantType = body['grant_type'] as string;
+    code = body['code'] as string;
+    codeVerifier = body['code_verifier'] as string;
+    redirectUri = body['redirect_uri'] as string;
+  } else {
+    const body = await c.req.json();
+    grantType = body.grant_type;
+    code = body.code;
+    codeVerifier = body.code_verifier;
+    redirectUri = body.redirect_uri;
+  }
+
+  if (grantType !== 'authorization_code') {
+    return c.json({ error: 'unsupported_grant_type' }, 400);
+  }
+  if (!code || !codeVerifier) {
+    return c.json({ error: 'invalid_request', error_description: 'code and code_verifier are required' }, 400);
+  }
+
+  // Look up the auth code
+  const codeData = await env.STRAVA_SESSIONS.get(`oauth_code:${code}`);
+  if (!codeData) {
+    return c.json({ error: 'invalid_grant', error_description: 'Invalid or expired authorization code' }, 400);
+  }
+
+  const codeInfo = JSON.parse(codeData) as {
+    athlete_id: number;
+    code_challenge: string;
+    code_challenge_method: string;
+    client_redirect_uri: string;
+    created_at: number;
+  };
+
+  // Verify PKCE
+  const pkceValid = await verifyPKCE(codeVerifier, codeInfo.code_challenge);
+  if (!pkceValid) {
+    return c.json({ error: 'invalid_grant', error_description: 'PKCE verification failed' }, 400);
+  }
+
+  // Verify redirect_uri matches
+  if (redirectUri && redirectUri !== codeInfo.client_redirect_uri) {
+    return c.json({ error: 'invalid_grant', error_description: 'redirect_uri mismatch' }, 400);
+  }
+
+  // Delete the code (one-time use)
+  await env.STRAVA_SESSIONS.delete(`oauth_code:${code}`);
+
+  // Get the athlete's existing personal MCP token
+  const mcpTokenData = await env.STRAVA_SESSIONS.get(`athlete_mcp_token:${codeInfo.athlete_id}`);
+  let accessToken: string;
+
+  if (mcpTokenData) {
+    accessToken = JSON.parse(mcpTokenData).token;
+  } else {
+    // Edge case: generate a new token if none exists
+    const array = new Uint8Array(24);
+    crypto.getRandomValues(array);
+    accessToken = Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+    const mcpTokenTtl = 365 * 24 * 60 * 60;
+    await env.STRAVA_SESSIONS.put(`personal_mcp:${accessToken}`, JSON.stringify({
+      athlete_id: codeInfo.athlete_id,
+      created_at: Math.floor(Date.now() / 1000),
+      expires_at: Math.floor(Date.now() / 1000) + mcpTokenTtl,
+    }), { expirationTtl: mcpTokenTtl });
+    await env.STRAVA_SESSIONS.put(`athlete_mcp_token:${codeInfo.athlete_id}`, JSON.stringify({
+      token: accessToken,
+      created_at: Math.floor(Date.now() / 1000),
+    }), { expirationTtl: mcpTokenTtl });
+  }
+
+  return c.json({
+    access_token: accessToken,
+    token_type: 'Bearer',
+    expires_in: 31536000, // 1 year
+    scope: 'strava',
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -783,7 +992,21 @@ app.get('/mcp', async (c) => {
       console.error('Personal token validation error:', error);
     }
   }
-  
+
+  // If no valid auth, return 401 with OAuth discovery header (triggers MCP OAuth flow)
+  if (!isAuthenticated) {
+    const resourceMetadata = `${getCurrentDomain(c)}/.well-known/oauth-authorization-server`;
+    return c.json({
+      jsonrpc: '2.0',
+      error: {
+        code: -32001,
+        message: 'Authentication required. Use OAuth to connect your Strava account.',
+      }
+    }, 401, {
+      'WWW-Authenticate': `Bearer resource_metadata="${resourceMetadata}"`,
+    });
+  }
+
   // Return MCP server capabilities for GET requests
   return c.json({
     jsonrpc: '2.0',
@@ -799,32 +1022,41 @@ app.get('/mcp', async (c) => {
         name: 'SportsMCP',
         version: '1.0.0'
       },
-      authenticated: isAuthenticated,
-      ...(isAuthenticated ? {} : {
-        authenticationRequired: {
-          message: 'Please authenticate with Strava to access your data',
-          authUrl: `${getCurrentDomain(c)}/auth`
-        }
-      })
+      authenticated: true,
     }
   });
 });
 
-// MCP JSON-RPC endpoint for direct calls  
+// MCP JSON-RPC endpoint for direct calls
 app.post('/mcp', async (c) => {
   const env = c.env as Env;
   const mcpServer = new SportsMCPServer(env);
-  
+
   try {
+    // Check for personal MCP token (header or query param)
+    const personalToken = getPersonalToken(c);
+
+    // If no auth credentials at all, return 401 to trigger OAuth discovery
+    if (!personalToken) {
+      const resourceMetadata = `${getCurrentDomain(c)}/.well-known/oauth-authorization-server`;
+      return c.json({
+        jsonrpc: '2.0',
+        error: {
+          code: -32001,
+          message: 'Authentication required. Use OAuth to connect your Strava account.',
+        }
+      }, 401, {
+        'WWW-Authenticate': `Bearer resource_metadata="${resourceMetadata}"`,
+      });
+    }
+
     const request = await c.req.json();
-    
+
     // Try to get authentication context
     let context: any = {
       baseUrl: getCurrentDomain(c)
     };
-    
-    // Check for personal MCP token (header or query param)
-    const personalToken = getPersonalToken(c);
+
     let authenticatedAthleteId = null;
 
     // Method 1: Personal MCP token (primary method)
