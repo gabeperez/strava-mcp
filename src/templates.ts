@@ -1899,7 +1899,7 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                     '<span class="w-2 h-2 bg-green-400 rounded-full flex-shrink-0"></span>' +
                     '<span class="text-xs font-semibold text-green-400">' + meta.name + '</span>' +
                     '<span class="text-xs text-gray-500 ml-auto">Active</span>' +
-                    '<button onclick="window.removeProvider(\'' + p + '\')" class="text-gray-500 hover:text-red-400 text-xs ml-2 transition-colors" title="Remove ' + meta.name + '">' +
+                    '<button onclick="window.removeProvider(&quot;' + p + '&quot;)" class="text-gray-500 hover:text-red-400 text-xs ml-2 transition-colors" title="Remove ' + meta.name + '">' +
                     '<i class="fas fa-times"></i></button>' +
                     '</div>';
             }).join('');
