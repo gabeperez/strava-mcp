@@ -118,6 +118,7 @@ export class AuthHandler {
         sessionId: string | null;
         created_at?: number;
         origin?: string;
+        mcp_oauth_state?: string;
       };
       try {
         stateInfo = JSON.parse(storedStateData) as {
@@ -125,6 +126,7 @@ export class AuthHandler {
           sessionId: string | null;
           created_at?: number;
           origin?: string;
+          mcp_oauth_state?: string;
         };
       } catch (e) {
         // Handle legacy string states
@@ -220,6 +222,40 @@ export class AuthHandler {
         token: personalMcpToken,
         created_at: Math.floor(Date.now() / 1000)
       }), { expirationTtl: mcpTokenTtl });
+
+      // MCP OAuth flow: redirect back to the MCP client with an auth code
+      if (stateInfo.mcp_oauth_state) {
+        const oauthPendingData = await this.env.STRAVA_SESSIONS.get(`oauth_pending:${stateInfo.mcp_oauth_state}`);
+        if (oauthPendingData) {
+          const pending = JSON.parse(oauthPendingData) as {
+            client_redirect_uri: string;
+            client_state: string;
+            code_challenge: string;
+            code_challenge_method: string;
+          };
+
+          // Generate a one-time authorization code
+          const authCode = this.generateSecureToken();
+          await this.env.STRAVA_SESSIONS.put(`oauth_code:${authCode}`, JSON.stringify({
+            athlete_id: tokenData.athlete.id,
+            code_challenge: pending.code_challenge,
+            code_challenge_method: pending.code_challenge_method,
+            client_redirect_uri: pending.client_redirect_uri,
+            created_at: Math.floor(Date.now() / 1000),
+          }), { expirationTtl: 300 }); // 5 minutes
+
+          // Clean up the pending state
+          await this.env.STRAVA_SESSIONS.delete(`oauth_pending:${stateInfo.mcp_oauth_state}`);
+
+          // Redirect to the MCP client's callback with the auth code
+          const redirectUrl = new URL(pending.client_redirect_uri);
+          redirectUrl.searchParams.set('code', authCode);
+          if (pending.client_state) {
+            redirectUrl.searchParams.set('state', pending.client_state);
+          }
+          return Response.redirect(redirectUrl.toString(), 302);
+        }
+      }
 
       // Redirect to dashboard using athlete ID (cookie-based auth, no token in URL)
       return new Response(null, {
