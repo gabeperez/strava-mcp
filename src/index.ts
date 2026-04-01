@@ -58,22 +58,44 @@ templates.loadTemplate('terms', TERMS_TEMPLATE);
 app.use('*', async (c, next) => {
   // Handle preflight requests
   if (c.req.method === 'OPTIONS') {
-    return c.json({}, 200, {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization, Cookie',
-      'Access-Control-Allow-Credentials': 'true',
-      'Access-Control-Max-Age': '86400',
+    return new Response(null, {
+      status: 204,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, Cookie',
+        'Access-Control-Allow-Credentials': 'true',
+        'Access-Control-Max-Age': '86400',
+      },
     });
   }
 
   await next();
 
-  // Add CORS headers to response
-  c.res.headers.set('Access-Control-Allow-Origin', '*');
-  c.res.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  c.res.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cookie');
-  c.res.headers.set('Access-Control-Allow-Credentials', 'true');
+  // Clone the response if headers are immutable (e.g. Response.redirect())
+  const corsHeaders: Record<string, string> = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, Cookie',
+    'Access-Control-Allow-Credentials': 'true',
+  };
+  try {
+    for (const [key, value] of Object.entries(corsHeaders)) {
+      c.res.headers.set(key, value);
+    }
+  } catch {
+    // Response has immutable headers — clone it with CORS headers added
+    const original = c.res;
+    const newHeaders = new Headers(original.headers);
+    for (const [key, value] of Object.entries(corsHeaders)) {
+      newHeaders.set(key, value);
+    }
+    c.res = new Response(original.body, {
+      status: original.status,
+      statusText: original.statusText,
+      headers: newHeaders,
+    });
+  }
 });
 
 // Helper function to get current origin
@@ -203,17 +225,14 @@ app.post('/oauth/register', async (c) => {
       created_at: Math.floor(Date.now() / 1000),
     }), { expirationTtl: 365 * 24 * 60 * 60 }); // 1 year
 
-    return new Response(JSON.stringify({
+    return c.json({
       client_id: clientId,
       client_name: body.client_name || 'MCP Client',
       redirect_uris: body.redirect_uris || [],
       grant_types: ['authorization_code'],
       response_types: ['code'],
       token_endpoint_auth_method: 'none',
-    }), {
-      status: 201,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    }, 201);
   } catch (error: any) {
     return c.json({ error: 'invalid_request', error_description: error.message }, 400);
   }
@@ -999,23 +1018,14 @@ app.get('/mcp', async (c) => {
   // If no valid auth, return 401 with OAuth discovery header (triggers MCP OAuth flow)
   if (!isAuthenticated) {
     const resourceMetadata = `${getCurrentDomain(c)}/.well-known/oauth-authorization-server`;
-    return new Response(JSON.stringify({
+    c.header('WWW-Authenticate', `Bearer resource_metadata="${resourceMetadata}"`);
+    return c.json({
       jsonrpc: '2.0',
       error: {
         code: -32001,
         message: 'Authentication required. Use OAuth to connect your Strava account.',
       }
-    }), {
-      status: 401,
-      headers: {
-        'Content-Type': 'application/json',
-        'WWW-Authenticate': `Bearer resource_metadata="${resourceMetadata}"`,
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization, Cookie',
-        'Access-Control-Allow-Credentials': 'true',
-      },
-    });
+    }, 401);
   }
 
   // Return MCP server capabilities for GET requests
@@ -1050,23 +1060,14 @@ app.post('/mcp', async (c) => {
     // If no auth credentials at all, return 401 to trigger OAuth discovery
     if (!personalToken) {
       const resourceMetadata = `${getCurrentDomain(c)}/.well-known/oauth-authorization-server`;
-      return new Response(JSON.stringify({
+      c.header('WWW-Authenticate', `Bearer resource_metadata="${resourceMetadata}"`);
+      return c.json({
         jsonrpc: '2.0',
         error: {
           code: -32001,
           message: 'Authentication required. Use OAuth to connect your Strava account.',
         }
-      }), {
-        status: 401,
-        headers: {
-          'Content-Type': 'application/json',
-          'WWW-Authenticate': `Bearer resource_metadata="${resourceMetadata}"`,
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization, Cookie',
-          'Access-Control-Allow-Credentials': 'true',
-        },
-      });
+      }, 401);
     }
 
     const request = await c.req.json();
