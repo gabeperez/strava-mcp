@@ -708,57 +708,55 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                     <p class="text-xs text-gray-500 mt-2">Authentication is handled via Bearer token in the config snippets below — your token is never exposed in the URL.</p>
                 </div>
 
-                <!-- Agent tabs -->
+                <!-- Connection type tabs -->
                 <div class="mb-3">
-                    <p class="text-sm text-gray-400 mb-3 font-semibold uppercase tracking-wide">Setup instructions by agent</p>
+                    <p class="text-sm text-gray-400 mb-3 font-semibold uppercase tracking-wide">Setup instructions</p>
                     <div class="flex flex-wrap gap-2 mb-4" id="agent-tabs">
-                        <button onclick="showAgent('claude')" id="tab-claude"
+                        <button onclick="showAgent('oauth')" id="tab-oauth"
                             class="agent-tab active-tab px-3 py-1 rounded-full text-xs font-semibold border border-orange-500 text-orange-400">
-                            Claude Desktop
+                            Streamable HTTP (OAuth)
                         </button>
-                        <button onclick="showAgent('cursor')" id="tab-cursor"
+                        <button onclick="showAgent('config')" id="tab-config"
                             class="agent-tab px-3 py-1 rounded-full text-xs font-semibold border border-gray-600 text-gray-400 hover:border-orange-500 hover:text-orange-400">
-                            Cursor
+                            JSON Config
                         </button>
-                        <button onclick="showAgent('windsurf')" id="tab-windsurf"
+                        <button onclick="showAgent('sse')" id="tab-sse"
                             class="agent-tab px-3 py-1 rounded-full text-xs font-semibold border border-gray-600 text-gray-400 hover:border-orange-500 hover:text-orange-400">
-                            Windsurf
+                            SSE (Legacy)
                         </button>
-                        <button onclick="showAgent('cline')" id="tab-cline"
+                        <button onclick="showAgent('manual')" id="tab-manual"
                             class="agent-tab px-3 py-1 rounded-full text-xs font-semibold border border-gray-600 text-gray-400 hover:border-orange-500 hover:text-orange-400">
-                            Cline
-                        </button>
-                        <button onclick="showAgent('continue')" id="tab-continue"
-                            class="agent-tab px-3 py-1 rounded-full text-xs font-semibold border border-gray-600 text-gray-400 hover:border-orange-500 hover:text-orange-400">
-                            Continue.dev
-                        </button>
-                        <button onclick="showAgent('poke')" id="tab-poke"
-                            class="agent-tab px-3 py-1 rounded-full text-xs font-semibold border border-gray-600 text-gray-400 hover:border-orange-500 hover:text-orange-400">
-                            Poke
-                        </button>
-                        <button onclick="showAgent('manus')" id="tab-manus"
-                            class="agent-tab px-3 py-1 rounded-full text-xs font-semibold border border-gray-600 text-gray-400 hover:border-orange-500 hover:text-orange-400">
-                            Manus
-                        </button>
-                        <button onclick="showAgent('openclaw')" id="tab-openclaw"
-                            class="agent-tab px-3 py-1 rounded-full text-xs font-semibold border border-gray-600 text-gray-400 hover:border-orange-500 hover:text-orange-400">
-                            OpenClaw
-                        </button>
-                        <button onclick="showAgent('custom')" id="tab-custom"
-                            class="agent-tab px-3 py-1 rounded-full text-xs font-semibold border border-gray-600 text-gray-400 hover:border-orange-500 hover:text-orange-400">
-                            ✚ Custom
-                        </button>
-                        <button onclick="showAgent('other')" id="tab-other"
-                            class="agent-tab px-3 py-1 rounded-full text-xs font-semibold border border-gray-600 text-gray-400 hover:border-orange-500 hover:text-orange-400">
-                            Other
+                            Manual
                         </button>
                     </div>
 
-                    <!-- Claude Desktop -->
-                    <div id="agent-claude" class="agent-panel">
-                        <p class="text-xs text-gray-400 mb-2">Add to <code class="text-orange-300">~/Library/Application Support/Claude/claude_desktop_config.json</code>:</p>
+                    <!-- Streamable HTTP (OAuth) -->
+                    <div id="agent-oauth" class="agent-panel">
+                        <div class="bg-green-900/20 border border-green-700/40 rounded-lg p-3 mb-3">
+                            <p class="text-xs text-green-300 font-semibold mb-1">Recommended — zero config, no tokens to copy</p>
+                            <p class="text-xs text-gray-400">Just paste the URL below. Your app will open a browser to log in with Strava automatically.</p>
+                        </div>
+                        <p class="text-xs text-gray-400 mb-2">Add this URL as a Streamable HTTP MCP server:</p>
                         <div class="relative">
-                            <pre class="bg-gray-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto"><code id="claude-config">{
+                            <pre class="bg-gray-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto"><code id="oauth-url">{{mcp_base_url}}</code></pre>
+                            <button onclick="copyConfig('oauth-url')"
+                                class="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-xs text-gray-300">
+                                <i class="fas fa-copy mr-1"></i>Copy
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-3"><strong class="text-gray-400">Works with:</strong> Claude Desktop, Cursor, Windsurf, Poke, and any app that supports MCP OAuth</p>
+                        <p class="text-xs text-gray-500 mt-1">The app handles authentication for you — no Bearer token or config file needed.</p>
+                    </div>
+
+                    <!-- JSON Config -->
+                    <div id="agent-config" class="agent-panel hidden">
+                        <div class="bg-gray-800/50 border border-gray-700/40 rounded-lg p-3 mb-3">
+                            <p class="text-xs text-gray-300 font-semibold mb-1">For apps that use a JSON config file</p>
+                            <p class="text-xs text-gray-400">Copy the config below into your app's MCP settings. The Bearer token authenticates your account.</p>
+                        </div>
+                        <p class="text-xs text-gray-400 mb-2 font-semibold">Standard config (most apps):</p>
+                        <div class="relative mb-3">
+                            <pre class="bg-gray-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto"><code id="json-config">{
   "mcpServers": {
     "sportsmcp": {
       "url": "{{mcp_base_url}}",
@@ -768,81 +766,12 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
     }
   }
 }</code></pre>
-                            <button onclick="copyConfig('claude-config')"
+                            <button onclick="copyConfig('json-config')"
                                 class="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-xs text-gray-300">
                                 <i class="fas fa-copy mr-1"></i>Copy
                             </button>
                         </div>
-                        <p class="text-xs text-gray-500 mt-2">Restart Claude Desktop after saving.</p>
-                    </div>
-
-                    <!-- Cursor -->
-                    <div id="agent-cursor" class="agent-panel hidden">
-                        <p class="text-xs text-gray-400 mb-2">Go to <strong>Settings → Cursor Settings → MCP</strong> and add:</p>
-                        <div class="relative">
-                            <pre class="bg-gray-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto"><code id="cursor-config">{
-  "mcpServers": {
-    "sportsmcp": {
-      "url": "{{mcp_base_url}}",
-      "headers": {
-        "Authorization": "Bearer {{mcp_bearer_token}}"
-      }
-    }
-  }
-}</code></pre>
-                            <button onclick="copyConfig('cursor-config')"
-                                class="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-xs text-gray-300">
-                                <i class="fas fa-copy mr-1"></i>Copy
-                            </button>
-                        </div>
-                        <p class="text-xs text-gray-500 mt-2">Cursor auto-reloads MCP servers on save.</p>
-                    </div>
-
-                    <!-- Windsurf -->
-                    <div id="agent-windsurf" class="agent-panel hidden">
-                        <p class="text-xs text-gray-400 mb-2">Go to <strong>Settings → Cascade → MCP Servers</strong> and add:</p>
-                        <div class="relative">
-                            <pre class="bg-gray-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto"><code id="windsurf-config">{
-  "mcpServers": {
-    "sportsmcp": {
-      "url": "{{mcp_base_url}}",
-      "headers": {
-        "Authorization": "Bearer {{mcp_bearer_token}}"
-      }
-    }
-  }
-}</code></pre>
-                            <button onclick="copyConfig('windsurf-config')"
-                                class="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-xs text-gray-300">
-                                <i class="fas fa-copy mr-1"></i>Copy
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Cline -->
-                    <div id="agent-cline" class="agent-panel hidden">
-                        <p class="text-xs text-gray-400 mb-2">In VS Code, open <strong>Cline → MCP Servers → Edit Config</strong> and add:</p>
-                        <div class="relative">
-                            <pre class="bg-gray-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto"><code id="cline-config">{
-  "mcpServers": {
-    "sportsmcp": {
-      "url": "{{mcp_base_url}}",
-      "headers": {
-        "Authorization": "Bearer {{mcp_bearer_token}}"
-      }
-    }
-  }
-}</code></pre>
-                            <button onclick="copyConfig('cline-config')"
-                                class="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-xs text-gray-300">
-                                <i class="fas fa-copy mr-1"></i>Copy
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Continue.dev -->
-                    <div id="agent-continue" class="agent-panel hidden">
-                        <p class="text-xs text-gray-400 mb-2">Add to your <code class="text-orange-300">~/.continue/config.json</code>:</p>
+                        <p class="text-xs text-gray-400 mb-2 font-semibold">Continue.dev format:</p>
                         <div class="relative">
                             <pre class="bg-gray-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto"><code id="continue-config">{
   "mcpServers": [
@@ -863,97 +792,30 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                                 <i class="fas fa-copy mr-1"></i>Copy
                             </button>
                         </div>
+                        <p class="text-xs text-gray-500 mt-3"><strong class="text-gray-400">Works with:</strong> Claude Desktop, Cursor, Windsurf, Cline, Continue.dev, Manus, OpenClaw, and any MCP-compatible app</p>
+                        <details class="mt-2">
+                            <summary class="text-xs text-gray-500 cursor-pointer hover:text-gray-400">Where to add this config</summary>
+                            <div class="mt-2 text-xs text-gray-500 space-y-1 pl-3 border-l border-gray-700">
+                                <p><strong class="text-gray-400">Claude Desktop:</strong> <code class="text-orange-300">~/Library/Application Support/Claude/claude_desktop_config.json</code> — restart after saving</p>
+                                <p><strong class="text-gray-400">Cursor:</strong> Settings → Cursor Settings → MCP</p>
+                                <p><strong class="text-gray-400">Windsurf:</strong> Settings → Cascade → MCP Servers</p>
+                                <p><strong class="text-gray-400">Cline:</strong> VS Code → Cline → MCP Servers → Edit Config</p>
+                                <p><strong class="text-gray-400">Continue.dev:</strong> <code class="text-orange-300">~/.continue/config.json</code> (use Continue.dev format above)</p>
+                                <p><strong class="text-gray-400">Poke:</strong> Settings → Integrations → Add MCP Server</p>
+                                <p><strong class="text-gray-400">Manus:</strong> Settings → Tools → Add MCP Server</p>
+                                <p><strong class="text-gray-400">OpenClaw:</strong> Settings → MCP Servers → Add Server</p>
+                            </div>
+                        </details>
                     </div>
 
-                    <!-- Poke -->
-                    <div id="agent-poke" class="agent-panel hidden">
-                        <p class="text-xs text-gray-400 mb-2">Go to <strong>Settings → Integrations → Add MCP Server</strong> in Poke and use this config:</p>
-                        <div class="relative">
-                            <pre class="bg-gray-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto"><code id="poke-config">{
-  "mcpServers": {
-    "sportsmcp": {
-      "url": "{{mcp_base_url}}",
-      "headers": {
-        "Authorization": "Bearer {{mcp_bearer_token}}"
-      }
-    }
-  }
-}</code></pre>
-                            <button onclick="copyConfig('poke-config')"
-                                class="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-xs text-gray-300">
-                                <i class="fas fa-copy mr-1"></i>Copy
-                            </button>
+                    <!-- SSE (Legacy) -->
+                    <div id="agent-sse" class="agent-panel hidden">
+                        <div class="bg-gray-800/50 border border-gray-700/40 rounded-lg p-3 mb-3">
+                            <p class="text-xs text-gray-300 font-semibold mb-1">For older MCP clients using HTTP+SSE transport</p>
+                            <p class="text-xs text-gray-400">Some older clients don't support Streamable HTTP yet. Use this SSE endpoint instead.</p>
                         </div>
-                        <p class="text-xs text-gray-500 mt-2">Poke also supports real-time workout notifications — see the Poke Notifications section below.</p>
-                    </div>
-
-                    <!-- Manus -->
-                    <div id="agent-manus" class="agent-panel hidden">
-                        <p class="text-xs text-gray-400 mb-2">In <strong>Manus</strong>, go to <strong>Settings → Tools → Add MCP Server</strong> and use the JSON config:</p>
                         <div class="relative">
-                            <pre class="bg-gray-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto"><code id="manus-config">{
-  "mcpServers": {
-    "sportsmcp": {
-      "url": "{{mcp_base_url}}",
-      "headers": {
-        "Authorization": "Bearer {{mcp_bearer_token}}"
-      }
-    }
-  }
-}</code></pre>
-                            <button onclick="copyConfig('manus-config')"
-                                class="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-xs text-gray-300">
-                                <i class="fas fa-copy mr-1"></i>Copy
-                            </button>
-                        </div>
-                        <p class="text-xs text-gray-500 mt-2">Manus supports the Streamable HTTP transport. Your Strava data will be available as tools in any Manus agent.</p>
-                    </div>
-
-                    <!-- OpenClaw -->
-                    <div id="agent-openclaw" class="agent-panel hidden">
-                        <p class="text-xs text-gray-400 mb-2">In <strong>OpenClaw</strong>, go to <strong>Settings → MCP Servers → Add Server</strong> and use the JSON config:</p>
-                        <div class="relative">
-                            <pre class="bg-gray-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto"><code id="openclaw-config">{
-  "mcpServers": {
-    "sportsmcp": {
-      "url": "{{mcp_base_url}}",
-      "headers": {
-        "Authorization": "Bearer {{mcp_bearer_token}}"
-      }
-    }
-  }
-}</code></pre>
-                            <button onclick="copyConfig('openclaw-config')"
-                                class="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-xs text-gray-300">
-                                <i class="fas fa-copy mr-1"></i>Copy
-                            </button>
-                        </div>
-                        <p class="text-xs text-gray-500 mt-2">Both Streamable HTTP and SSE transports are supported.</p>
-                    </div>
-
-                    <!-- Custom Agent -->
-                    <div id="agent-custom" class="agent-panel hidden">
-                        <p class="text-xs text-gray-400 mb-3">Add SportsMCP to any MCP-compatible agent using the config below:</p>
-                        <p class="text-xs text-gray-400 mb-2 font-semibold">Standard JSON config (most agents):</p>
-                        <div class="relative mb-3">
-                            <pre class="bg-gray-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto"><code id="custom-config">{
-  "mcpServers": {
-    "sportsmcp": {
-      "url": "{{mcp_base_url}}",
-      "headers": {
-        "Authorization": "Bearer {{mcp_bearer_token}}"
-      }
-    }
-  }
-}</code></pre>
-                            <button onclick="copyConfig('custom-config')"
-                                class="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-xs text-gray-300">
-                                <i class="fas fa-copy mr-1"></i>Copy
-                            </button>
-                        </div>
-                        <p class="text-xs text-gray-400 mb-2 font-semibold">SSE transport (legacy clients):</p>
-                        <div class="relative">
-                            <pre class="bg-gray-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto"><code id="custom-sse-config">{
+                            <pre class="bg-gray-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto"><code id="sse-config">{
   "mcpServers": {
     "sportsmcp": {
       "url": "{{mcp_sse_base_url}}",
@@ -963,23 +825,35 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
     }
   }
 }</code></pre>
-                            <button onclick="copyConfig('custom-sse-config')"
+                            <button onclick="copyConfig('sse-config')"
                                 class="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-xs text-gray-300">
                                 <i class="fas fa-copy mr-1"></i>Copy
                             </button>
                         </div>
-                        <p class="text-xs text-gray-500 mt-3">If your agent isn't listed above, open a <a href="https://github.com/gabeperez/strava-mcp/issues" class="text-orange-400 hover:underline">GitHub issue</a> and we'll add instructions for it!</p>
+                        <p class="text-xs text-gray-500 mt-3"><strong class="text-gray-400">Use this if:</strong> your app doesn't connect with the Streamable HTTP URL or JSON config above</p>
                     </div>
 
-                    <!-- Other -->
-                    <div id="agent-other" class="agent-panel hidden">
-                        <p class="text-xs text-gray-400 mb-2">Any MCP-compatible agent that supports <strong>Streamable HTTP</strong> or <strong>HTTP+SSE</strong> transport works:</p>
-                        <div class="bg-gray-900 rounded-lg p-4 text-xs space-y-2 text-gray-300">
-                            <p><span class="text-orange-400 font-semibold">Endpoint:</span> <code class="text-green-300">{{mcp_base_url}}</code></p>
-                            <p><span class="text-orange-400 font-semibold">Auth header:</span> <code class="text-green-300">Authorization: Bearer {{mcp_bearer_token}}</code></p>
-                            <p><span class="text-orange-400 font-semibold">SSE endpoint:</span> <code class="text-green-300">{{mcp_sse_base_url}}</code></p>
+                    <!-- Manual -->
+                    <div id="agent-manual" class="agent-panel hidden">
+                        <div class="bg-gray-800/50 border border-gray-700/40 rounded-lg p-3 mb-3">
+                            <p class="text-xs text-gray-300 font-semibold mb-1">Raw connection details</p>
+                            <p class="text-xs text-gray-400">For apps that ask for the endpoint and auth header separately.</p>
                         </div>
-                        <p class="text-xs text-gray-500 mt-2">Check your agent's MCP docs for which transport type it uses. Both are supported.</p>
+                        <div class="bg-gray-900 rounded-lg p-4 text-xs space-y-3 text-gray-300">
+                            <div>
+                                <p class="text-orange-400 font-semibold mb-1">Streamable HTTP endpoint</p>
+                                <code class="text-green-300">{{mcp_base_url}}</code>
+                            </div>
+                            <div>
+                                <p class="text-orange-400 font-semibold mb-1">SSE endpoint (legacy)</p>
+                                <code class="text-green-300">{{mcp_sse_base_url}}</code>
+                            </div>
+                            <div>
+                                <p class="text-orange-400 font-semibold mb-1">Authorization header</p>
+                                <code class="text-green-300">Bearer {{mcp_bearer_token}}</code>
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-3">Any MCP-compatible app that supports Streamable HTTP or SSE transport will work. Check your app's docs for which transport it uses.</p>
                     </div>
                 </div>
             </div>
