@@ -222,7 +222,9 @@ export class AuthHandler {
       }), { expirationTtl: mcpTokenTtl });
 
       // Redirect to dashboard using athlete ID (cookie-based auth, no token in URL)
-      return c.redirect(`${flowOrigin}/dashboard/${tokenData.athlete.id}`);
+      return c.redirect(`${flowOrigin}/dashboard/${tokenData.athlete.id}`, 302, {
+        'Set-Cookie': cookie,
+      });
     } catch (error: any) {
       console.error('OAuth callback error:', error);
       return c.html(`
