@@ -660,8 +660,11 @@ export async function handleMCPOverSSE(c: Context) {
       })()
     };
 
-    // --- Authentication: prefer token query param, then fall back to cookie/device ---
-    const personalToken = c.req.query('token');
+    // --- Authentication: prefer Bearer header, then token query param, then cookie/device ---
+    const authHeader = c.req.header('Authorization');
+    const personalToken = authHeader?.startsWith('Bearer ')
+      ? authHeader.slice(7)
+      : c.req.query('token');
     let authenticatedAthleteId: number | null = null;
 
     if (personalToken) {

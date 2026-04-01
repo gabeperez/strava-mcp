@@ -697,14 +697,15 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
 
                 <div class="bg-gray-800 rounded-lg p-4 mb-6">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                        <code class="text-orange-400 font-mono text-xs sm:text-sm break-all" id="mcp-url-text">{{mcp_url}}</code>
+                        <code class="text-orange-400 font-mono text-xs sm:text-sm break-all" id="mcp-url-text">{{mcp_base_url}}</code>
                         <button
-                            onclick="window.copyToClipboard('{{mcp_url}}')"
+                            onclick="window.copyToClipboard('{{mcp_base_url}}')"
                             class="w-full sm:w-auto sm:ml-4 bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex-shrink-0 flex items-center justify-center"
                         >
                             <i class="fas fa-copy mr-2"></i>Copy URL
                         </button>
                     </div>
+                    <p class="text-xs text-gray-500 mt-2">Authentication is handled via Bearer token in the config snippets below — your token is never exposed in the URL.</p>
                 </div>
 
                 <!-- Agent tabs -->
@@ -760,7 +761,10 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                             <pre class="bg-gray-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto"><code id="claude-config">{
   "mcpServers": {
     "sportsmcp": {
-      "url": "{{mcp_url}}"
+      "url": "{{mcp_base_url}}",
+      "headers": {
+        "Authorization": "Bearer {{mcp_bearer_token}}"
+      }
     }
   }
 }</code></pre>
@@ -779,7 +783,10 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                             <pre class="bg-gray-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto"><code id="cursor-config">{
   "mcpServers": {
     "sportsmcp": {
-      "url": "{{mcp_url}}"
+      "url": "{{mcp_base_url}}",
+      "headers": {
+        "Authorization": "Bearer {{mcp_bearer_token}}"
+      }
     }
   }
 }</code></pre>
@@ -798,7 +805,10 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                             <pre class="bg-gray-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto"><code id="windsurf-config">{
   "mcpServers": {
     "sportsmcp": {
-      "url": "{{mcp_url}}"
+      "url": "{{mcp_base_url}}",
+      "headers": {
+        "Authorization": "Bearer {{mcp_bearer_token}}"
+      }
     }
   }
 }</code></pre>
@@ -816,7 +826,10 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                             <pre class="bg-gray-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto"><code id="cline-config">{
   "mcpServers": {
     "sportsmcp": {
-      "url": "{{mcp_url}}"
+      "url": "{{mcp_base_url}}",
+      "headers": {
+        "Authorization": "Bearer {{mcp_bearer_token}}"
+      }
     }
   }
 }</code></pre>
@@ -837,7 +850,10 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
       "name": "sportsmcp",
       "transport": {
         "type": "streamable-http",
-        "url": "{{mcp_url}}"
+        "url": "{{mcp_base_url}}",
+        "headers": {
+          "Authorization": "Bearer {{mcp_bearer_token}}"
+        }
       }
     }
   ]
@@ -851,25 +867,37 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
 
                     <!-- Poke -->
                     <div id="agent-poke" class="agent-panel hidden">
-                        <p class="text-xs text-gray-400 mb-2">Go to <strong>Settings → Integrations → Add MCP Server</strong> in Poke and paste:</p>
-                        <div class="bg-gray-900 rounded-lg p-4">
-                            <code class="text-orange-400 text-sm break-all">{{mcp_url}}</code>
+                        <p class="text-xs text-gray-400 mb-2">Go to <strong>Settings → Integrations → Add MCP Server</strong> in Poke and use this config:</p>
+                        <div class="relative">
+                            <pre class="bg-gray-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto"><code id="poke-config">{
+  "mcpServers": {
+    "sportsmcp": {
+      "url": "{{mcp_base_url}}",
+      "headers": {
+        "Authorization": "Bearer {{mcp_bearer_token}}"
+      }
+    }
+  }
+}</code></pre>
+                            <button onclick="copyConfig('poke-config')"
+                                class="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-xs text-gray-300">
+                                <i class="fas fa-copy mr-1"></i>Copy
+                            </button>
                         </div>
                         <p class="text-xs text-gray-500 mt-2">Poke also supports real-time workout notifications — see the Poke Notifications section below.</p>
                     </div>
 
                     <!-- Manus -->
                     <div id="agent-manus" class="agent-panel hidden">
-                        <p class="text-xs text-gray-400 mb-2">In <strong>Manus</strong>, go to <strong>Settings → Tools → Add MCP Server</strong> and paste your MCP URL:</p>
-                        <div class="bg-gray-900 rounded-lg p-4 mb-3">
-                            <code class="text-orange-400 text-sm break-all">{{mcp_url}}</code>
-                        </div>
-                        <p class="text-xs text-gray-400 mb-2">Or use the JSON config format if Manus requests it:</p>
+                        <p class="text-xs text-gray-400 mb-2">In <strong>Manus</strong>, go to <strong>Settings → Tools → Add MCP Server</strong> and use the JSON config:</p>
                         <div class="relative">
                             <pre class="bg-gray-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto"><code id="manus-config">{
   "mcpServers": {
     "sportsmcp": {
-      "url": "{{mcp_url}}"
+      "url": "{{mcp_base_url}}",
+      "headers": {
+        "Authorization": "Bearer {{mcp_bearer_token}}"
+      }
     }
   }
 }</code></pre>
@@ -883,16 +911,15 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
 
                     <!-- OpenClaw -->
                     <div id="agent-openclaw" class="agent-panel hidden">
-                        <p class="text-xs text-gray-400 mb-2">In <strong>OpenClaw</strong>, go to <strong>Settings → MCP Servers → Add Server</strong> and paste your MCP URL:</p>
-                        <div class="bg-gray-900 rounded-lg p-4 mb-3">
-                            <code class="text-orange-400 text-sm break-all">{{mcp_url}}</code>
-                        </div>
-                        <p class="text-xs text-gray-400 mb-2">Or use the JSON config format:</p>
+                        <p class="text-xs text-gray-400 mb-2">In <strong>OpenClaw</strong>, go to <strong>Settings → MCP Servers → Add Server</strong> and use the JSON config:</p>
                         <div class="relative">
                             <pre class="bg-gray-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto"><code id="openclaw-config">{
   "mcpServers": {
     "sportsmcp": {
-      "url": "{{mcp_url}}"
+      "url": "{{mcp_base_url}}",
+      "headers": {
+        "Authorization": "Bearer {{mcp_bearer_token}}"
+      }
     }
   }
 }</code></pre>
@@ -901,24 +928,21 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                                 <i class="fas fa-copy mr-1"></i>Copy
                             </button>
                         </div>
-                        <p class="text-xs text-gray-500 mt-2">Both Streamable HTTP and SSE transports are supported. Use <code class="text-orange-300">{{mcp_sse_url}}</code> for SSE.</p>
+                        <p class="text-xs text-gray-500 mt-2">Both Streamable HTTP and SSE transports are supported.</p>
                     </div>
 
                     <!-- Custom Agent -->
                     <div id="agent-custom" class="agent-panel hidden">
-                        <p class="text-xs text-gray-400 mb-3">Add SportsMCP to any MCP-compatible agent. Your personal URL and both config formats are below:</p>
-                        <div class="bg-gray-900 rounded-lg p-3 mb-3 flex items-center justify-between gap-2">
-                            <code class="text-orange-400 text-xs break-all flex-1">{{mcp_url}}</code>
-                            <button onclick="copyText('{{mcp_url}}')" class="bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-xs text-gray-300 whitespace-nowrap flex-shrink-0">
-                                <i class="fas fa-copy mr-1"></i>Copy URL
-                            </button>
-                        </div>
+                        <p class="text-xs text-gray-400 mb-3">Add SportsMCP to any MCP-compatible agent using the config below:</p>
                         <p class="text-xs text-gray-400 mb-2 font-semibold">Standard JSON config (most agents):</p>
                         <div class="relative mb-3">
                             <pre class="bg-gray-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto"><code id="custom-config">{
   "mcpServers": {
     "sportsmcp": {
-      "url": "{{mcp_url}}"
+      "url": "{{mcp_base_url}}",
+      "headers": {
+        "Authorization": "Bearer {{mcp_bearer_token}}"
+      }
     }
   }
 }</code></pre>
@@ -928,9 +952,19 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                             </button>
                         </div>
                         <p class="text-xs text-gray-400 mb-2 font-semibold">SSE transport (legacy clients):</p>
-                        <div class="bg-gray-900 rounded-lg p-3 flex items-center justify-between gap-2">
-                            <code class="text-green-300 text-xs break-all flex-1">{{mcp_sse_url}}</code>
-                            <button onclick="copyText('{{mcp_sse_url}}')" class="bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-xs text-gray-300 whitespace-nowrap flex-shrink-0">
+                        <div class="relative">
+                            <pre class="bg-gray-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto"><code id="custom-sse-config">{
+  "mcpServers": {
+    "sportsmcp": {
+      "url": "{{mcp_sse_base_url}}",
+      "headers": {
+        "Authorization": "Bearer {{mcp_bearer_token}}"
+      }
+    }
+  }
+}</code></pre>
+                            <button onclick="copyConfig('custom-sse-config')"
+                                class="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded text-xs text-gray-300">
                                 <i class="fas fa-copy mr-1"></i>Copy
                             </button>
                         </div>
@@ -940,9 +974,10 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                     <!-- Other -->
                     <div id="agent-other" class="agent-panel hidden">
                         <p class="text-xs text-gray-400 mb-2">Any MCP-compatible agent that supports <strong>Streamable HTTP</strong> or <strong>HTTP+SSE</strong> transport works:</p>
-                        <div class="bg-gray-900 rounded-lg p-4 text-xs space-y-1 text-gray-300">
-                            <p><span class="text-orange-400 font-semibold">Streamable HTTP:</span> <code class="text-green-300">POST {{mcp_url}}</code></p>
-                            <p><span class="text-orange-400 font-semibold">SSE transport:</span> <code class="text-green-300">GET {{mcp_sse_url}}</code></p>
+                        <div class="bg-gray-900 rounded-lg p-4 text-xs space-y-2 text-gray-300">
+                            <p><span class="text-orange-400 font-semibold">Endpoint:</span> <code class="text-green-300">{{mcp_base_url}}</code></p>
+                            <p><span class="text-orange-400 font-semibold">Auth header:</span> <code class="text-green-300">Authorization: Bearer {{mcp_bearer_token}}</code></p>
+                            <p><span class="text-orange-400 font-semibold">SSE endpoint:</span> <code class="text-green-300">{{mcp_sse_base_url}}</code></p>
                         </div>
                         <p class="text-xs text-gray-500 mt-2">Check your agent's MCP docs for which transport type it uses. Both are supported.</p>
                     </div>
@@ -1294,8 +1329,10 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                         <pre class="bg-gray-900 rounded-lg p-3 text-xs text-green-300 overflow-x-auto mb-3"><code id="claude-conn-config">{
   "mcpServers": {
     "SportsMCP": {
-      "command": "npx",
-      "args": ["-y", "mcp-remote@latest", "{{mcp_url}}"]
+      "url": "{{mcp_base_url}}",
+      "headers": {
+        "Authorization": "Bearer {{mcp_bearer_token}}"
+      }
     }
   }
 }</code></pre>
@@ -1331,7 +1368,10 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                         <pre class="bg-gray-900 rounded-lg p-3 text-xs text-green-300 overflow-x-auto mb-3"><code id="cursor-conn-config">{
   "mcpServers": {
     "SportsMCP": {
-      "url": "{{mcp_url}}"
+      "url": "{{mcp_base_url}}",
+      "headers": {
+        "Authorization": "Bearer {{mcp_bearer_token}}"
+      }
     }
   }
 }</code></pre>
@@ -1367,8 +1407,10 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                         <pre class="bg-gray-900 rounded-lg p-3 text-xs text-green-300 overflow-x-auto mb-3"><code id="windsurf-conn-config">{
   "mcpServers": {
     "SportsMCP": {
-      "serverUrl": "{{mcp_sse_url}}",
-      "type": "sse"
+      "url": "{{mcp_base_url}}",
+      "headers": {
+        "Authorization": "Bearer {{mcp_bearer_token}}"
+      }
     }
   }
 }</code></pre>
@@ -1404,7 +1446,10 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                         <pre class="bg-gray-900 rounded-lg p-3 text-xs text-green-300 overflow-x-auto mb-3"><code id="cline-conn-config">{
   "mcpServers": {
     "SportsMCP": {
-      "url": "{{mcp_url}}",
+      "url": "{{mcp_base_url}}",
+      "headers": {
+        "Authorization": "Bearer {{mcp_bearer_token}}"
+      },
       "type": "streamable-http"
     }
   }
@@ -1443,7 +1488,10 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
     "modelContextProtocolServers": [{
       "transport": {
         "type": "streamable-http",
-        "url": "{{mcp_url}}"
+        "url": "{{mcp_base_url}}",
+        "headers": {
+          "Authorization": "Bearer {{mcp_bearer_token}}"
+        }
       }
     }]
   }
@@ -1476,10 +1524,19 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                         <div class="{{agent_manus_on}} mb-3 flex items-center gap-2 text-xs text-gray-400">
                             <span class="{{agent_manus_lasttool_visible}} bg-gray-900 rounded px-2 py-0.5 text-gray-300">Last tool: <span class="text-orange-400">{{agent_manus_lasttool}}</span></span>
                         </div>
-                        <p class="text-xs text-gray-400 mb-3">In Manus, add an MCP server with this URL:</p>
-                        <div class="flex items-center gap-2 mb-3">
-                            <code class="flex-1 bg-gray-900 rounded-lg px-3 py-2 text-xs text-green-300 break-all" id="manus-url">{{mcp_url}}</code>
-                            <button onclick="copyText('{{mcp_url}}')" class="shrink-0 text-xs bg-gray-700 hover:bg-gray-600 text-gray-200 px-3 py-2 rounded-lg transition-colors">Copy URL</button>
+                        <p class="text-xs text-gray-400 mb-3">In Manus, add an MCP server with this config:</p>
+                        <pre class="bg-gray-900 rounded-lg p-3 text-xs text-green-300 overflow-x-auto mb-3"><code id="manus-conn-config">{
+  "mcpServers": {
+    "SportsMCP": {
+      "url": "{{mcp_base_url}}",
+      "headers": {
+        "Authorization": "Bearer {{mcp_bearer_token}}"
+      }
+    }
+  }
+}</code></pre>
+                        <div class="flex gap-2">
+                            <button onclick="copyConfig('manus-conn-config')" class="flex-1 text-xs bg-gray-700 hover:bg-gray-600 text-gray-200 py-1.5 rounded-lg transition-colors">Copy Config</button>
                         </div>
                     </div>
                 </div>
@@ -1506,10 +1563,19 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
                         <div class="{{agent_openclaw_on}} mb-3 flex items-center gap-2 text-xs text-gray-400">
                             <span class="{{agent_openclaw_lasttool_visible}} bg-gray-900 rounded px-2 py-0.5 text-gray-300">Last tool: <span class="text-orange-400">{{agent_openclaw_lasttool}}</span></span>
                         </div>
-                        <p class="text-xs text-gray-400 mb-3">In OpenClaw, add an MCP server with this URL:</p>
-                        <div class="flex items-center gap-2 mb-3">
-                            <code class="flex-1 bg-gray-900 rounded-lg px-3 py-2 text-xs text-green-300 break-all" id="openclaw-url">{{mcp_url}}</code>
-                            <button onclick="copyText('{{mcp_url}}')" class="shrink-0 text-xs bg-gray-700 hover:bg-gray-600 text-gray-200 px-3 py-2 rounded-lg transition-colors">Copy URL</button>
+                        <p class="text-xs text-gray-400 mb-3">In OpenClaw, add an MCP server with this config:</p>
+                        <pre class="bg-gray-900 rounded-lg p-3 text-xs text-green-300 overflow-x-auto mb-3"><code id="openclaw-conn-config">{
+  "mcpServers": {
+    "SportsMCP": {
+      "url": "{{mcp_base_url}}",
+      "headers": {
+        "Authorization": "Bearer {{mcp_bearer_token}}"
+      }
+    }
+  }
+}</code></pre>
+                        <div class="flex gap-2">
+                            <button onclick="copyConfig('openclaw-conn-config')" class="flex-1 text-xs bg-gray-700 hover:bg-gray-600 text-gray-200 py-1.5 rounded-lg transition-colors">Copy Config</button>
                         </div>
                     </div>
                 </div>
@@ -1613,6 +1679,9 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
     </div>
 
     <script>
+        // Embedded MCP token for client-side API calls (not in URL)
+        window.__mcpToken = '{{mcp_token}}';
+
         // ── Tools Modal ──────────────────────────────────────────────────────
         const D_TOOLS = [
           { name: 'get-recent-activities', cat: 'activities', emoji: '📋', title: 'Recent Activities', desc: 'Fetch your latest workouts with distance, time, pace, and sport type.', example: '"Show me my last 10 runs"' },
@@ -1780,7 +1849,7 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
         };
 
         function _pokeToken() {
-            return new URLSearchParams(window.location.search).get('token') || '';
+            return window.__mcpToken || '';
         }
         function _pokeStatus(msg, isError, location) {
             var target = location || 'both';
