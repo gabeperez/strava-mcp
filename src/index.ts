@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { Env } from './types';
 import { AuthHandler } from './auth';
 import { AuthMiddleware } from './middleware';
+import { getCookieValue, createCookie } from './session';
 import { StravaApiHandlers } from './api';
 import { SportsMCPServer, handleMCPOverSSE } from './mcp-server';
 import { TemplateEngine, LANDING_TEMPLATE, DASHBOARD_TEMPLATE } from './templates';
@@ -530,28 +531,76 @@ async function handleSaveNotificationConfig(c: any) {
 app.post('/settings/poke-key', handleSaveNotificationConfig);
 app.post('/settings/notification-config', handleSaveNotificationConfig);
 
-// Dashboard endpoint
+// Dashboard backward-compat: /dashboard?token=xxx → redirect to /dashboard/{athleteId}
 app.get('/dashboard', async (c) => {
   const token = c.req.query('token');
   if (!token) {
+    // No token — check cookie
+    const cookieAthleteId = getCookieValue(c.req.raw, 'sid');
+    if (cookieAthleteId) {
+      return c.redirect(`/dashboard/${cookieAthleteId}`);
+    }
     return c.redirect('/auth');
   }
-  
+
   try {
-    // Get user data using the personal MCP token
     const personalData = await c.env.STRAVA_SESSIONS.get(`personal_mcp:${token}`);
     if (!personalData) {
       return c.redirect('/auth');
     }
-    
     const { athlete_id } = JSON.parse(personalData);
+
+    // Set cookie if not already present, then redirect
+    const existingCookie = getCookieValue(c.req.raw, 'sid');
+    if (!existingCookie || existingCookie !== String(athlete_id)) {
+      const cookie = createCookie('sid', String(athlete_id), 30 * 24 * 60 * 60);
+      return new Response(null, {
+        status: 302,
+        headers: {
+          'Location': `/dashboard/${athlete_id}`,
+          'Set-Cookie': cookie,
+        },
+      });
+    }
+    return c.redirect(`/dashboard/${athlete_id}`);
+  } catch (error) {
+    console.error('Dashboard redirect error:', error);
+    return c.redirect('/auth');
+  }
+});
+
+// Dashboard endpoint (cookie-based auth, no token in URL)
+app.get('/dashboard/:athleteId', async (c) => {
+  const urlAthleteId = c.req.param('athleteId');
+
+  // Authenticate via cookie
+  const cookieAthleteId = getCookieValue(c.req.raw, 'sid');
+  if (!cookieAthleteId) {
+    return c.redirect('/auth');
+  }
+
+  // Verify the cookie matches the URL (prevent viewing other users' dashboards)
+  if (cookieAthleteId !== urlAthleteId) {
+    return c.redirect(`/dashboard/${cookieAthleteId}`);
+  }
+
+  const athlete_id = parseInt(urlAthleteId);
+  if (isNaN(athlete_id)) {
+    return c.redirect('/auth');
+  }
+
+  try {
     const sessionManager = new (await import('./session')).KVSessionManager(c.env);
     const session = await sessionManager.getSession(athlete_id);
-    
+
     if (!session) {
       return c.redirect('/auth');
     }
-    
+
+    // Retrieve the personal MCP token via reverse lookup
+    const mcpTokenData = await c.env.STRAVA_SESSIONS.get(`athlete_mcp_token:${athlete_id}`);
+    const token = mcpTokenData ? JSON.parse(mcpTokenData).token : null;
+
     // Fetch user's Strava data + agent connection info in parallel
     const agentSlugs = AGENT_DEFS.map(d => d.slug);
     const [profileResponse, statsResponse, activitiesResponse, lastConnRaw, ...perAgentRaws] = await Promise.all([
@@ -594,11 +643,11 @@ app.get('/dashboard', async (c) => {
         try { perAgentData[slug] = JSON.parse(raw as string); } catch (_) {}
       }
     });
-    
+
     const profile = await profileResponse.json();
     const stats = await statsResponse.json();
     const activities = await activitiesResponse.json();
-    
+
     // Format activity data for template
     const activitiesArray = Array.isArray(activities) ? activities : [];
     const formattedActivities = activitiesArray.slice(0, 7).map((activity: any) => ({
@@ -609,47 +658,50 @@ app.get('/dashboard', async (c) => {
         month: 'short',
         day: 'numeric'
       }),
-      pace: activity.sport_type === 'Run' && activity.distance > 0 ? 
-        Math.floor(activity.moving_time / (activity.distance / 1000) / 60) + ':' + 
+      pace: activity.sport_type === 'Run' && activity.distance > 0 ?
+        Math.floor(activity.moving_time / (activity.distance / 1000) / 60) + ':' +
         String(Math.floor(activity.moving_time / (activity.distance / 1000) % 60)).padStart(2, '0') + '/km' : null,
-      speed: activity.sport_type === 'Ride' && activity.distance > 0 ? 
+      speed: activity.sport_type === 'Ride' && activity.distance > 0 ?
         Math.round(activity.distance / 1000 / (activity.moving_time / 3600) * 10) / 10 + ' km/h' : null
     }));
-    
+
     // Calculate insights
     const totalActivities = stats.recent_run_totals.count + stats.recent_ride_totals.count + (stats.recent_swim_totals?.count || 0);
-    const avgDistance = totalActivities > 0 ? 
+    const avgDistance = totalActivities > 0 ?
       Math.round((stats.recent_run_totals.distance + stats.recent_ride_totals.distance) / totalActivities / 100) / 10 : 0;
     const totalElevation = stats.recent_run_totals.elevation_gain + stats.recent_ride_totals.elevation_gain;
-    
+
     // Format profile data
     const formattedProfile = {
       ...profile,
       username: profile.username || 'Not set',
-      location: profile.city && profile.state ? `${profile.city}, ${profile.state}` : 
-                profile.city ? profile.city : 
+      location: profile.city && profile.state ? `${profile.city}, ${profile.state}` :
+                profile.city ? profile.city :
                 profile.country ? profile.country : 'Not set',
       created_date: profile.created_at ? new Date(profile.created_at).toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long'
       }) : 'Unknown'
     };
-    
+
     // Calculate date range for "recent" stats (last 4 weeks)
     const fourWeeksAgo = new Date();
     fourWeeksAgo.setDate(fourWeeksAgo.getDate() - 28);
-    const statsDateRange = fourWeeksAgo.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + 
+    const statsDateRange = fourWeeksAgo.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) +
       ' - ' + new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    
+
     const currentDomain = getCurrentDomain(c);
-    
+
     // Prepare dashboard data
     const dashboardData = {
       profile: formattedProfile,
       stats,
       recent_activities: formattedActivities,
-      mcp_url: `${currentDomain}/mcp?token=${token}`,
-      mcp_sse_url: `${currentDomain}/sse?token=${token}`,
+      mcp_url: token ? `${currentDomain}/mcp?token=${token}` : '',
+      mcp_sse_url: token ? `${currentDomain}/sse?token=${token}` : '',
+      mcp_base_url: `${currentDomain}/mcp`,
+      mcp_sse_base_url: `${currentDomain}/sse`,
+      mcp_bearer_token: token || '',
       created_at: new Date(session.created_at * 1000).toLocaleDateString(),
       last_refresh: new Date().toLocaleString(),
       total_time: Math.round((stats.recent_run_totals.moving_time + stats.recent_ride_totals.moving_time) / 3600) + 'h',
@@ -674,7 +726,7 @@ app.get('/dashboard', async (c) => {
       active_providers_json: JSON.stringify(activeConfigs.map(c => c.provider)),
       providers_json: JSON.stringify(PROVIDER_INFO),
       agent_poke: activeConfigs.some(c => c.provider === 'poke'),
-      mcp_token: token,
+      mcp_token: token || '',
       last_conn_display: lastConnDisplay,
       last_conn_agent: lastConnAgent,
       last_conn_count: lastConnCount,
@@ -695,23 +747,34 @@ app.get('/dashboard', async (c) => {
       agent_poke_on:      activeConfigs.some(c => c.provider === 'poke') ? '' : 'hidden',
       agent_poke_off:     activeConfigs.some(c => c.provider === 'poke') ? 'hidden' : ''
     };
-    
+
     // Render the beautiful dashboard HTML
     const html = templates.render('dashboard', dashboardData);
     return c.html(html);
-    
+
   } catch (error) {
     console.error('Dashboard error:', error);
     return c.redirect('/auth');
   }
 });
 
+// Helper: extract personal MCP token from Authorization header or query param
+function getPersonalToken(c: any): string | null {
+  // Prefer Authorization: Bearer header
+  const authHeader = c.req.header('Authorization');
+  if (authHeader?.startsWith('Bearer ')) {
+    return authHeader.slice(7);
+  }
+  // Fall back to query param
+  return c.req.query('token') || null;
+}
+
 // MCP endpoint - handle both GET (info) and POST (JSON-RPC)
 app.get('/mcp', async (c) => {
   // Check if there's a valid personal MCP token
-  const personalToken = c.req.query('token');
+  const personalToken = getPersonalToken(c);
   let isAuthenticated = false;
-  
+
   if (personalToken) {
     try {
       const personalData = await c.env.STRAVA_SESSIONS.get(`personal_mcp:${personalToken}`);
@@ -760,10 +823,10 @@ app.post('/mcp', async (c) => {
       baseUrl: getCurrentDomain(c)
     };
     
-    // Check for personal MCP token in URL parameter
-    const personalToken = c.req.query('token');
+    // Check for personal MCP token (header or query param)
+    const personalToken = getPersonalToken(c);
     let authenticatedAthleteId = null;
-    
+
     // Method 1: Personal MCP token (primary method)
     if (personalToken) {
       try {

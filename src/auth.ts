@@ -208,14 +208,27 @@ export class AuthHandler {
       
       // Generate unique personal MCP token
       const personalMcpToken = this.generateSecureToken();
+      const mcpTokenTtl = 365 * 24 * 60 * 60; // 1 year
       await this.env.STRAVA_SESSIONS.put(`personal_mcp:${personalMcpToken}`, JSON.stringify({
         athlete_id: tokenData.athlete.id,
         created_at: Math.floor(Date.now() / 1000),
-        expires_at: Math.floor(Date.now() / 1000) + (365 * 24 * 60 * 60) // 1 year
-      }), { expirationTtl: 365 * 24 * 60 * 60 }); // 1 year
+        expires_at: Math.floor(Date.now() / 1000) + mcpTokenTtl
+      }), { expirationTtl: mcpTokenTtl });
 
-      // Redirect back to the original tenant domain that started the flow
-      return c.redirect(`${flowOrigin}/dashboard?token=${personalMcpToken}`);
+      // Store reverse lookup: athlete_id → MCP token (for dashboard to retrieve)
+      await this.env.STRAVA_SESSIONS.put(`athlete_mcp_token:${tokenData.athlete.id}`, JSON.stringify({
+        token: personalMcpToken,
+        created_at: Math.floor(Date.now() / 1000)
+      }), { expirationTtl: mcpTokenTtl });
+
+      // Redirect to dashboard using athlete ID (cookie-based auth, no token in URL)
+      return new Response(null, {
+        status: 302,
+        headers: {
+          'Location': `${flowOrigin}/dashboard/${tokenData.athlete.id}`,
+          'Set-Cookie': cookie,
+        },
+      });
     } catch (error: any) {
       console.error('OAuth callback error:', error);
       return c.html(`
@@ -297,8 +310,12 @@ export class AuthHandler {
       const cookie = deleteCookie('sid');
       
       // Redirect to landing page after successful logout
-      return c.redirect('/', 302, {
-        'Set-Cookie': cookie,
+      return new Response(null, {
+        status: 302,
+        headers: {
+          'Location': '/',
+          'Set-Cookie': cookie,
+        },
       });
     } catch (error) {
       console.error('Error logging out:', error);
