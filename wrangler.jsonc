@@ -10,7 +10,7 @@
 			"binding": "STRAVA_SESSIONS",
 			// Run: wrangler kv:namespace create STRAVA_SESSIONS
 			// Then paste the id you get here (or run: node scripts/setup.js)
-			"id": "25472761404c4f98a37a8ece07550458"
+			"id": "YOUR_KV_NAMESPACE_ID"
 		}
 	],
 	// ⚠️  Set your secrets via: wrangler secret put STRAVA_CLIENT_ID
@@ -19,7 +19,7 @@
 	//                             wrangler secret put POKE_API_KEY
 	// STRAVA_REDIRECT_URI must match exactly what you registered on strava.com/settings/api
 	"vars": {
-		"STRAVA_REDIRECT_URI": "https://sportmcp.mainichi.fit/callback"
+		"STRAVA_REDIRECT_URI": "https://your-worker-name.your-subdomain.workers.dev/callback"
 	},
 	"observability": {
 		"enabled": true

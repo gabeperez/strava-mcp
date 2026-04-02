@@ -523,12 +523,10 @@ See [.env.example](.env.example) for all configuration options.
 
 ### Coming Soon
 
-- [ ] **Multi-user Webhook Support** - Per-user Poke API keys and notification routing
-- [ ] **Public sportsmcp.com Service** - Hosted version for non-technical users
+- [ ] **Multi-user Webhook Support** - Per-user notification keys and routing
 - [ ] **More Notification Channels** - Discord, Slack, email, etc.
 - [ ] **Activity Analytics** - Trends, insights, and training load tracking
 - [ ] **Custom Webhook Filters** - Choose which activities trigger notifications
-- [ ] **Web Dashboard Enhancements** - More stats, charts, and visualizations
 
 Interested in contributing to any of these? [Open a discussion](https://github.com/gabeperez/strava-mcp/discussions)!
 

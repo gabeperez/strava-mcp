@@ -10,3 +10,4 @@ coverage/
 node_modules/
 scratch/
 agent/
+mcp/

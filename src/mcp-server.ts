@@ -655,7 +655,7 @@ export async function handleMCPOverSSE(c: Context) {
         try {
           return new URL(c.req.url).origin;
         } catch {
-          return 'https://strava-mcp-oauth.perez-jg22.workers.dev';
+          return 'https://your-worker-name.your-subdomain.workers.dev';
         }
       })()
     };
