@@ -141,9 +141,15 @@ export const LANDING_TEMPLATE = `<!DOCTYPE html>
             <div class="flex items-center space-x-6">
                 <a href="/about" class="text-gray-300 hover:text-white transition-colors">About</a>
                 <a href="/support" class="text-gray-300 hover:text-white transition-colors">Support</a>
+                {{#if is_authenticated}}
+                <a href="/dashboard/{{athlete_id}}" class="bg-orange-500 hover:bg-orange-600 px-6 py-2 rounded-lg font-semibold transition-colors">
+                    Dashboard
+                </a>
+                {{else}}
                 <a href="/auth" class="bg-orange-500 hover:bg-orange-600 px-6 py-2 rounded-lg font-semibold transition-colors">
                     Get Started
                 </a>
+                {{/if}}
             </div>
         </div>
     </nav>
@@ -169,10 +175,17 @@ export const LANDING_TEMPLATE = `<!DOCTYPE html>
                 </p>
                 
                 <div class="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
+                    {{#if is_authenticated}}
+                    <a href="/dashboard/{{athlete_id}}" class="gradient-bg hover:opacity-90 text-white font-bold py-4 px-8 rounded-lg text-lg transition-all transform hover:scale-105 shadow-lg flex items-center">
+                        <i class="fas fa-tachometer-alt mr-2"></i>
+                        Go to Dashboard
+                    </a>
+                    {{else}}
                     <a href="/auth" class="gradient-bg hover:opacity-90 text-white font-bold py-4 px-8 rounded-lg text-lg transition-all transform hover:scale-105 shadow-lg flex items-center">
                         <i class="fab fa-strava mr-2"></i>
                         Connect with Strava
                     </a>
+                    {{/if}}
                     <div class="text-gray-400 flex items-center">
                         <i class="fas fa-shield-alt mr-2"></i>
                         Secure OAuth Authentication
@@ -350,7 +363,11 @@ export const LANDING_TEMPLATE = `<!DOCTYPE html>
                 <!-- Footer -->
                 <div class="border-t border-gray-700/50 px-6 py-4 flex-shrink-0 flex items-center justify-between">
                     <p class="text-xs text-gray-500">All tools use your personal OAuth token — your data is never shared.</p>
+                    {{#if is_authenticated}}
+                    <a href="/dashboard/{{athlete_id}}" class="bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-colors">Dashboard →</a>
+                    {{else}}
                     <a href="/auth" class="bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-colors">Connect Strava →</a>
+                    {{/if}}
                 </div>
             </div>
         </div>
@@ -456,15 +473,25 @@ export const LANDING_TEMPLATE = `<!DOCTYPE html>
     <!-- CTA Section -->
     <section class="py-24 gradient-bg">
         <div class="max-w-4xl mx-auto text-center px-6">
+            {{#if is_authenticated}}
+            <h2 class="text-4xl font-bold mb-6">Welcome Back!</h2>
+            <p class="text-xl mb-8 text-orange-100">
+                Your MCP server is ready. Head to your dashboard to manage connections and settings.
+            </p>
+            <a href="/dashboard/{{athlete_id}}" class="inline-block bg-white text-orange-600 hover:text-orange-700 font-bold py-4 px-8 rounded-xl text-lg transition-colors shadow-xl hover:shadow-2xl transform hover:scale-105">
+                <i class="fas fa-tachometer-alt mr-3"></i>
+                Open Dashboard
+            </a>
+            {{else}}
             <h2 class="text-4xl font-bold mb-6">Ready to Get Started?</h2>
             <p class="text-xl mb-8 text-orange-100">
                 Connect your Strava account and get your personal MCP URL in under 30 seconds.
             </p>
-            
             <a href="/auth" class="inline-block bg-white text-orange-600 hover:text-orange-700 font-bold py-4 px-8 rounded-xl text-lg transition-colors shadow-xl hover:shadow-2xl transform hover:scale-105">
                 <i class="fab fa-strava mr-3"></i>
                 Get Your MCP URL Now
             </a>
+            {{/if}}
         </div>
     </section>
 

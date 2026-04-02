@@ -7,6 +7,7 @@ import { StravaApiHandlers } from './api';
 import { SportsMCPServer, handleMCPOverSSE } from './mcp-server';
 import { TemplateEngine, LANDING_TEMPLATE, DASHBOARD_TEMPLATE } from './templates';
 import { ABOUT_TEMPLATE, SUPPORT_TEMPLATE, PRIVACY_TEMPLATE, TERMS_TEMPLATE } from './legal-templates';
+import { NOTHING_LANDING_TEMPLATE, NOTHING_DASHBOARD_TEMPLATE, NOTHING_ABOUT_TEMPLATE, NOTHING_SUPPORT_TEMPLATE, NOTHING_PRIVACY_TEMPLATE, NOTHING_TERMS_TEMPLATE } from './nothing-templates';
 import { StravaWebhookHandler } from './webhook';
 import { sendNotification, sendNotificationToAll, NotificationConfig, NotificationProvider, PROVIDER_INFO, maskKey } from './notifications';
 
@@ -53,6 +54,12 @@ templates.loadTemplate('about', ABOUT_TEMPLATE);
 templates.loadTemplate('support', SUPPORT_TEMPLATE);
 templates.loadTemplate('privacy', PRIVACY_TEMPLATE);
 templates.loadTemplate('terms', TERMS_TEMPLATE);
+templates.loadTemplate('nothing-landing', NOTHING_LANDING_TEMPLATE);
+templates.loadTemplate('nothing-dashboard', NOTHING_DASHBOARD_TEMPLATE);
+templates.loadTemplate('nothing-about', NOTHING_ABOUT_TEMPLATE);
+templates.loadTemplate('nothing-support', NOTHING_SUPPORT_TEMPLATE);
+templates.loadTemplate('nothing-privacy', NOTHING_PRIVACY_TEMPLATE);
+templates.loadTemplate('nothing-terms', NOTHING_TERMS_TEMPLATE);
 
 // CORS middleware for all routes
 app.use('*', async (c, next) => {
@@ -90,6 +97,36 @@ function getCurrentDomain(c: any): string {
   }
 }
 
+// Helper: check sid cookie and return auth state
+function getAuthState(c: any): { is_authenticated: boolean; athlete_id: string | null } {
+  const sid = getCookieValue(c.req.raw, 'sid');
+  if (sid) {
+    return { is_authenticated: true, athlete_id: sid };
+  }
+  return { is_authenticated: false, athlete_id: null };
+}
+
+// Helper: build Nothing nav HTML based on auth state
+function buildNothingNav(isAuth: boolean, athleteId: string | null, useNothingLinks = true): string {
+  const aboutHref = useNothingLinks ? '/about/nothing' : '/about';
+  const supportHref = useNothingLinks ? '/support/nothing' : '/support';
+  const authLink = isAuth
+    ? `<a href="/dashboard/${athleteId}/nothing">Dashboard</a>`
+    : `<a href="/auth" style="display: inline-flex; align-items: center; gap: 6px;"><img src="https://www.strava.com/assets/api/logo-strava-white.svg" alt="Strava" style="height: 14px; opacity: 0.7;"> Connect</a>`;
+
+  return `<nav>
+        <div class="container">
+            <div class="inner">
+                <a href="/nothing" class="nav-brand">毎日</a>
+                <div class="nav-links">
+                    <a href="${aboutHref}">About</a>
+                    <a href="${supportHref}">Support</a>
+                    ${authLink}
+                </div>
+            </div>
+        </div>
+    </nav>`;
+}
 
 // Root endpoint - Serve landing page
 app.get('/', (c) => {
@@ -131,8 +168,44 @@ app.get('/', (c) => {
   }
   
   // Otherwise, serve the beautiful landing page
-  const html = templates.render('landing', { base_url: currentDomain });
+  const auth = getAuthState(c);
+  const html = templates.render('landing', { base_url: currentDomain, ...auth });
   return c.html(html);
+});
+
+// Nothing design landing page
+app.get('/nothing', (c) => {
+  const currentDomain = getCurrentDomain(c);
+  const auth = getAuthState(c);
+  const nothingNav = buildNothingNav(auth.is_authenticated, auth.athlete_id);
+  const mcp_card_link = auth.is_authenticated ? `/dashboard/${auth.athlete_id}/nothing` : '/auth';
+  const dashboard_link = auth.is_authenticated ? `/dashboard/${auth.athlete_id}/nothing` : '/auth';
+  const html = templates.render('nothing-landing', { base_url: currentDomain, nothing_nav: nothingNav, mcp_card_link, dashboard_link, ...auth });
+  return c.html(html);
+});
+
+// Waitlist email capture
+app.post('/api/waitlist', async (c) => {
+  try {
+    const body = await c.req.json();
+    const email = body.email?.trim()?.toLowerCase();
+    if (!email || !email.includes('@')) {
+      return c.json({ error: 'Invalid email address' }, 400);
+    }
+    const key = `waitlist:${email}`;
+    const existing = await c.env.STRAVA_SESSIONS.get(key);
+    if (existing) {
+      return c.json({ message: "You're already on the list." });
+    }
+    await c.env.STRAVA_SESSIONS.put(key, JSON.stringify({
+      email,
+      timestamp: Date.now(),
+      source: 'nothing-landing'
+    }));
+    return c.json({ message: "You're on the list." });
+  } catch {
+    return c.json({ error: 'Something went wrong' }, 500);
+  }
 });
 
 // Authentication endpoints
@@ -660,23 +733,41 @@ app.delete('/settings/notification-config', handleDeleteNotificationConfig);
 
 // Legal and informational pages  
 app.get('/about', (c) => {
-  const html = templates.render('about', { base_url: getCurrentDomain(c) });
-  return c.html(html);
+  const auth = getAuthState(c);
+  return c.html(templates.render('about', { base_url: getCurrentDomain(c), ...auth }));
 });
 
 app.get('/support', (c) => {
-  const html = templates.render('support', { base_url: getCurrentDomain(c) });
-  return c.html(html);
+  const auth = getAuthState(c);
+  return c.html(templates.render('support', { base_url: getCurrentDomain(c), ...auth }));
 });
 
 app.get('/privacy', (c) => {
-  const html = templates.render('privacy', { base_url: getCurrentDomain(c) });
-  return c.html(html);
+  const auth = getAuthState(c);
+  return c.html(templates.render('privacy', { base_url: getCurrentDomain(c), ...auth }));
 });
 
 app.get('/terms', (c) => {
-  const html = templates.render('terms', { base_url: getCurrentDomain(c) });
-  return c.html(html);
+  const auth = getAuthState(c);
+  return c.html(templates.render('terms', { base_url: getCurrentDomain(c), ...auth }));
+});
+
+// Nothing design variants
+app.get('/about/nothing', (c) => {
+  const auth = getAuthState(c);
+  return c.html(templates.render('nothing-about', { base_url: getCurrentDomain(c), nothing_nav: buildNothingNav(auth.is_authenticated, auth.athlete_id), ...auth }));
+});
+app.get('/support/nothing', (c) => {
+  const auth = getAuthState(c);
+  return c.html(templates.render('nothing-support', { base_url: getCurrentDomain(c), nothing_nav: buildNothingNav(auth.is_authenticated, auth.athlete_id), ...auth }));
+});
+app.get('/privacy/nothing', (c) => {
+  const auth = getAuthState(c);
+  return c.html(templates.render('nothing-privacy', { base_url: getCurrentDomain(c), nothing_nav: buildNothingNav(auth.is_authenticated, auth.athlete_id), ...auth }));
+});
+app.get('/terms/nothing', (c) => {
+  const auth = getAuthState(c);
+  return c.html(templates.render('nothing-terms', { base_url: getCurrentDomain(c), nothing_nav: buildNothingNav(auth.is_authenticated, auth.athlete_id), ...auth }));
 });
 
 // ---- POST: Add / update a provider in the configs array ----
@@ -778,189 +869,181 @@ app.get('/dashboard', async (c) => {
   }
 });
 
-// Dashboard endpoint (cookie-based auth, no token in URL)
-app.get('/dashboard/:athleteId', async (c) => {
-  const urlAthleteId = c.req.param('athleteId');
-
-  // Authenticate via cookie
+// Shared dashboard data builder — used by both classic and Nothing designs
+async function buildDashboardData(c: any, urlAthleteId: string): Promise<Record<string, any> | null> {
   const cookieAthleteId = getCookieValue(c.req.raw, 'sid');
-  if (!cookieAthleteId) {
-    return c.redirect('/auth');
-  }
-
-  // Verify the cookie matches the URL (prevent viewing other users' dashboards)
-  if (cookieAthleteId !== urlAthleteId) {
-    return c.redirect(`/dashboard/${cookieAthleteId}`);
-  }
+  if (!cookieAthleteId) return null;
+  if (cookieAthleteId !== urlAthleteId) return null;
 
   const athlete_id = parseInt(urlAthleteId);
-  if (isNaN(athlete_id)) {
-    return c.redirect('/auth');
+  if (isNaN(athlete_id)) return null;
+
+  const sessionManager = new (await import('./session')).KVSessionManager(c.env);
+  const session = await sessionManager.getSession(athlete_id);
+  if (!session) return null;
+
+  const mcpTokenData = await c.env.STRAVA_SESSIONS.get(`athlete_mcp_token:${athlete_id}`);
+  const token = mcpTokenData ? JSON.parse(mcpTokenData).token : null;
+
+  const agentSlugs = AGENT_DEFS.map(d => d.slug);
+  const [profileResponse, statsResponse, activitiesResponse, lastConnRaw, ...perAgentRaws] = await Promise.all([
+    fetch('https://www.strava.com/api/v3/athlete', {
+      headers: { 'Authorization': `Bearer ${session.access_token}` }
+    }),
+    fetch('https://www.strava.com/api/v3/athletes/' + athlete_id + '/stats', {
+      headers: { 'Authorization': `Bearer ${session.access_token}` }
+    }),
+    fetch('https://www.strava.com/api/v3/athlete/activities?per_page=7', {
+      headers: { 'Authorization': `Bearer ${session.access_token}` }
+    }),
+    c.env.STRAVA_SESSIONS.get(`agent_lastconn:${athlete_id}`),
+    ...agentSlugs.map(slug => c.env.STRAVA_SESSIONS.get(`agent_perconn:${athlete_id}:${slug}`))
+  ]);
+
+  const activeConfigs = await loadNotificationConfigs(c.env, athlete_id);
+
+  let lastConnDisplay = '';
+  let lastConnAgent = '';
+  let lastConnCount = 0;
+  if (lastConnRaw) {
+    try {
+      const lc = JSON.parse(lastConnRaw as string);
+      lastConnCount = lc.count || 0;
+      const ua: string = lc.ua || '';
+      const slug = detectAgentFromUA(ua);
+      lastConnAgent = slug ? agentDisplayName(slug) : (ua.split('/')[0] || 'Unknown client');
+      lastConnDisplay = formatTimeAgo(lc.ts || 0);
+    } catch (_) {}
   }
 
+  const perAgentData: Record<string, { ts: number; count: number; lastTool: string | null }> = {};
+  agentSlugs.forEach((slug, i) => {
+    const raw = perAgentRaws[i];
+    if (raw) {
+      try { perAgentData[slug] = JSON.parse(raw as string); } catch (_) {}
+    }
+  });
+
+  const profile = await profileResponse.json();
+  const stats = await statsResponse.json();
+  const activities = await activitiesResponse.json();
+
+  const activitiesArray = Array.isArray(activities) ? activities : [];
+  const formattedActivities = activitiesArray.slice(0, 7).map((activity: any) => ({
+    ...activity,
+    distance: Math.round(activity.distance / 1000 * 10) / 10,
+    moving_time: Math.floor(activity.moving_time / 60) + 'min',
+    start_date_local: new Date(activity.start_date_local).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric'
+    }),
+    pace: activity.sport_type === 'Run' && activity.distance > 0 ?
+      Math.floor(activity.moving_time / (activity.distance / 1000) / 60) + ':' +
+      String(Math.floor(activity.moving_time / (activity.distance / 1000) % 60)).padStart(2, '0') + '/km' : null,
+    speed: activity.sport_type === 'Ride' && activity.distance > 0 ?
+      Math.round(activity.distance / 1000 / (activity.moving_time / 3600) * 10) / 10 + ' km/h' : null
+  }));
+
+  const totalActivities = stats.recent_run_totals.count + stats.recent_ride_totals.count + (stats.recent_swim_totals?.count || 0);
+  const avgDistance = totalActivities > 0 ?
+    Math.round((stats.recent_run_totals.distance + stats.recent_ride_totals.distance) / totalActivities / 100) / 10 : 0;
+  const totalElevation = stats.recent_run_totals.elevation_gain + stats.recent_ride_totals.elevation_gain;
+
+  const formattedProfile = {
+    ...profile,
+    username: profile.username || 'Not set',
+    location: profile.city && profile.state ? `${profile.city}, ${profile.state}` :
+              profile.city ? profile.city :
+              profile.country ? profile.country : 'Not set',
+    created_date: profile.created_at ? new Date(profile.created_at).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long'
+    }) : 'Unknown'
+  };
+
+  const fourWeeksAgo = new Date();
+  fourWeeksAgo.setDate(fourWeeksAgo.getDate() - 28);
+  const statsDateRange = fourWeeksAgo.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) +
+    ' - ' + new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+  const currentDomain = getCurrentDomain(c);
+
+  return {
+    profile: formattedProfile,
+    stats,
+    recent_activities: formattedActivities,
+    mcp_url: token ? `${currentDomain}/mcp?token=${token}` : '',
+    mcp_sse_url: token ? `${currentDomain}/sse?token=${token}` : '',
+    mcp_base_url: `${currentDomain}/mcp`,
+    mcp_sse_base_url: `${currentDomain}/sse`,
+    mcp_bearer_token: token || '',
+    created_at: new Date(session.created_at * 1000).toLocaleDateString(),
+    last_refresh: new Date().toLocaleString(),
+    total_time: Math.round((stats.recent_run_totals.moving_time + stats.recent_ride_totals.moving_time) / 3600) + 'h',
+    total_distance: Math.round((stats.recent_run_totals.distance + stats.recent_ride_totals.distance) / 1000) + 'km',
+    stats_date_range: statsDateRange,
+    total_activities: totalActivities,
+    avg_distance: avgDistance,
+    total_elevation: Math.round(totalElevation),
+    insights: {
+      most_active_sport: stats.recent_run_totals.count > stats.recent_ride_totals.count ? 'Running' : 'Cycling',
+      weekly_average: Math.round(totalActivities / 4 * 10) / 10,
+      longest_activity: activitiesArray.length > 0 ? Math.round(Math.max(...activitiesArray.map((a: any) => a.distance)) / 1000 * 10) / 10 : 0
+    },
+    poke_key_saved: activeConfigs.length > 0,
+    poke_masked_key: activeConfigs.length > 0 ? maskKey(activeConfigs[0].api_key) : '',
+    poke_saved_class: activeConfigs.length > 0 ? '' : 'hidden',
+    poke_form_class: activeConfigs.length > 0 ? 'hidden' : '',
+    notification_provider: activeConfigs.length > 0 ? activeConfigs[0].provider : '',
+    notification_provider_name: activeConfigs.length > 0
+      ? activeConfigs.map(c => PROVIDER_INFO[c.provider]?.name || c.provider).join(', ')
+      : '',
+    active_providers_json: JSON.stringify(activeConfigs.map(c => c.provider)),
+    providers_json: JSON.stringify(PROVIDER_INFO),
+    agent_poke: activeConfigs.some(c => c.provider === 'poke'),
+    mcp_token: token || '',
+    last_conn_display: lastConnDisplay,
+    last_conn_agent: lastConnAgent,
+    last_conn_count: lastConnCount,
+    last_conn_has_data: lastConnDisplay ? '' : 'hidden',
+    last_conn_no_data: lastConnDisplay ? 'hidden' : '',
+    ...Object.fromEntries(agentSlugs.flatMap(slug => {
+      const data = perAgentData[slug];
+      return [
+        [`agent_${slug}_on`, data ? '' : 'hidden'],
+        [`agent_${slug}_off`, data ? 'hidden' : ''],
+        [`agent_${slug}_lastconn`, data ? formatTimeAgo(data.ts) : ''],
+        [`agent_${slug}_count`, data ? String(data.count) : '0'],
+        [`agent_${slug}_lasttool`, data?.lastTool || ''],
+        [`agent_${slug}_lasttool_visible`, data?.lastTool ? '' : 'hidden'],
+      ];
+    })),
+    agent_poke_on:      activeConfigs.some(c => c.provider === 'poke') ? '' : 'hidden',
+    agent_poke_off:     activeConfigs.some(c => c.provider === 'poke') ? 'hidden' : ''
+  };
+}
+
+// Nothing design dashboard
+app.get('/dashboard/:athleteId/nothing', async (c) => {
   try {
-    const sessionManager = new (await import('./session')).KVSessionManager(c.env);
-    const session = await sessionManager.getSession(athlete_id);
+    const athleteId = c.req.param('athleteId');
+    const data = await buildDashboardData(c, athleteId);
+    if (!data) return c.redirect('/auth');
+    data.nothing_nav = buildNothingNav(true, athleteId);
+    return c.html(templates.render('nothing-dashboard', data));
+  } catch (error) {
+    console.error('Nothing dashboard error:', error);
+    return c.redirect('/auth');
+  }
+});
 
-    if (!session) {
-      return c.redirect('/auth');
-    }
-
-    // Retrieve the personal MCP token via reverse lookup
-    const mcpTokenData = await c.env.STRAVA_SESSIONS.get(`athlete_mcp_token:${athlete_id}`);
-    const token = mcpTokenData ? JSON.parse(mcpTokenData).token : null;
-
-    // Fetch user's Strava data + agent connection info in parallel
-    const agentSlugs = AGENT_DEFS.map(d => d.slug);
-    const [profileResponse, statsResponse, activitiesResponse, lastConnRaw, ...perAgentRaws] = await Promise.all([
-      fetch('https://www.strava.com/api/v3/athlete', {
-        headers: { 'Authorization': `Bearer ${session.access_token}` }
-      }),
-      fetch('https://www.strava.com/api/v3/athletes/' + athlete_id + '/stats', {
-        headers: { 'Authorization': `Bearer ${session.access_token}` }
-      }),
-      fetch('https://www.strava.com/api/v3/athlete/activities?per_page=7', {
-        headers: { 'Authorization': `Bearer ${session.access_token}` }
-      }),
-      c.env.STRAVA_SESSIONS.get(`agent_lastconn:${athlete_id}`),
-      ...agentSlugs.map(slug => c.env.STRAVA_SESSIONS.get(`agent_perconn:${athlete_id}:${slug}`))
-    ]);
-
-    // Load all configured notification providers
-    const activeConfigs = await loadNotificationConfigs(c.env, athlete_id);
-
-    // Parse global last-connection info
-    let lastConnDisplay = '';
-    let lastConnAgent = '';
-    let lastConnCount = 0;
-    if (lastConnRaw) {
-      try {
-        const lc = JSON.parse(lastConnRaw as string);
-        lastConnCount = lc.count || 0;
-        const ua: string = lc.ua || '';
-        const slug = detectAgentFromUA(ua);
-        lastConnAgent = slug ? agentDisplayName(slug) : (ua.split('/')[0] || 'Unknown client');
-        lastConnDisplay = formatTimeAgo(lc.ts || 0);
-      } catch (_) {}
-    }
-
-    // Parse per-agent connection data
-    const perAgentData: Record<string, { ts: number; count: number; lastTool: string | null }> = {};
-    agentSlugs.forEach((slug, i) => {
-      const raw = perAgentRaws[i];
-      if (raw) {
-        try { perAgentData[slug] = JSON.parse(raw as string); } catch (_) {}
-      }
-    });
-
-    const profile = await profileResponse.json();
-    const stats = await statsResponse.json();
-    const activities = await activitiesResponse.json();
-
-    // Format activity data for template
-    const activitiesArray = Array.isArray(activities) ? activities : [];
-    const formattedActivities = activitiesArray.slice(0, 7).map((activity: any) => ({
-      ...activity,
-      distance: Math.round(activity.distance / 1000 * 10) / 10, // Convert to km with 1 decimal
-      moving_time: Math.floor(activity.moving_time / 60) + 'min', // Convert to minutes
-      start_date_local: new Date(activity.start_date_local).toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric'
-      }),
-      pace: activity.sport_type === 'Run' && activity.distance > 0 ?
-        Math.floor(activity.moving_time / (activity.distance / 1000) / 60) + ':' +
-        String(Math.floor(activity.moving_time / (activity.distance / 1000) % 60)).padStart(2, '0') + '/km' : null,
-      speed: activity.sport_type === 'Ride' && activity.distance > 0 ?
-        Math.round(activity.distance / 1000 / (activity.moving_time / 3600) * 10) / 10 + ' km/h' : null
-    }));
-
-    // Calculate insights
-    const totalActivities = stats.recent_run_totals.count + stats.recent_ride_totals.count + (stats.recent_swim_totals?.count || 0);
-    const avgDistance = totalActivities > 0 ?
-      Math.round((stats.recent_run_totals.distance + stats.recent_ride_totals.distance) / totalActivities / 100) / 10 : 0;
-    const totalElevation = stats.recent_run_totals.elevation_gain + stats.recent_ride_totals.elevation_gain;
-
-    // Format profile data
-    const formattedProfile = {
-      ...profile,
-      username: profile.username || 'Not set',
-      location: profile.city && profile.state ? `${profile.city}, ${profile.state}` :
-                profile.city ? profile.city :
-                profile.country ? profile.country : 'Not set',
-      created_date: profile.created_at ? new Date(profile.created_at).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long'
-      }) : 'Unknown'
-    };
-
-    // Calculate date range for "recent" stats (last 4 weeks)
-    const fourWeeksAgo = new Date();
-    fourWeeksAgo.setDate(fourWeeksAgo.getDate() - 28);
-    const statsDateRange = fourWeeksAgo.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) +
-      ' - ' + new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-
-    const currentDomain = getCurrentDomain(c);
-
-    // Prepare dashboard data
-    const dashboardData = {
-      profile: formattedProfile,
-      stats,
-      recent_activities: formattedActivities,
-      mcp_url: token ? `${currentDomain}/mcp?token=${token}` : '',
-      mcp_sse_url: token ? `${currentDomain}/sse?token=${token}` : '',
-      mcp_base_url: `${currentDomain}/mcp`,
-      mcp_sse_base_url: `${currentDomain}/sse`,
-      mcp_bearer_token: token || '',
-      created_at: new Date(session.created_at * 1000).toLocaleDateString(),
-      last_refresh: new Date().toLocaleString(),
-      total_time: Math.round((stats.recent_run_totals.moving_time + stats.recent_ride_totals.moving_time) / 3600) + 'h',
-      total_distance: Math.round((stats.recent_run_totals.distance + stats.recent_ride_totals.distance) / 1000) + 'km',
-      stats_date_range: statsDateRange,
-      total_activities: totalActivities,
-      avg_distance: avgDistance,
-      total_elevation: Math.round(totalElevation),
-      insights: {
-        most_active_sport: stats.recent_run_totals.count > stats.recent_ride_totals.count ? 'Running' : 'Cycling',
-        weekly_average: Math.round(totalActivities / 4 * 10) / 10,
-        longest_activity: activitiesArray.length > 0 ? Math.round(Math.max(...activitiesArray.map((a: any) => a.distance)) / 1000 * 10) / 10 : 0
-      },
-      poke_key_saved: activeConfigs.length > 0,
-      poke_masked_key: activeConfigs.length > 0 ? maskKey(activeConfigs[0].api_key) : '',
-      poke_saved_class: activeConfigs.length > 0 ? '' : 'hidden',
-      poke_form_class: activeConfigs.length > 0 ? 'hidden' : '',
-      notification_provider: activeConfigs.length > 0 ? activeConfigs[0].provider : '',
-      notification_provider_name: activeConfigs.length > 0
-        ? activeConfigs.map(c => PROVIDER_INFO[c.provider]?.name || c.provider).join(', ')
-        : '',
-      active_providers_json: JSON.stringify(activeConfigs.map(c => c.provider)),
-      providers_json: JSON.stringify(PROVIDER_INFO),
-      agent_poke: activeConfigs.some(c => c.provider === 'poke'),
-      mcp_token: token || '',
-      last_conn_display: lastConnDisplay,
-      last_conn_agent: lastConnAgent,
-      last_conn_count: lastConnCount,
-      last_conn_has_data: lastConnDisplay ? '' : 'hidden',
-      last_conn_no_data: lastConnDisplay ? 'hidden' : '',
-      // Per-agent connection data (auto-detected from actual MCP tool calls)
-      ...Object.fromEntries(agentSlugs.flatMap(slug => {
-        const data = perAgentData[slug];
-        return [
-          [`agent_${slug}_on`, data ? '' : 'hidden'],
-          [`agent_${slug}_off`, data ? 'hidden' : ''],
-          [`agent_${slug}_lastconn`, data ? formatTimeAgo(data.ts) : ''],
-          [`agent_${slug}_count`, data ? String(data.count) : '0'],
-          [`agent_${slug}_lasttool`, data?.lastTool || ''],
-          [`agent_${slug}_lasttool_visible`, data?.lastTool ? '' : 'hidden'],
-        ];
-      })),
-      agent_poke_on:      activeConfigs.some(c => c.provider === 'poke') ? '' : 'hidden',
-      agent_poke_off:     activeConfigs.some(c => c.provider === 'poke') ? 'hidden' : ''
-    };
-
-    // Render the beautiful dashboard HTML
-    const html = templates.render('dashboard', dashboardData);
+// Dashboard endpoint (cookie-based auth, no token in URL)
+app.get('/dashboard/:athleteId', async (c) => {
+  try {
+    const data = await buildDashboardData(c, c.req.param('athleteId'));
+    if (!data) return c.redirect('/auth');
+    const html = templates.render('dashboard', data);
     return c.html(html);
-
   } catch (error) {
     console.error('Dashboard error:', error);
     return c.redirect('/auth');

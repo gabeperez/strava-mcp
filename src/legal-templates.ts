@@ -28,7 +28,11 @@ export const ABOUT_TEMPLATE = `<!DOCTYPE html>
                     <a href="/" class="text-gray-300 hover:text-white transition-colors">Home</a>
                     <a href="/about" class="text-orange-400 font-semibold">About</a>
                     <a href="/support" class="text-gray-300 hover:text-white transition-colors">Support</a>
+                    {{#if is_authenticated}}
+                    <a href="/dashboard/{{athlete_id}}" class="bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-lg font-semibold transition-colors">Dashboard</a>
+                    {{else}}
                     <a href="/auth" class="bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-lg font-semibold transition-colors">Get Started</a>
+                    {{/if}}
                 </div>
             </div>
         </div>
@@ -318,7 +322,11 @@ export const SUPPORT_TEMPLATE = `<!DOCTYPE html>
                     <a href="/" class="text-gray-300 hover:text-white transition-colors">Home</a>
                     <a href="/about" class="text-gray-300 hover:text-white transition-colors">About</a>
                     <a href="/support" class="text-orange-400 font-semibold">Support</a>
+                    {{#if is_authenticated}}
+                    <a href="/dashboard/{{athlete_id}}" class="bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-lg font-semibold transition-colors">Dashboard</a>
+                    {{else}}
                     <a href="/auth" class="bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-lg font-semibold transition-colors">Get Started</a>
+                    {{/if}}
                 </div>
             </div>
         </div>
@@ -740,7 +748,11 @@ export const PRIVACY_TEMPLATE = `<!DOCTYPE html>
                     <a href="/" class="text-gray-300 hover:text-white transition-colors">Home</a>
                     <a href="/about" class="text-gray-300 hover:text-white transition-colors">About</a>
                     <a href="/support" class="text-gray-300 hover:text-white transition-colors">Support</a>
+                    {{#if is_authenticated}}
+                    <a href="/dashboard/{{athlete_id}}" class="bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-lg font-semibold transition-colors">Dashboard</a>
+                    {{else}}
                     <a href="/auth" class="bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-lg font-semibold transition-colors">Get Started</a>
+                    {{/if}}
                 </div>
             </div>
         </div>
@@ -755,7 +767,7 @@ export const PRIVACY_TEMPLATE = `<!DOCTYPE html>
                 How we protect and handle your personal information
             </p>
             <p class="text-sm text-gray-500 mt-2">
-                Last updated: October 2025
+                Last updated: April 2026
             </p>
         </div>
 
@@ -769,6 +781,9 @@ export const PRIVACY_TEMPLATE = `<!DOCTYPE html>
                 <div class="space-y-4 text-gray-300">
                     <p class="text-lg">
                         At SportsMCP, we are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, and safeguard your data when you use our Model Context Protocol (MCP) server service.
+                    </p>
+                    <p class="text-sm text-gray-400">
+                        SportsMCP accesses your data through the official Strava API, subject to the <a href="https://www.strava.com/legal/api" target="_blank" rel="noopener noreferrer" class="text-orange-400 hover:text-orange-300">Strava API Agreement</a>.
                     </p>
                     <p>
                         <strong>Contact Information:</strong><br>
@@ -1125,7 +1140,11 @@ export const TERMS_TEMPLATE = `<!DOCTYPE html>
                     <a href="/" class="text-gray-300 hover:text-white transition-colors">Home</a>
                     <a href="/about" class="text-gray-300 hover:text-white transition-colors">About</a>
                     <a href="/support" class="text-gray-300 hover:text-white transition-colors">Support</a>
+                    {{#if is_authenticated}}
+                    <a href="/dashboard/{{athlete_id}}" class="bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-lg font-semibold transition-colors">Dashboard</a>
+                    {{else}}
                     <a href="/auth" class="bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-lg font-semibold transition-colors">Get Started</a>
+                    {{/if}}
                 </div>
             </div>
         </div>
@@ -1140,7 +1159,7 @@ export const TERMS_TEMPLATE = `<!DOCTYPE html>
                 Legal terms and conditions for using SportsMCP
             </p>
             <p class="text-sm text-gray-500 mt-2">
-                Last updated: October 2025
+                Last updated: April 2026
             </p>
         </div>
 
@@ -1156,7 +1175,7 @@ export const TERMS_TEMPLATE = `<!DOCTYPE html>
                         By accessing or using SportsMCP ("the Service"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, do not use the Service.
                     </p>
                     <p>
-                        These Terms constitute a legally binding agreement between you and SportsMCP. Your use of the Service is also subject to our Privacy Policy.
+                        These Terms constitute a legally binding agreement between you and SportsMCP. Your use of the Service is also subject to our Privacy Policy. SportsMCP operates under the <a href="https://www.strava.com/legal/api" target="_blank" rel="noopener noreferrer" class="text-orange-400 hover:text-orange-300">Strava API Agreement</a>.
                     </p>
                     <div class="bg-blue-900/30 border border-blue-400 rounded-lg p-4">
                         <p class="text-blue-300">
