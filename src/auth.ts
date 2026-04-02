@@ -49,7 +49,7 @@ export class AuthHandler {
       // Always use the registered Strava callback URI — Strava rejects any URI
       // that doesn't exactly match what's registered in the app settings.
       // The origin is stored in state so we can redirect back to the correct
-      // tenant domain (stravamcp.com, mainichi.fit, etc.) after the callback.
+      // tenant domain after the callback.
       const registeredRedirectUri = this.env.STRAVA_REDIRECT_URI || `${currentDomain}/callback`;
 
       const authUrl = new URL('https://www.strava.com/oauth/authorize');

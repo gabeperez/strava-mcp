@@ -8,7 +8,7 @@ import { SportsMCPServer, handleMCPOverSSE } from './mcp-server';
 import { TemplateEngine, LANDING_TEMPLATE, DASHBOARD_TEMPLATE } from './templates';
 import { ABOUT_TEMPLATE, SUPPORT_TEMPLATE, PRIVACY_TEMPLATE, TERMS_TEMPLATE } from './legal-templates';
 import { NOTHING_LANDING_TEMPLATE, NOTHING_DASHBOARD_TEMPLATE, NOTHING_ABOUT_TEMPLATE, NOTHING_SUPPORT_TEMPLATE, NOTHING_PRIVACY_TEMPLATE, NOTHING_TERMS_TEMPLATE } from './nothing-templates';
-import { STRAVA_LOGO_WHITE_SVG } from './strava-brand';
+import { STRAVA_LOGO_WHITE_SVG, STRAVA_POWERED_BADGE_SVG } from './strava-brand';
 import { StravaWebhookHandler } from './webhook';
 import { sendNotification, sendNotificationToAll, NotificationConfig, NotificationProvider, PROVIDER_INFO, maskKey } from './notifications';
 
@@ -107,26 +107,9 @@ function getAuthState(c: any): { is_authenticated: boolean; athlete_id: string |
   return { is_authenticated: false, athlete_id: null };
 }
 
-// Helper: build Nothing nav HTML based on auth state
-function buildNothingNav(isAuth: boolean, athleteId: string | null, useNothingLinks = true): string {
-  const aboutHref = useNothingLinks ? '/about/nothing' : '/about';
-  const supportHref = useNothingLinks ? '/support/nothing' : '/support';
-  const authLink = isAuth
-    ? `<a href="/dashboard/${athleteId}/nothing">Dashboard</a>`
-    : `<a href="/auth?design=nothing" style="display: inline-flex; align-items: center; gap: 6px;"><span style="height: 14px; display: inline-flex; align-items: center; opacity: 0.7;">${STRAVA_LOGO_WHITE_SVG}</span> Connect</a>`;
-
-  return `<nav>
-        <div class="container">
-            <div class="inner">
-                <a href="/nothing" class="nav-brand">毎日</a>
-                <div class="nav-links">
-                    <a href="${aboutHref}">About</a>
-                    <a href="${supportHref}">Support</a>
-                    ${authLink}
-                </div>
-            </div>
-        </div>
-    </nav>`;
+// Helper: build nav HTML (simplified for open-source version)
+function buildNothingNav(isAuth: boolean, athleteId: string | null): string {
+  return ''; // Nothing nav is handled by the templates in the open-source version
 }
 
 // Root endpoint - Serve landing page
@@ -185,29 +168,7 @@ app.get('/nothing', (c) => {
   return c.html(html);
 });
 
-// Waitlist email capture
-app.post('/api/waitlist', async (c) => {
-  try {
-    const body = await c.req.json();
-    const email = body.email?.trim()?.toLowerCase();
-    if (!email || !email.includes('@')) {
-      return c.json({ error: 'Invalid email address' }, 400);
-    }
-    const key = `waitlist:${email}`;
-    const existing = await c.env.STRAVA_SESSIONS.get(key);
-    if (existing) {
-      return c.json({ message: "You're already on the list." });
-    }
-    await c.env.STRAVA_SESSIONS.put(key, JSON.stringify({
-      email,
-      timestamp: Date.now(),
-      source: 'nothing-landing'
-    }));
-    return c.json({ message: "You're on the list." });
-  } catch {
-    return c.json({ error: 'Something went wrong' }, 500);
-  }
-});
+// (Waitlist endpoint removed for open-source version)
 
 // Authentication endpoints
 app.get('/auth', async (c) => {
