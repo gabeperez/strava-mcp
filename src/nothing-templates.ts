@@ -924,12 +924,89 @@ export const NOTHING_DASHBOARD_TEMPLATE = `<!DOCTYPE html>
             </div>
         </div>
 
+        <hr class="divider">
+
+        <!-- AI Notifications -->
+        <div style="padding-bottom: 48px;">
+            <div class="section-label">AI Notifications</div>
+            <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 24px;">
+                Get pinged whenever you finish a workout. Add one or more providers — all active providers receive every workout.
+            </p>
+
+            <!-- Active providers (shown when connected) -->
+            <div id="poke-saved-view" class="{{poke_saved_class}}">
+                <div id="active-providers-list" style="margin-bottom: 16px;"></div>
+                <div style="display: flex; gap: 8px;">
+                    <button onclick="window.testPokeKey()" id="poke-test-btn"
+                        class="copy-btn" style="flex: 1; text-align: center;">
+                        Send Test Ping
+                    </button>
+                    <button onclick="window.showAddProvider()"
+                        class="copy-btn" style="flex: 1; text-align: center;">
+                        Add Provider
+                    </button>
+                </div>
+            </div>
+
+            <!-- Add provider form -->
+            <div id="poke-form-view" class="{{poke_form_class}}">
+                <form id="poke-form" onsubmit="window.savePokeKey(event)">
+                    <div class="label" style="margin-bottom: 8px;">Choose Provider</div>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; margin-bottom: 16px;" id="provider-selector">
+                        <button type="button" onclick="window.selectProvider('poke')"
+                            class="provider-btn" data-provider="poke"
+                            style="background: var(--surface); border: 1px solid var(--border); padding: 12px; text-align: center; cursor: pointer; transition: border-color 200ms ease-out;">
+                            <div style="font-family: var(--font-body); font-size: 14px; font-weight: 500; color: var(--text-display);">Poke</div>
+                            <div style="font-family: var(--font-mono); font-size: 10px; color: var(--text-disabled); letter-spacing: 0.04em;">poke.com</div>
+                        </button>
+                        <button type="button" onclick="window.selectProvider('openclaw')"
+                            class="provider-btn" data-provider="openclaw"
+                            style="background: var(--surface); border: 1px solid var(--border); padding: 12px; text-align: center; cursor: pointer; transition: border-color 200ms ease-out;">
+                            <div style="font-family: var(--font-body); font-size: 14px; font-weight: 500; color: var(--text-display);">OpenClaw</div>
+                            <div style="font-family: var(--font-mono); font-size: 10px; color: var(--text-disabled); letter-spacing: 0.04em;">openclaw.ai</div>
+                        </button>
+                        <button type="button" onclick="window.selectProvider('manus')"
+                            class="provider-btn" data-provider="manus"
+                            style="background: var(--surface); border: 1px solid var(--border); padding: 12px; text-align: center; cursor: pointer; transition: border-color 200ms ease-out;">
+                            <div style="font-family: var(--font-body); font-size: 14px; font-weight: 500; color: var(--text-display);">Manus</div>
+                            <div style="font-family: var(--font-mono); font-size: 10px; color: var(--text-disabled); letter-spacing: 0.04em;">manus.im</div>
+                        </button>
+                    </div>
+
+                    <input type="hidden" id="selected-provider" value="poke">
+
+                    <div class="label" style="margin-bottom: 4px;" id="api-key-label">Poke API Key</div>
+                    <input type="password" id="poke-key-input" placeholder="poke_xxxxxxxxxxxxxxxx"
+                        style="width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--border-visible); color: var(--text-primary); font-family: var(--font-mono); font-size: 14px; padding: 12px 0; outline: none; margin-bottom: 16px;">
+
+                    <div id="endpoint-field" class="hidden">
+                        <div class="label" style="margin-bottom: 4px;">Gateway URL</div>
+                        <input type="url" id="endpoint-input" placeholder="https://your-openclaw-instance:18789"
+                            style="width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--border-visible); color: var(--text-primary); font-family: var(--font-mono); font-size: 14px; padding: 12px 0; outline: none; margin-bottom: 16px;">
+                    </div>
+
+                    <button type="submit" class="copy-btn" style="width: 100%; text-align: center; background: var(--text-display); color: var(--black);">
+                        Save & Connect
+                    </button>
+                </form>
+                <button onclick="window.cancelPokeEdit()" id="cancel-add-btn"
+                    class="{{poke_form_class}}" style="width: 100%; font-family: var(--font-mono); font-size: 11px; color: var(--text-disabled); background: none; border: none; padding: 8px; cursor: pointer; margin-top: 4px;">
+                    Cancel
+                </button>
+            </div>
+
+            <div id="poke-status-bar" class="hidden" style="margin-top: 12px;">
+                <div id="poke-status" style="font-family: var(--font-mono); font-size: 12px; padding: 8px 12px;"></div>
+            </div>
+        </div>
+
         <a href="/dashboard/{{profile.id}}" style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-disabled); text-decoration: none;">[ Classic Dashboard ]</a>
     </div>
 
     ${NOTHING_FOOTER}
 
     <script>
+    // MCP setup tabs
     function showSetup(panel) {
         document.querySelectorAll('.setup-panel').forEach(el => el.classList.add('hidden'));
         document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -952,7 +1029,140 @@ export const NOTHING_DASHBOARD_TEMPLATE = `<!DOCTYPE html>
             setTimeout(() => s.textContent = '', 2000);
         });
     }
+
+    // Notification system
+    (function() {
+        var _activeProviders = JSON.parse('{{active_providers_json}}' || '[]');
+        var _providerMeta = {
+            poke:     { name: 'Poke',     keyLabel: 'Poke API Key',  keyPlaceholder: 'poke_xxxxxxxxxxxxxxxx', needsEndpoint: false },
+            openclaw: { name: 'OpenClaw',  keyLabel: 'Gateway Token', keyPlaceholder: 'your-gateway-token',   needsEndpoint: true  },
+            manus:    { name: 'Manus',     keyLabel: 'API Key',       keyPlaceholder: 'your-manus-api-key',   needsEndpoint: false }
+        };
+
+        function _pokeToken() { return window.__mcpToken || ''; }
+
+        function _pokeStatus(msg, isError) {
+            var bar = document.getElementById('poke-status-bar');
+            var el = document.getElementById('poke-status');
+            if (!bar || !el) return;
+            el.textContent = (isError ? '[ERROR] ' : '[OK] ') + msg;
+            el.style.color = isError ? 'var(--accent)' : 'var(--success)';
+            bar.classList.remove('hidden');
+        }
+
+        function _showPokeView(view) {
+            document.getElementById('poke-saved-view').classList.toggle('hidden', view !== 'saved');
+            document.getElementById('poke-form-view').classList.toggle('hidden', view !== 'form');
+            var cancelBtn = document.getElementById('cancel-add-btn');
+            if (cancelBtn) cancelBtn.classList.toggle('hidden', _activeProviders.length === 0);
+        }
+
+        function _renderActiveProviders() {
+            var container = document.getElementById('active-providers-list');
+            if (!container) return;
+            if (_activeProviders.length === 0) { container.innerHTML = ''; return; }
+            container.innerHTML = _activeProviders.map(function(p) {
+                var meta = _providerMeta[p] || { name: p };
+                return '<div style="display: flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--border); padding: 12px 16px; margin-bottom: 2px;">' +
+                    '<span style="width: 6px; height: 6px; background: var(--success); border-radius: 50%;"></span>' +
+                    '<span style="font-family: var(--font-mono); font-size: 12px; color: var(--success); letter-spacing: 0.04em;">' + meta.name + '</span>' +
+                    '<span style="font-family: var(--font-mono); font-size: 10px; color: var(--text-disabled); letter-spacing: 0.06em; text-transform: uppercase; margin-left: auto;">Active</span>' +
+                    '<button onclick="window.removeProvider(\\'' + p + '\\')" style="font-family: var(--font-mono); font-size: 10px; color: var(--text-disabled); background: none; border: none; cursor: pointer; padding: 2px 6px;" title="Remove">[x]</button>' +
+                    '</div>';
+            }).join('');
+        }
+        _renderActiveProviders();
+
+        window.selectProvider = function selectProvider(provider) {
+            var meta = _providerMeta[provider] || _providerMeta.poke;
+            document.getElementById('selected-provider').value = provider;
+            document.getElementById('api-key-label').textContent = meta.keyLabel;
+            document.getElementById('poke-key-input').placeholder = meta.keyPlaceholder;
+            var epField = document.getElementById('endpoint-field');
+            if (epField) epField.classList.toggle('hidden', !meta.needsEndpoint);
+            document.querySelectorAll('.provider-btn').forEach(function(btn) {
+                var isActive = btn.getAttribute('data-provider') === provider;
+                btn.style.borderColor = isActive ? 'var(--text-display)' : 'var(--border)';
+            });
+        };
+
+        // Default to first non-active provider
+        (function() {
+            var pick = ['poke', 'openclaw', 'manus'].find(function(p) { return _activeProviders.indexOf(p) === -1; }) || 'poke';
+            window.selectProvider(pick);
+        })();
+
+        window.showAddProvider = function() { _showPokeView('form'); };
+        window.cancelPokeEdit = function() { _showPokeView('saved'); };
+
+        window.savePokeKey = async function savePokeKey(event) {
+            event.preventDefault();
+            var provider = document.getElementById('selected-provider').value || 'poke';
+            var key = document.getElementById('poke-key-input').value.trim();
+            var endpoint = document.getElementById('endpoint-input') ? document.getElementById('endpoint-input').value.trim() : '';
+            if (!key) { _pokeStatus('Please enter your API key.', true); return; }
+            if (provider === 'openclaw' && !endpoint) { _pokeStatus('OpenClaw requires a Gateway URL.', true); return; }
+            try {
+                var body = { token: _pokeToken(), provider: provider, api_key: key };
+                if (endpoint) body.endpoint = endpoint;
+                var res = await fetch('/settings/notification-config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                if (res.ok) {
+                    var data = await res.json();
+                    document.getElementById('poke-key-input').value = '';
+                    if (document.getElementById('endpoint-input')) document.getElementById('endpoint-input').value = '';
+                    _activeProviders = data.providers || _activeProviders;
+                    if (_activeProviders.indexOf(provider) === -1) _activeProviders.push(provider);
+                    _renderActiveProviders();
+                    _showPokeView('saved');
+                    var providerName = (_providerMeta[provider] || {}).name || provider;
+                    _pokeStatus("Connected to " + providerName + ". You'll get a ping after every workout.", false);
+                } else {
+                    var err = await res.json();
+                    _pokeStatus(err.error || 'Failed to save.', true);
+                }
+            } catch (e) { _pokeStatus('Network error.', true); }
+        };
+
+        window.testPokeKey = async function testPokeKey() {
+            var btn = document.getElementById('poke-test-btn');
+            var orig = btn ? btn.textContent : '';
+            if (btn) { btn.textContent = '...'; btn.disabled = true; }
+            try {
+                var res = await fetch('/test-notification?token=' + _pokeToken(), { method: 'POST' });
+                var data = await res.json();
+                if (res.ok && data.success) {
+                    _pokeStatus(data.message, false);
+                } else {
+                    _pokeStatus(data.error || 'Test failed.', true);
+                }
+            } catch (e) { _pokeStatus('Network error.', true); }
+            finally { if (btn) { btn.textContent = orig; btn.disabled = false; } }
+        };
+
+        window.removeProvider = async function removeProvider(provider) {
+            try {
+                var res = await fetch('/settings/notification-config', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: _pokeToken(), provider: provider })
+                });
+                if (res.ok) {
+                    _activeProviders = _activeProviders.filter(function(p) { return p !== provider; });
+                    _renderActiveProviders();
+                    if (_activeProviders.length === 0) _showPokeView('form');
+                    _pokeStatus((_providerMeta[provider] || {}).name + ' removed.', false);
+                } else { _pokeStatus('Could not remove.', true); }
+            } catch (e) { _pokeStatus('Network error.', true); }
+        };
+
+        if (_activeProviders.length > 0) { _showPokeView('saved'); } else { _showPokeView('form'); }
+    })();
     </script>
+    <script>window.__mcpToken = '{{mcp_token}}';</script>
 </body>
 </html>`;
 
