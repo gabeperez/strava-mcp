@@ -18,6 +18,7 @@ const NOTHING_CSS = `
             --text-disabled: #666666; --text-secondary: #999999;
             --text-primary: #E8E8E8; --text-display: #FFFFFF;
             --accent: #D71921; --accent-subtle: rgba(215,25,33,0.15);
+            --interactive: #FC4C02;
             --success: #4A9E5C;
             --font-display: 'Doto', 'Space Mono', monospace;
             --font-body: 'Space Grotesk', system-ui, sans-serif;
@@ -30,13 +31,13 @@ const NOTHING_CSS = `
         .divider { border: none; border-top: 1px solid var(--border); margin: 48px 0; }
         .section-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-disabled); margin-bottom: 24px; }
         a { color: var(--text-secondary); transition: color 200ms ease-out; }
-        a:hover { color: var(--text-display); }
+        a:hover { color: var(--interactive); }
 
         /* Nav */
         nav { padding: 24px 0; border-bottom: 1px solid var(--border); }
         nav .inner { display: flex; align-items: center; justify-content: space-between; }
         nav a { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none; color: var(--text-secondary); }
-        nav a:hover { color: var(--text-display); }
+        nav a:hover { color: var(--interactive); }
         nav .nav-links { display: flex; gap: 24px; align-items: center; }
         .nav-brand { font-family: var(--font-display); font-size: 18px; color: var(--text-display) !important; letter-spacing: -0.02em !important; text-transform: none !important; }
 
@@ -45,7 +46,7 @@ const NOTHING_CSS = `
         footer .footer-inner { display: flex; justify-content: space-between; align-items: flex-start; gap: 32px; flex-wrap: wrap; }
         footer .footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
         footer a { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-disabled); text-decoration: none; }
-        footer a:hover { color: var(--text-secondary); }
+        footer a:hover { color: var(--interactive); }
         .footer-bottom { margin-top: 32px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
         .footer-disclaimer { font-size: 11px; color: var(--text-disabled); max-width: 400px; line-height: 1.5; }
 
@@ -191,7 +192,7 @@ export const NOTHING_LANDING_TEMPLATE = `<!DOCTYPE html>
             text-decoration: none;
             transition: color 200ms ease-out;
         }
-        nav a:hover { color: var(--text-display); }
+        nav a:hover { color: var(--interactive); }
         nav .nav-links { display: flex; gap: 24px; align-items: center; }
         .nav-brand {
             font-family: var(--font-display);
@@ -280,7 +281,7 @@ export const NOTHING_LANDING_TEMPLATE = `<!DOCTYPE html>
             transition: border-color 200ms ease-out;
         }
         .coming-card:hover {
-            border-color: var(--border-visible);
+            border-color: var(--interactive);
         }
         .coming-card .card-number {
             font-family: var(--font-mono);
@@ -315,11 +316,11 @@ export const NOTHING_LANDING_TEMPLATE = `<!DOCTYPE html>
             margin-top: 16px;
         }
         .coming-card.active-card {
-            border-color: var(--accent);
+            border-color: var(--interactive);
         }
         .coming-card.active-card .card-tag {
-            color: var(--accent);
-            border-color: var(--accent);
+            color: var(--interactive);
+            border-color: var(--interactive);
         }
 
         /* Waitlist */
@@ -425,7 +426,7 @@ export const NOTHING_LANDING_TEMPLATE = `<!DOCTYPE html>
             text-decoration: none;
             transition: color 200ms ease-out;
         }
-        footer a:hover { color: var(--text-secondary); }
+        footer a:hover { color: var(--interactive); }
         .footer-bottom {
             margin-top: 32px;
             display: flex;
@@ -726,7 +727,7 @@ export const NOTHING_DASHBOARD_TEMPLATE = `<!DOCTYPE html>
             cursor: pointer;
             transition: all 200ms ease-out;
         }
-        .copy-btn:hover { color: var(--text-display); border-color: var(--text-secondary); }
+        .copy-btn:hover { color: var(--interactive); border-color: var(--interactive); }
         .copy-status {
             font-family: var(--font-mono);
             font-size: 11px;
@@ -784,7 +785,7 @@ export const NOTHING_DASHBOARD_TEMPLATE = `<!DOCTYPE html>
             cursor: pointer;
             transition: all 200ms ease-out;
         }
-        .tab-btn:hover { color: var(--text-secondary); border-color: var(--border-visible); }
+        .tab-btn:hover { color: var(--interactive); border-color: var(--interactive); }
         .tab-btn.active { color: var(--text-display); border-color: var(--text-display); background: var(--surface); }
     </style>
 </head>
