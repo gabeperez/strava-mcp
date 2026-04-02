@@ -97,6 +97,36 @@ function getCurrentDomain(c: any): string {
   }
 }
 
+// Helper: check sid cookie and return auth state
+function getAuthState(c: any): { is_authenticated: boolean; athlete_id: string | null } {
+  const sid = getCookieValue(c.req.raw, 'sid');
+  if (sid) {
+    return { is_authenticated: true, athlete_id: sid };
+  }
+  return { is_authenticated: false, athlete_id: null };
+}
+
+// Helper: build Nothing nav HTML based on auth state
+function buildNothingNav(isAuth: boolean, athleteId: string | null, useNothingLinks = true): string {
+  const aboutHref = useNothingLinks ? '/about/nothing' : '/about';
+  const supportHref = useNothingLinks ? '/support/nothing' : '/support';
+  const authLink = isAuth
+    ? `<a href="/dashboard/${athleteId}/nothing">Dashboard</a>`
+    : `<a href="/auth" style="display: inline-flex; align-items: center; gap: 6px;"><img src="https://www.strava.com/assets/api/logo-strava-white.svg" alt="Strava" style="height: 14px; opacity: 0.7;"> Connect</a>`;
+
+  return `<nav>
+        <div class="container">
+            <div class="inner">
+                <a href="/nothing" class="nav-brand">毎日</a>
+                <div class="nav-links">
+                    <a href="${aboutHref}">About</a>
+                    <a href="${supportHref}">Support</a>
+                    ${authLink}
+                </div>
+            </div>
+        </div>
+    </nav>`;
+}
 
 // Root endpoint - Serve landing page
 app.get('/', (c) => {
@@ -138,14 +168,19 @@ app.get('/', (c) => {
   }
   
   // Otherwise, serve the beautiful landing page
-  const html = templates.render('landing', { base_url: currentDomain });
+  const auth = getAuthState(c);
+  const html = templates.render('landing', { base_url: currentDomain, ...auth });
   return c.html(html);
 });
 
 // Nothing design landing page
 app.get('/nothing', (c) => {
   const currentDomain = getCurrentDomain(c);
-  const html = templates.render('nothing-landing', { base_url: currentDomain });
+  const auth = getAuthState(c);
+  const nothingNav = buildNothingNav(auth.is_authenticated, auth.athlete_id);
+  const mcp_card_link = auth.is_authenticated ? `/dashboard/${auth.athlete_id}/nothing` : '/auth';
+  const dashboard_link = auth.is_authenticated ? `/dashboard/${auth.athlete_id}/nothing` : '/auth';
+  const html = templates.render('nothing-landing', { base_url: currentDomain, nothing_nav: nothingNav, mcp_card_link, dashboard_link, ...auth });
   return c.html(html);
 });
 
@@ -698,37 +733,41 @@ app.delete('/settings/notification-config', handleDeleteNotificationConfig);
 
 // Legal and informational pages  
 app.get('/about', (c) => {
-  const html = templates.render('about', { base_url: getCurrentDomain(c) });
-  return c.html(html);
+  const auth = getAuthState(c);
+  return c.html(templates.render('about', { base_url: getCurrentDomain(c), ...auth }));
 });
 
 app.get('/support', (c) => {
-  const html = templates.render('support', { base_url: getCurrentDomain(c) });
-  return c.html(html);
+  const auth = getAuthState(c);
+  return c.html(templates.render('support', { base_url: getCurrentDomain(c), ...auth }));
 });
 
 app.get('/privacy', (c) => {
-  const html = templates.render('privacy', { base_url: getCurrentDomain(c) });
-  return c.html(html);
+  const auth = getAuthState(c);
+  return c.html(templates.render('privacy', { base_url: getCurrentDomain(c), ...auth }));
 });
 
 app.get('/terms', (c) => {
-  const html = templates.render('terms', { base_url: getCurrentDomain(c) });
-  return c.html(html);
+  const auth = getAuthState(c);
+  return c.html(templates.render('terms', { base_url: getCurrentDomain(c), ...auth }));
 });
 
 // Nothing design variants
 app.get('/about/nothing', (c) => {
-  return c.html(templates.render('nothing-about', { base_url: getCurrentDomain(c) }));
+  const auth = getAuthState(c);
+  return c.html(templates.render('nothing-about', { base_url: getCurrentDomain(c), nothing_nav: buildNothingNav(auth.is_authenticated, auth.athlete_id), ...auth }));
 });
 app.get('/support/nothing', (c) => {
-  return c.html(templates.render('nothing-support', { base_url: getCurrentDomain(c) }));
+  const auth = getAuthState(c);
+  return c.html(templates.render('nothing-support', { base_url: getCurrentDomain(c), nothing_nav: buildNothingNav(auth.is_authenticated, auth.athlete_id), ...auth }));
 });
 app.get('/privacy/nothing', (c) => {
-  return c.html(templates.render('nothing-privacy', { base_url: getCurrentDomain(c) }));
+  const auth = getAuthState(c);
+  return c.html(templates.render('nothing-privacy', { base_url: getCurrentDomain(c), nothing_nav: buildNothingNav(auth.is_authenticated, auth.athlete_id), ...auth }));
 });
 app.get('/terms/nothing', (c) => {
-  return c.html(templates.render('nothing-terms', { base_url: getCurrentDomain(c) }));
+  const auth = getAuthState(c);
+  return c.html(templates.render('nothing-terms', { base_url: getCurrentDomain(c), nothing_nav: buildNothingNav(auth.is_authenticated, auth.athlete_id), ...auth }));
 });
 
 // ---- POST: Add / update a provider in the configs array ----
@@ -987,8 +1026,10 @@ async function buildDashboardData(c: any, urlAthleteId: string): Promise<Record<
 // Nothing design dashboard
 app.get('/dashboard/:athleteId/nothing', async (c) => {
   try {
-    const data = await buildDashboardData(c, c.req.param('athleteId'));
+    const athleteId = c.req.param('athleteId');
+    const data = await buildDashboardData(c, athleteId);
     if (!data) return c.redirect('/auth');
+    data.nothing_nav = buildNothingNav(true, athleteId);
     return c.html(templates.render('nothing-dashboard', data));
   } catch (error) {
     console.error('Nothing dashboard error:', error);

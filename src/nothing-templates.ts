@@ -57,20 +57,8 @@ const NOTHING_CSS = `
         }
 `;
 
-const NOTHING_NAV = `
-    <nav>
-        <div class="container">
-            <div class="inner">
-                <a href="/nothing" class="nav-brand">毎日</a>
-                <div class="nav-links">
-                    <a href="/about/nothing">About</a>
-                    <a href="/support/nothing">Support</a>
-                    <a href="/auth">Connect</a>
-                </div>
-            </div>
-        </div>
-    </nav>
-`;
+// NOTHING_NAV is now generated dynamically via {{nothing_nav}} template variable
+// See buildNothingNav() in index.ts
 
 const NOTHING_FOOTER = `
     <footer>
@@ -456,18 +444,7 @@ export const NOTHING_LANDING_TEMPLATE = `<!DOCTYPE html>
 </head>
 <body>
     <!-- Nav -->
-    <nav>
-        <div class="container">
-            <div class="inner">
-                <a href="/nothing" class="nav-brand">毎日</a>
-                <div class="nav-links">
-                    <a href="/about">About</a>
-                    <a href="/support">Support</a>
-                    <a href="/auth">Connect</a>
-                </div>
-            </div>
-        </div>
-    </nav>
+    {{nothing_nav}}
 
     <!-- Hero -->
     <section class="hero">
@@ -494,7 +471,7 @@ export const NOTHING_LANDING_TEMPLATE = `<!DOCTYPE html>
                     <p>Daily check-ins, workout suggestions, and recovery guidance delivered through conversation. Your AI coach learns your patterns and adapts.</p>
                     <span class="card-tag">In Development</span>
                 </div>
-                <a href="/auth" style="text-decoration: none; color: inherit;">
+                <a href="{{mcp_card_link}}" style="text-decoration: none; color: inherit;">
                     <div class="coming-card active-card">
                         <div class="card-number">02</div>
                         <h3>MCP Powered by Strava</h3>
@@ -511,6 +488,27 @@ export const NOTHING_LANDING_TEMPLATE = `<!DOCTYPE html>
             </div>
         </div>
     </section>
+
+    <!-- Connect with Strava CTA -->
+    {{#if is_authenticated}}
+    <section style="padding: 48px 0;">
+        <div class="container" style="text-align: center;">
+            <a href="{{dashboard_link}}" style="display: inline-flex; align-items: center; gap: 12px; background: #FC4C02; color: #fff; font-family: var(--font-mono); font-size: 14px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; text-decoration: none; padding: 14px 32px; border-radius: 0; transition: background 200ms ease-out;" onmouseover="this.style.background='#e04400'" onmouseout="this.style.background='#FC4C02'">
+                <img src="https://www.strava.com/assets/api/logo-strava-white.svg" alt="Strava" style="height: 18px;">
+                View Dashboard
+            </a>
+        </div>
+    </section>
+    {{else}}
+    <section style="padding: 48px 0;">
+        <div class="container" style="text-align: center;">
+            <a href="/auth" style="display: inline-flex; align-items: center; gap: 12px; background: #FC4C02; color: #fff; font-family: var(--font-mono); font-size: 14px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; text-decoration: none; padding: 14px 32px; border-radius: 0; transition: background 200ms ease-out;" onmouseover="this.style.background='#e04400'" onmouseout="this.style.background='#FC4C02'">
+                <img src="https://www.strava.com/assets/api/logo-strava-white.svg" alt="Strava" style="height: 18px;">
+                Connect with Strava
+            </a>
+        </div>
+    </section>
+    {{/if}}
 
     <div class="container"><hr class="divider"></div>
 
@@ -535,10 +533,10 @@ export const NOTHING_LANDING_TEMPLATE = `<!DOCTYPE html>
         <div class="container">
             <div class="footer-inner">
                 <div class="footer-links">
-                    <a href="/privacy">Privacy</a>
-                    <a href="/terms">Terms</a>
-                    <a href="/about">About</a>
-                    <a href="/support">Support</a>
+                    <a href="/privacy/nothing">Privacy</a>
+                    <a href="/terms/nothing">Terms</a>
+                    <a href="/about/nothing">About</a>
+                    <a href="/support/nothing">Support</a>
                     <a href="/">Classic</a>
                 </div>
                 <a href="https://www.strava.com" target="_blank" rel="noopener noreferrer">
@@ -790,7 +788,7 @@ export const NOTHING_DASHBOARD_TEMPLATE = `<!DOCTYPE html>
     </style>
 </head>
 <body>
-    ${NOTHING_NAV}
+    {{nothing_nav}}
 
     <div class="container">
         <!-- Profile -->
@@ -1191,7 +1189,7 @@ export const NOTHING_ABOUT_TEMPLATE = `<!DOCTYPE html>
     </style>
 </head>
 <body>
-    ${NOTHING_NAV}
+    {{nothing_nav}}
     <div class="container">
         <div class="page-title">About</div>
         <div class="page-subtitle">Bridging AI assistants and your personal fitness data</div>
@@ -1268,7 +1266,7 @@ export const NOTHING_SUPPORT_TEMPLATE = `<!DOCTYPE html>
     </style>
 </head>
 <body>
-    ${NOTHING_NAV}
+    {{nothing_nav}}
     <div class="container">
         <div class="page-title">Support</div>
         <div class="page-subtitle">Get started and troubleshoot common issues</div>
@@ -1349,7 +1347,7 @@ export const NOTHING_PRIVACY_TEMPLATE = `<!DOCTYPE html>
     </style>
 </head>
 <body>
-    ${NOTHING_NAV}
+    {{nothing_nav}}
     <div class="container">
         <div class="page-title">Privacy Policy</div>
         <div class="page-meta">Last updated: April 2026</div>
@@ -1453,7 +1451,7 @@ export const NOTHING_TERMS_TEMPLATE = `<!DOCTYPE html>
     </style>
 </head>
 <body>
-    ${NOTHING_NAV}
+    {{nothing_nav}}
     <div class="container">
         <div class="page-title">Terms of Service</div>
         <div class="page-meta">Last updated: April 2026</div>

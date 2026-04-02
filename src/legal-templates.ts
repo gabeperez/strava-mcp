@@ -28,7 +28,11 @@ export const ABOUT_TEMPLATE = `<!DOCTYPE html>
                     <a href="/" class="text-gray-300 hover:text-white transition-colors">Home</a>
                     <a href="/about" class="text-orange-400 font-semibold">About</a>
                     <a href="/support" class="text-gray-300 hover:text-white transition-colors">Support</a>
+                    {{#if is_authenticated}}
+                    <a href="/dashboard/{{athlete_id}}" class="bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-lg font-semibold transition-colors">Dashboard</a>
+                    {{else}}
                     <a href="/auth" class="bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-lg font-semibold transition-colors">Get Started</a>
+                    {{/if}}
                 </div>
             </div>
         </div>
@@ -318,7 +322,11 @@ export const SUPPORT_TEMPLATE = `<!DOCTYPE html>
                     <a href="/" class="text-gray-300 hover:text-white transition-colors">Home</a>
                     <a href="/about" class="text-gray-300 hover:text-white transition-colors">About</a>
                     <a href="/support" class="text-orange-400 font-semibold">Support</a>
+                    {{#if is_authenticated}}
+                    <a href="/dashboard/{{athlete_id}}" class="bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-lg font-semibold transition-colors">Dashboard</a>
+                    {{else}}
                     <a href="/auth" class="bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-lg font-semibold transition-colors">Get Started</a>
+                    {{/if}}
                 </div>
             </div>
         </div>
@@ -740,7 +748,11 @@ export const PRIVACY_TEMPLATE = `<!DOCTYPE html>
                     <a href="/" class="text-gray-300 hover:text-white transition-colors">Home</a>
                     <a href="/about" class="text-gray-300 hover:text-white transition-colors">About</a>
                     <a href="/support" class="text-gray-300 hover:text-white transition-colors">Support</a>
+                    {{#if is_authenticated}}
+                    <a href="/dashboard/{{athlete_id}}" class="bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-lg font-semibold transition-colors">Dashboard</a>
+                    {{else}}
                     <a href="/auth" class="bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-lg font-semibold transition-colors">Get Started</a>
+                    {{/if}}
                 </div>
             </div>
         </div>
@@ -1128,7 +1140,11 @@ export const TERMS_TEMPLATE = `<!DOCTYPE html>
                     <a href="/" class="text-gray-300 hover:text-white transition-colors">Home</a>
                     <a href="/about" class="text-gray-300 hover:text-white transition-colors">About</a>
                     <a href="/support" class="text-gray-300 hover:text-white transition-colors">Support</a>
+                    {{#if is_authenticated}}
+                    <a href="/dashboard/{{athlete_id}}" class="bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-lg font-semibold transition-colors">Dashboard</a>
+                    {{else}}
                     <a href="/auth" class="bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-lg font-semibold transition-colors">Get Started</a>
+                    {{/if}}
                 </div>
             </div>
         </div>
