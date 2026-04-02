@@ -2,6 +2,8 @@
 // Swiss typography, industrial design, monochrome, OLED black
 // Fonts: Doto (display), Space Grotesk (body), Space Mono (labels/data)
 
+import { STRAVA_LOGO_WHITE_SVG, STRAVA_POWERED_BADGE_SVG } from './strava-brand';
+
 // Shared Nothing CSS (injected into all templates)
 const NOTHING_HEAD = `
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -60,6 +62,7 @@ const NOTHING_CSS = `
 // NOTHING_NAV is now generated dynamically via {{nothing_nav}} template variable
 // See buildNothingNav() in index.ts
 
+
 const NOTHING_FOOTER = `
     <footer>
         <div class="container">
@@ -72,7 +75,7 @@ const NOTHING_FOOTER = `
                     <a href="/">Classic</a>
                 </div>
                 <a href="https://www.strava.com" target="_blank" rel="noopener noreferrer">
-                    <img src="https://www.strava.com/assets/api/badge-strava-light.svg" alt="Powered by Strava" style="height: 28px; opacity: 0.5; transition: opacity 200ms ease-out;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='0.5'">
+                    <span style="height: 28px; opacity: 0.5; transition: opacity 200ms ease-out; display: inline-block;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='0.5'">${STRAVA_POWERED_BADGE_SVG}</span>
                 </a>
             </div>
             <div class="footer-bottom">
@@ -494,7 +497,7 @@ export const NOTHING_LANDING_TEMPLATE = `<!DOCTYPE html>
     <section style="padding: 48px 0;">
         <div class="container" style="text-align: center;">
             <a href="{{dashboard_link}}" style="display: inline-flex; align-items: center; gap: 12px; background: #FC4C02; color: #fff; font-family: var(--font-mono); font-size: 14px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; text-decoration: none; padding: 14px 32px; border-radius: 0; transition: background 200ms ease-out;" onmouseover="this.style.background='#e04400'" onmouseout="this.style.background='#FC4C02'">
-                <img src="https://www.strava.com/assets/api/logo-strava-white.svg" alt="Strava" style="height: 18px;">
+                <span style="height: 18px; display: inline-flex; align-items: center;">${STRAVA_LOGO_WHITE_SVG}</span>
                 View Dashboard
             </a>
         </div>
@@ -502,8 +505,8 @@ export const NOTHING_LANDING_TEMPLATE = `<!DOCTYPE html>
     {{else}}
     <section style="padding: 48px 0;">
         <div class="container" style="text-align: center;">
-            <a href="/auth" style="display: inline-flex; align-items: center; gap: 12px; background: #FC4C02; color: #fff; font-family: var(--font-mono); font-size: 14px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; text-decoration: none; padding: 14px 32px; border-radius: 0; transition: background 200ms ease-out;" onmouseover="this.style.background='#e04400'" onmouseout="this.style.background='#FC4C02'">
-                <img src="https://www.strava.com/assets/api/logo-strava-white.svg" alt="Strava" style="height: 18px;">
+            <a href="/auth?design=nothing" style="display: inline-flex; align-items: center; gap: 12px; background: #FC4C02; color: #fff; font-family: var(--font-mono); font-size: 14px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; text-decoration: none; padding: 14px 32px; border-radius: 0; transition: background 200ms ease-out;" onmouseover="this.style.background='#e04400'" onmouseout="this.style.background='#FC4C02'">
+                <span style="height: 18px; display: inline-flex; align-items: center;">${STRAVA_LOGO_WHITE_SVG}</span>
                 Connect with Strava
             </a>
         </div>
@@ -540,7 +543,7 @@ export const NOTHING_LANDING_TEMPLATE = `<!DOCTYPE html>
                     <a href="/">Classic</a>
                 </div>
                 <a href="https://www.strava.com" target="_blank" rel="noopener noreferrer">
-                    <img src="https://www.strava.com/assets/api/badge-strava-light.svg" alt="Powered by Strava" style="height: 28px; opacity: 0.5; transition: opacity 200ms ease-out;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='0.5'">
+                    <span style="height: 28px; opacity: 0.5; transition: opacity 200ms ease-out; display: inline-block;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='0.5'">${STRAVA_POWERED_BADGE_SVG}</span>
                 </a>
             </div>
             <div class="footer-bottom">
@@ -800,6 +803,7 @@ export const NOTHING_DASHBOARD_TEMPLATE = `<!DOCTYPE html>
             </div>
             <div style="margin-left: auto;">
                 <form action="/logout" method="post" style="display: inline;">
+                    <input type="hidden" name="design" value="nothing">
                     <button type="submit" class="logout-btn">Logout</button>
                 </form>
             </div>

@@ -31,6 +31,7 @@ export class AuthHandler {
   async initiateAuth(c: Context) {
     try {
       const sessionId = c.req.query('session'); // Get session ID if provided
+      const design = c.req.query('design') || null; // Track which design variant to return to
       const state = generateState();
       const currentDomain = this.getCurrentDomain(c);
 
@@ -40,6 +41,7 @@ export class AuthHandler {
         pending: true,
         sessionId: sessionId || null,
         origin: currentDomain,
+        design,
         created_at: Math.floor(Date.now() / 1000)
       };
       await this.env.STRAVA_SESSIONS.put(`state:${state}`, JSON.stringify(stateData), { expirationTtl: 600 }); // 10 min expiry
@@ -118,6 +120,7 @@ export class AuthHandler {
         sessionId: string | null;
         created_at?: number;
         origin?: string;
+        design?: string | null;
         mcp_oauth_state?: string;
       };
       try {
@@ -126,6 +129,7 @@ export class AuthHandler {
           sessionId: string | null;
           created_at?: number;
           origin?: string;
+          design?: string | null;
           mcp_oauth_state?: string;
         };
       } catch (e) {
@@ -258,10 +262,12 @@ export class AuthHandler {
       }
 
       // Redirect to dashboard using athlete ID (cookie-based auth, no token in URL)
+      // Preserve design variant so Nothing users land on the Nothing dashboard
+      const dashSuffix = stateInfo.design === 'nothing' ? '/nothing' : '';
       return new Response(null, {
         status: 302,
         headers: {
-          'Location': `${flowOrigin}/dashboard/${tokenData.athlete.id}`,
+          'Location': `${flowOrigin}/dashboard/${tokenData.athlete.id}${dashSuffix}`,
           'Set-Cookie': cookie,
         },
       });
@@ -344,12 +350,26 @@ export class AuthHandler {
       }
 
       const cookie = deleteCookie('sid');
-      
+
+      // Determine where to redirect based on design variant
+      // The design param can come from a hidden form field (POST body) or query param
+      let design: string | null = null;
+      try {
+        const body = await c.req.parseBody();
+        design = (body.design as string) || null;
+      } catch {
+        // ignore parse errors
+      }
+      if (!design) {
+        design = c.req.query('design') || null;
+      }
+      const landingPath = design === 'nothing' ? '/nothing' : '/';
+
       // Redirect to landing page after successful logout
       return new Response(null, {
         status: 302,
         headers: {
-          'Location': '/',
+          'Location': landingPath,
           'Set-Cookie': cookie,
         },
       });
