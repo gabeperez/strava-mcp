@@ -1,5 +1,6 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { STRAVA_POWERED_BADGE_SVG } from './strava-brand';
 
 // Simple template engine for HTML rendering
 export class TemplateEngine {
@@ -512,7 +513,7 @@ export const LANDING_TEMPLATE = `<!DOCTYPE html>
             
             <div class="flex justify-center mb-4">
                 <a href="https://www.strava.com" target="_blank" rel="noopener noreferrer">
-                    <img src="https://www.strava.com/assets/api/badge-strava-light.svg" alt="Powered by Strava" class="h-8 opacity-70 hover:opacity-100 transition-opacity">
+                    <span class="h-8 opacity-70 hover:opacity-100 transition-opacity inline-block">${STRAVA_POWERED_BADGE_SVG}</span>
                 </a>
             </div>
             <p class="text-sm">
@@ -1639,7 +1640,7 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
     <footer class="bg-gray-950 py-6 mt-8">
         <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
             <a href="https://www.strava.com" target="_blank" rel="noopener noreferrer">
-                <img src="https://www.strava.com/assets/api/badge-strava-light.svg" alt="Powered by Strava" class="h-8 opacity-70 hover:opacity-100 transition-opacity">
+                <span class="h-8 opacity-70 hover:opacity-100 transition-opacity inline-block">${STRAVA_POWERED_BADGE_SVG}</span>
             </a>
             <p class="text-xs text-gray-600 text-center">
                 SportsMCP is not affiliated with, endorsed, or sponsored by Strava.<br>

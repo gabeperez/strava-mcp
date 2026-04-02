@@ -8,6 +8,7 @@ import { SportsMCPServer, handleMCPOverSSE } from './mcp-server';
 import { TemplateEngine, LANDING_TEMPLATE, DASHBOARD_TEMPLATE } from './templates';
 import { ABOUT_TEMPLATE, SUPPORT_TEMPLATE, PRIVACY_TEMPLATE, TERMS_TEMPLATE } from './legal-templates';
 import { NOTHING_LANDING_TEMPLATE, NOTHING_DASHBOARD_TEMPLATE, NOTHING_ABOUT_TEMPLATE, NOTHING_SUPPORT_TEMPLATE, NOTHING_PRIVACY_TEMPLATE, NOTHING_TERMS_TEMPLATE } from './nothing-templates';
+import { STRAVA_LOGO_WHITE_SVG } from './strava-brand';
 import { StravaWebhookHandler } from './webhook';
 import { sendNotification, sendNotificationToAll, NotificationConfig, NotificationProvider, PROVIDER_INFO, maskKey } from './notifications';
 
@@ -112,7 +113,7 @@ function buildNothingNav(isAuth: boolean, athleteId: string | null, useNothingLi
   const supportHref = useNothingLinks ? '/support/nothing' : '/support';
   const authLink = isAuth
     ? `<a href="/dashboard/${athleteId}/nothing">Dashboard</a>`
-    : `<a href="/auth" style="display: inline-flex; align-items: center; gap: 6px;"><img src="https://www.strava.com/assets/api/logo-strava-white.svg" alt="Strava" style="height: 14px; opacity: 0.7;"> Connect</a>`;
+    : `<a href="/auth?design=nothing" style="display: inline-flex; align-items: center; gap: 6px;"><span style="height: 14px; display: inline-flex; align-items: center; opacity: 0.7;">${STRAVA_LOGO_WHITE_SVG}</span> Connect</a>`;
 
   return `<nav>
         <div class="container">
@@ -178,8 +179,8 @@ app.get('/nothing', (c) => {
   const currentDomain = getCurrentDomain(c);
   const auth = getAuthState(c);
   const nothingNav = buildNothingNav(auth.is_authenticated, auth.athlete_id);
-  const mcp_card_link = auth.is_authenticated ? `/dashboard/${auth.athlete_id}/nothing` : '/auth';
-  const dashboard_link = auth.is_authenticated ? `/dashboard/${auth.athlete_id}/nothing` : '/auth';
+  const mcp_card_link = auth.is_authenticated ? `/dashboard/${auth.athlete_id}/nothing` : '/auth?design=nothing';
+  const dashboard_link = auth.is_authenticated ? `/dashboard/${auth.athlete_id}/nothing` : '/auth?design=nothing';
   const html = templates.render('nothing-landing', { base_url: currentDomain, nothing_nav: nothingNav, mcp_card_link, dashboard_link, ...auth });
   return c.html(html);
 });
@@ -1028,12 +1029,12 @@ app.get('/dashboard/:athleteId/nothing', async (c) => {
   try {
     const athleteId = c.req.param('athleteId');
     const data = await buildDashboardData(c, athleteId);
-    if (!data) return c.redirect('/auth');
+    if (!data) return c.redirect('/auth?design=nothing');
     data.nothing_nav = buildNothingNav(true, athleteId);
     return c.html(templates.render('nothing-dashboard', data));
   } catch (error) {
     console.error('Nothing dashboard error:', error);
-    return c.redirect('/auth');
+    return c.redirect('/auth?design=nothing');
   }
 });
 
