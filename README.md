@@ -1,4 +1,4 @@
-# 🏃 SportsMCP — Strava for Any AI Agent
+# 🏃 SportMCP — Strava for Any AI Agent
 
 > **Production-ready MCP server** for Strava — works with Claude Desktop, Cursor, Windsurf, Cline, Continue.dev, Poke, and any MCP-compatible AI agent.
 
@@ -12,7 +12,7 @@
 
 A complete **[Model Context Protocol](https://modelcontextprotocol.io/) server** that gives any AI assistant secure, read-only access to your personal Strava fitness data. Deploy once to Cloudflare Workers, authenticate with Strava, and paste your personal MCP URL into whichever AI tools you use.
 
-> Compatible with Strava. SportsMCP is not affiliated with, endorsed, or sponsored by Strava.
+> Compatible with Strava. SportMCP is not affiliated with, endorsed, or sponsored by Strava.
 
 ## ✨ Features
 
@@ -125,7 +125,7 @@ The script automatically:
 
 **Step 5: Visit Your Dashboard**
 
-1. Open the URL the script gave you (looks like `https://sportsmcp.yourname.workers.dev`)
+1. Open the URL the script gave you (looks like `https://sportmcp.yourname.workers.dev`)
 2. Click "Authenticate with Strava"
 3. You'll see your beautiful dashboard with:
    - 🏃 Recent activities
@@ -141,7 +141,7 @@ Copy your personal MCP URL from the dashboard and add it to your preferred AI ag
 
 ## 🤖 Connecting to AI Agents
 
-SportsMCP uses the standard **Model Context Protocol**, so it works with any MCP-compatible client. Your personal URL looks like:
+SportMCP uses the standard **Model Context Protocol**, so it works with any MCP-compatible client. Your personal URL looks like:
 ```
 https://your-worker.workers.dev/mcp?token=YOUR_TOKEN
 ```
@@ -151,7 +151,7 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
 ```json
 {
   "mcpServers": {
-    "sportsmcp": {
+    "sportmcp": {
       "url": "https://your-worker.workers.dev/mcp?token=YOUR_TOKEN"
     }
   }
@@ -164,7 +164,7 @@ Go to **Settings → Cursor Settings → MCP** and add:
 ```json
 {
   "mcpServers": {
-    "sportsmcp": {
+    "sportmcp": {
       "url": "https://your-worker.workers.dev/mcp?token=YOUR_TOKEN"
     }
   }
@@ -183,7 +183,7 @@ Add to `~/.continue/config.json`:
 {
   "mcpServers": [
     {
-      "name": "sportsmcp",
+      "name": "sportmcp",
       "transport": {
         "type": "streamable-http",
         "url": "https://your-worker.workers.dev/mcp?token=YOUR_TOKEN"

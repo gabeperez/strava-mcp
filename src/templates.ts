@@ -127,13 +127,13 @@ export const LANDING_TEMPLATE = `<!DOCTYPE html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SportsMCP — Strava MCP Server</title>
+  <title>SportMCP — Strava MCP Server</title>
   <style>${DEV_CSS}</style>
 </head>
 <body>
   <nav>
     <div class="inner">
-      <a href="/" class="brand">SportsMCP</a>
+      <a href="/" class="brand">SportMCP</a>
       <div class="links">
         <a href="https://github.com/gabeperez/strava-mcp">GitHub</a>
         {{#if is_authenticated}}<a href="/dashboard/{{athlete_id}}">Dashboard</a>{{else}}<a href="/auth">Connect Strava</a>{{/if}}
@@ -171,7 +171,7 @@ node scripts/setup.js</code></pre>
       <p>After deploying, add your MCP URL to any compatible client:</p>
       <pre><code>{
   "mcpServers": {
-    "sportsmcp": {
+    "sportmcp": {
       "url": "https://your-worker.workers.dev/mcp?token=YOUR_TOKEN"
     }
   }
@@ -193,13 +193,13 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard — SportsMCP</title>
+  <title>Dashboard — SportMCP</title>
   <style>${DEV_CSS}</style>
 </head>
 <body>
   <nav>
     <div class="inner">
-      <a href="/" class="brand">SportsMCP</a>
+      <a href="/" class="brand">SportMCP</a>
       <div class="links">
         <a href="https://github.com/gabeperez/strava-mcp">GitHub</a>
         <form method="POST" action="/logout" style="display: inline;"><button type="submit" class="btn-secondary" style="background: none; border: none; color: #888; cursor: pointer; font-size: 0.9rem;">Logout</button></form>
@@ -232,7 +232,7 @@ export const DASHBOARD_TEMPLATE = `<!DOCTYPE html>
       <p>Paste into your AI agent's MCP settings:</p>
       <pre><code>{
   "mcpServers": {
-    "sportsmcp": {
+    "sportmcp": {
       "url": "{{mcp_url}}"
     }
   }

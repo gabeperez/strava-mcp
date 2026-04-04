@@ -12,7 +12,7 @@ const legalPage = (title: string, body: string) => `<!DOCTYPE html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${title} — SportsMCP</title>
+  <title>${title} — SportMCP</title>
   <style>
     body { font-family: system-ui, sans-serif; background: #0a0a0a; color: #e0e0e0; line-height: 1.6; margin: 0; }
     a { color: #FC4C02; }
@@ -25,7 +25,7 @@ const legalPage = (title: string, body: string) => `<!DOCTYPE html>
   </style>
 </head>
 <body>
-  <nav><div class="inner"><a href="/" class="brand">SportsMCP</a></div></nav>
+  <nav><div class="inner"><a href="/" class="brand">SportMCP</a></div></nav>
   <div class="container">
     <h1>${title}</h1>
     ${body}
@@ -34,13 +34,13 @@ const legalPage = (title: string, body: string) => `<!DOCTYPE html>
 </html>`;
 
 export const NOTHING_ABOUT_TEMPLATE = legalPage('About',
-  '<p>SportsMCP is an open-source Model Context Protocol server for Strava. It gives any MCP-compatible AI assistant secure, read-only access to your fitness data.</p><p>See the <a href="https://github.com/gabeperez/strava-mcp">GitHub repository</a> for documentation and source code.</p>');
+  '<p>SportMCP is an open-source Model Context Protocol server for Strava. It gives any MCP-compatible AI assistant secure, read-only access to your fitness data.</p><p>See the <a href="https://github.com/gabeperez/strava-mcp">GitHub repository</a> for documentation and source code.</p>');
 
 export const NOTHING_SUPPORT_TEMPLATE = legalPage('Support',
-  '<p>For help with SportsMCP, please <a href="https://github.com/gabeperez/strava-mcp/issues">open a GitHub issue</a>.</p><p>Common issues are covered in the <a href="https://github.com/gabeperez/strava-mcp#-troubleshooting">troubleshooting section</a> of the README.</p>');
+  '<p>For help with SportMCP, please <a href="https://github.com/gabeperez/strava-mcp/issues">open a GitHub issue</a>.</p><p>Common issues are covered in the <a href="https://github.com/gabeperez/strava-mcp#-troubleshooting">troubleshooting section</a> of the README.</p>');
 
 export const NOTHING_PRIVACY_TEMPLATE = legalPage('Privacy',
-  '<p>SportsMCP is self-hosted. Your Strava tokens are stored in your own Cloudflare KV namespace. No data is sent to third parties beyond the Strava API and any notification providers you configure.</p><p>When you deauthorize, all stored data is deleted within 48 hours per Strava API requirements.</p>');
+  '<p>SportMCP is self-hosted. Your Strava tokens are stored in your own Cloudflare KV namespace. No data is sent to third parties beyond the Strava API and any notification providers you configure.</p><p>When you deauthorize, all stored data is deleted within 48 hours per Strava API requirements.</p>');
 
 export const NOTHING_TERMS_TEMPLATE = legalPage('Terms',
-  '<p>SportsMCP is provided under the <a href="https://github.com/gabeperez/strava-mcp/blob/main/LICENSE">MIT License</a>. Use at your own risk. This project is not affiliated with Strava.</p>');
+  '<p>SportMCP is provided under the <a href="https://github.com/gabeperez/strava-mcp/blob/main/LICENSE">MIT License</a>. Use at your own risk. This project is not affiliated with Strava.</p>');

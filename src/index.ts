@@ -4,7 +4,7 @@ import { AuthHandler } from './auth';
 import { AuthMiddleware } from './middleware';
 import { getCookieValue, createCookie, generateState } from './session';
 import { StravaApiHandlers } from './api';
-import { SportsMCPServer, handleMCPOverSSE } from './mcp-server';
+import { SportMCPServer, handleMCPOverSSE } from './mcp-server';
 import { TemplateEngine, LANDING_TEMPLATE, DASHBOARD_TEMPLATE } from './templates';
 import { ABOUT_TEMPLATE, SUPPORT_TEMPLATE, PRIVACY_TEMPLATE, TERMS_TEMPLATE } from './legal-templates';
 import { NOTHING_LANDING_TEMPLATE, NOTHING_DASHBOARD_TEMPLATE, NOTHING_ABOUT_TEMPLATE, NOTHING_SUPPORT_TEMPLATE, NOTHING_PRIVACY_TEMPLATE, NOTHING_TERMS_TEMPLATE } from './nothing-templates';
@@ -120,7 +120,7 @@ app.get('/', (c) => {
   // If requesting JSON (for API or MCP clients), return server info
   if (acceptHeader?.includes('application/json')) {
     return c.json({
-      name: 'SportsMCP',
+      name: 'SportMCP',
       version: '1.0.0',
       description: 'Model Context Protocol server for Strava API with OAuth authentication',
       protocol: 'mcp',
@@ -131,7 +131,7 @@ app.get('/', (c) => {
         }
       },
       serverInfo: {
-        name: 'SportsMCP',
+        name: 'SportMCP',
         version: '1.0.0'
       },
       endpoints: {
@@ -414,7 +414,7 @@ app.get('/sse', async (c) => {
 // Cloudflare Workers (no persistent memory across requests) we respond inline here.
 app.post('/messages', async (c) => {
   const env = c.env as Env;
-  const mcpServer = new SportsMCPServer(env);
+  const mcpServer = new SportMCPServer(env);
 
   try {
     const request = await c.req.json();
@@ -582,7 +582,7 @@ async function handleTestNotification(c: any) {
             if (act.pr_count && act.pr_count > 0) {
               lines.push(`🏆 ${act.pr_count} PR${act.pr_count > 1 ? 's' : ''}!`);
             }
-            recentActivityBlock = `\n\nHere is ${athleteFirstName}'s most recent Strava workout:\n\n${lines.join('\n')}\n\nPlease reply acknowledging this test ping from SportsMCP and confirm you can see the workout data above.`;
+            recentActivityBlock = `\n\nHere is ${athleteFirstName}'s most recent Strava workout:\n\n${lines.join('\n')}\n\nPlease reply acknowledging this test ping from SportMCP and confirm you can see the workout data above.`;
           }
         }
       } catch (_) {
@@ -591,8 +591,8 @@ async function handleTestNotification(c: any) {
     }
 
     const providerNames = notificationConfigs.map(c => PROVIDER_INFO[c.provider]?.name || c.provider);
-    const fallback = `\n\nSportsMCP gives your AI access to your full Strava history: recent activities, lap splits, heart rate zones, segment efforts, gear mileage, clubs, and more.\n\nPlease reply to confirm you received this and that the SportsMCP + Strava connection is active on your end.`;
-    const testMessage = `👋 Test ping from SportsMCP — your Strava data is now connected to your AI assistant.${recentActivityBlock || fallback}
+    const fallback = `\n\nSportMCP gives your AI access to your full Strava history: recent activities, lap splits, heart rate zones, segment efforts, gear mileage, clubs, and more.\n\nPlease reply to confirm you received this and that the SportMCP + Strava connection is active on your end.`;
+    const testMessage = `👋 Test ping from SportMCP — your Strava data is now connected to your AI assistant.${recentActivityBlock || fallback}
 
 — Sent ${now}`;
 
@@ -1064,7 +1064,7 @@ app.get('/mcp', async (c) => {
         }
       },
       serverInfo: {
-        name: 'SportsMCP',
+        name: 'SportMCP',
         version: '1.0.0'
       },
       authenticated: true,
@@ -1075,7 +1075,7 @@ app.get('/mcp', async (c) => {
 // MCP JSON-RPC endpoint for direct calls
 app.post('/mcp', async (c) => {
   const env = c.env as Env;
-  const mcpServer = new SportsMCPServer(env);
+  const mcpServer = new SportMCPServer(env);
 
   try {
     // Check for personal MCP token (header or query param)

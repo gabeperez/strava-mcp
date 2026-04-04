@@ -2,7 +2,7 @@ import { env, createExecutionContext, waitOnExecutionContext } from 'cloudflare:
 import { describe, it, expect } from 'vitest';
 import worker from '../src';
 
-describe('SportsMCP worker', () => {
+describe('SportMCP worker', () => {
 	it('GET / returns HTML landing page', async () => {
 		const request = new Request<unknown, IncomingRequestCfProperties>('http://example.com/');
 		const ctx = createExecutionContext();
@@ -11,7 +11,7 @@ describe('SportsMCP worker', () => {
 		expect(response.status).toBe(200);
 		expect(response.headers.get('content-type')).toContain('text/html');
 		const text = await response.text();
-		expect(text).toContain('SportsMCP');
+		expect(text).toContain('SportMCP');
 	});
 
 	it('GET / with Accept: application/json returns server info', async () => {
@@ -23,7 +23,7 @@ describe('SportsMCP worker', () => {
 		await waitOnExecutionContext(ctx);
 		expect(response.status).toBe(200);
 		const json = await response.json() as any;
-		expect(json.name).toBe('SportsMCP');
+		expect(json.name).toBe('SportMCP');
 		expect(json.protocol).toBe('mcp');
 	});
 

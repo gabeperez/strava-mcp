@@ -30,7 +30,7 @@ interface MCPNotification {
 }
 
 // MCP Server implementation for Strava
-export class SportsMCPServer {
+export class SportMCPServer {
   private env: Env;
   private authMiddleware: AuthMiddleware;
 
@@ -151,7 +151,7 @@ export class SportsMCPServer {
           tools: {}
         },
         serverInfo: {
-          name: 'SportsMCP',
+          name: 'SportMCP',
           version: '1.0.0'
         }
       }
@@ -447,7 +447,7 @@ export class SportsMCPServer {
                 content: [
                   {
                     type: 'text',
-                    text: `🎉 **Welcome back, ${context.session.athlete.firstname}!**\n\nYour Strava account is connected and ready to use with SportsMCP.\n\n🏃 **Try asking:**\n• "Show me my last 10 activities"\n• "Break down the laps on my interval run"\n• "What are my heart rate and power zones?"\n• "How many miles are on my shoes?"\n• "Show my history on segment 12345"\n• "Find climbs near Boulder, Colorado"\n• "What clubs am I a member of?"\n\n📊 **21 tools:** activities, laps, streams, kudos, comments, segments, segment efforts, routes, clubs, gear, zones & stats — all powered by Strava.`
+                    text: `🎉 **Welcome back, ${context.session.athlete.firstname}!**\n\nYour Strava account is connected and ready to use with SportMCP.\n\n🏃 **Try asking:**\n• "Show me my last 10 activities"\n• "Break down the laps on my interval run"\n• "What are my heart rate and power zones?"\n• "How many miles are on my shoes?"\n• "Show my history on segment 12345"\n• "Find climbs near Boulder, Colorado"\n• "What clubs am I a member of?"\n\n📊 **21 tools:** activities, laps, streams, kudos, comments, segments, segment efforts, routes, clubs, gear, zones & stats — all powered by Strava.`
                   }
                 ]
               }
@@ -460,7 +460,7 @@ export class SportsMCPServer {
                 content: [
                   {
                     type: 'text',
-                    text: `👋 **Welcome to SportsMCP** — your Strava data for any AI agent.\n\nSportsMCP works with **Claude Desktop, Cursor, Windsurf, Cline, Continue.dev, Poke**, and any other MCP-compatible client.\n\n🔐 **Quick Setup:**\n1. Visit [${baseUrl}/auth](${baseUrl}/auth) and connect your Strava account\n2. Copy your personal MCP URL from the dashboard\n3. Paste it into your AI agent's MCP settings\n\n**Config format (works in all major clients):**\n\`\`\`json\n{\n  "mcpServers": {\n    "sportsmcp": {\n      "url": "${baseUrl}/mcp?token=YOUR_TOKEN"\n    }\n  }\n}\n\`\`\`\n\n🏃 **Once connected, you can ask:**\n• "Show me my recent activities"\n• "Break down the laps on my last run"\n• "What are my heart rate zones?"\n• "How many miles are on my gear?"\n• "Find popular segments near me"\n\n📊 **21 tools:** activities, laps, streams, segments, routes, clubs, gear, zones & stats — powered by Strava.\n\n🔒 **Privacy:** Your personal URL is unique to you. Data is fetched live, never stored or shared.`
+                    text: `👋 **Welcome to SportMCP** — your Strava data for any AI agent.\n\nSportMCP works with **Claude Desktop, Cursor, Windsurf, Cline, Continue.dev, Poke**, and any other MCP-compatible client.\n\n🔐 **Quick Setup:**\n1. Visit [${baseUrl}/auth](${baseUrl}/auth) and connect your Strava account\n2. Copy your personal MCP URL from the dashboard\n3. Paste it into your AI agent's MCP settings\n\n**Config format (works in all major clients):**\n\`\`\`json\n{\n  "mcpServers": {\n    "sportmcp": {\n      "url": "${baseUrl}/mcp?token=YOUR_TOKEN"\n    }\n  }\n}\n\`\`\`\n\n🏃 **Once connected, you can ask:**\n• "Show me my recent activities"\n• "Break down the laps on my last run"\n• "What are my heart rate zones?"\n• "How many miles are on my gear?"\n• "Find popular segments near me"\n\n📊 **21 tools:** activities, laps, streams, segments, routes, clubs, gear, zones & stats — powered by Strava.\n\n🔒 **Privacy:** Your personal URL is unique to you. Data is fetched live, never stored or shared.`
                   }
                 ]
               }
@@ -647,7 +647,7 @@ export class SportsMCPServer {
 // For the newer Streamable HTTP transport, use POST /mcp directly.
 export async function handleMCPOverSSE(c: Context) {
   const env = c.env as Env;
-  const mcpServer = new SportsMCPServer(env);
+  const mcpServer = new SportMCPServer(env);
 
   return streamSSE(c, async (stream) => {
     let context: any = {
