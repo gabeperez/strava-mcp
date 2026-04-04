@@ -31,7 +31,7 @@ app.use('*', async (c, next) => {
 // Root endpoint with basic info
 app.get('/', (c) => {
   return c.json({
-    name: 'SportsMCP Worker',
+    name: 'SportMCP Worker',
     version: '1.0.0',
     description: 'HTTPS endpoints for Strava MCP server with OAuth authentication',
     endpoints: {

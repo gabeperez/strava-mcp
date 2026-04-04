@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Generate SportsMCP app icon/logo."""
+"""Generate SportMCP app icon/logo."""
 
 from PIL import Image, ImageDraw, ImageFont
 import math
 import os
 
 def generate_logo(size=512, output_dir='.'):
-    """Generate a modern SportsMCP logo."""
+    """Generate a modern SportMCP logo."""
     img = Image.new('RGBA', (size, size), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
 
@@ -113,21 +113,21 @@ def generate_logo(size=512, output_dir='.'):
     os.makedirs(output_dir, exist_ok=True)
 
     # Main logo
-    logo_path = os.path.join(output_dir, 'sportsmcp-logo-512.png')
+    logo_path = os.path.join(output_dir, 'sportmcp-logo-512.png')
     img.save(logo_path, 'PNG')
     print(f"Saved: {logo_path}")
 
     # Strava requires various sizes
     for s in [256, 128, 64]:
         resized = img.resize((s, s), Image.LANCZOS)
-        path = os.path.join(output_dir, f'sportsmcp-logo-{s}.png')
+        path = os.path.join(output_dir, f'sportmcp-logo-{s}.png')
         resized.save(path, 'PNG')
         print(f"Saved: {path}")
 
     # Also save a square version without transparency for Strava upload
     flat = Image.new('RGB', (size, size), (24, 24, 27))
     flat.paste(img, (0, 0), img)
-    flat_path = os.path.join(output_dir, 'sportsmcp-logo-flat.png')
+    flat_path = os.path.join(output_dir, 'sportmcp-logo-flat.png')
     flat.save(flat_path, 'PNG')
     print(f"Saved: {flat_path} (no transparency, for Strava upload)")
 
